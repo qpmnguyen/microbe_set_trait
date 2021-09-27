@@ -1,0 +1,3 @@
+dada2:
+  script: script_dada2.R
+  store: store_dada2
