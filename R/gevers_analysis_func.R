@@ -10,4 +10,13 @@ process_db <- function(){
     dplyr::filter(superkingdom == "Bacteria")
   
   
+  
+  pathway_sets <- unique(trait_db$pathways)
+  
+  pathway_sets <- pathway_sets %>% map(~{str_split(.x, ",")}) %>% flatten() %>% flatten_chr() %>% 
+    map_chr(~{str_trim(.x)}) %>% unique()
+  
+  
+
+  
 }
