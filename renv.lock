@@ -62,6 +62,12 @@
       "Source": "Bioconductor",
       "Hash": "3379c69d49481e0676e1fb3c8d2caf76"
     },
+    "BiocVersion": {
+      "Package": "BiocVersion",
+      "Version": "3.13.1",
+      "Source": "Bioconductor",
+      "Hash": "94abf4508341d86378c2a78d219b3fca"
+    },
     "Biostrings": {
       "Package": "Biostrings",
       "Version": "2.60.2",
@@ -1176,10 +1182,5 @@
       "Source": "Bioconductor",
       "Hash": "fb9cf082f0e3c89e05a720003fa94450"
     }
-  },
-  "Python": {
-    "Version": "3.9.7",
-    "Type": "virtualenv",
-    "Name": "/Users/quangnguyen/miniconda3/envs/microbe_set_trait"
   }
 }
