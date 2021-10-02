@@ -2,6 +2,9 @@ library(tidyverse)
 library(phyloseq)
 library(BiocSet)
 library(taxizedb)
+library(reticulate)
+library(glue)
+library(ape)
 
 if (!file.exists(tdb_cache$list())){
   taxizedb::db_download_ncbi(verbose = FALSE, overwrite = FALSE)
@@ -82,16 +85,70 @@ process_db <- function(agg = FALSE, thresh = 0.95){
   return(trait_sets)
 }
 
+# do not run 
 process_metacyc <- function(){
-  # change db_path
-  db_path <- file.path("databases", "meta_25.1", "data")
-  if (length(list.files(db_path)) == 0){
-    stop("Need to download metaCyc pathways to db_path")
-  }
-  
-  class_file <- file.path(db_path, "classes.dat")
-  classes <- readr::read_file(class_file)
-  
-  
+  # please make sure pathway tools is running in the background
+  # The following commands did not work because it forces
+  # the current R console to be in the pathway-tools program
+  # with no easy way to exit
+  # pthway_tools_exec <- "~/pathway-tools"
+  # system(glue("{dir}/pathway-tools -lisp -python-local-only", 
+  #            dir = pthway_tools_exec))
+  Sys.setenv(RETICULATE_PYTHON = "~/miniconda3/envs/microbe_set_trait/bin/python3")
+  reticulate::source_python("python/metacyc.py")
+  # get_hierarchy and get_instances are python functions
+  subclass <- get_hierarchy()  
+  inst <- map(subclass, ~{
+    get_instances(.x)
+  })
+  names(inst) <- subclass
+  return(inst)
 }
 
+#' Load the gevers et al data set and reformat 
+load_and_format <- function(file_path = "data/gevers_dada2.rds"){
+  data <- readRDS(file = file_path)
+  otu_tab <- data$seqtab_nochim
+  tax_tab <- data$taxa
+  
+  # getting sequences 
+  seq <- colnames(otu_tab)
+  names(seq) <- paste0("ASV", 1:length(seq))
+  seq <- Biostrings::DNAStringSet(seq)
+  colnames(otu_tab) <- names(seq)
+  rownames(tax_tab) <- names(seq)
+  
+  # getting metadata 
+  metadata <- read_tsv(file = "metadata/gevers_metadata.txt")
+  samp_names_fmt <- map_chr(str_split(rownames(otu_tab), 
+                                      pattern = ".fastq.gz"), ~{ .x[1]})
+  rownames(otu_tab) <- samp_names_fmt
+  metadata <- metadata |> filter(sample_name %in% samp_names_fmt) |> 
+    select(sample_name, age, diagnosis) |> column_to_rownames(var = "sample_name")
+  
+  # stitch together using phyloseq
+  physeq <- phyloseq(
+    otu_table(otu_tab, taxa_are_rows = FALSE),
+    sample_data(metadata),
+    tax_table(tax_tab),
+    seq
+  )
+  
+  # let's do some filtering!  
+  #physeq <- physeq |> 
+  #  filter_taxa(function(x) sum(x > 0) > (0.1 * length(x)), TRUE)
+  
+  return(physeq)
+}
+
+export_picrust <- function(physeq){
+  Biostrings::writeXStringSet(refseq(physeq), filepath = "data/gevers_seq.fa")
+  otu <- t(as(otu_table(physeq), "matrix"))
+  otu_biom <- biomformat::make_biom(data = otu)
+  biomformat::write_biom(otu_biom, "data/gevers.biom")
+}
+
+
+perform_picrust <- function(){
+  Sys.setenv(RETICULATE_PYTHON = "~/miniconda3/envs/qiime2-2021.2/bin/python3")
+}
