@@ -7,3 +7,6 @@ databases/
 
 store_*/
 large_files/
+.nextflow/
+.nextflow.log*
+work/

@@ -1,0 +1,14 @@
+digraph "flowchart" {
+p0 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.fromPath"];
+p2 [label="place_seqs"];
+p0 -> p2 [label="biom"];
+
+p1 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.fromPath"];
+p2 [label="place_seqs"];
+p1 -> p2 [label="seqs"];
+
+p2 [label="place_seqs"];
+p3 [shape=point];
+p2 -> p3 [label="placed_tree"];
+
+}
