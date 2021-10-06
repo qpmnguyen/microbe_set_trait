@@ -1,0 +1,10 @@
+name: picrust_2.4.1
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - picrust2=2.4.1
+  - nextflow=21.04.0
+  - graphviz
+prefix: /Users/quangnguyen/miniconda3/envs/picrust_2.4.1
