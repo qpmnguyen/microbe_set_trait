@@ -10,3 +10,4 @@ large_files/
 .nextflow/
 .nextflow.log*
 work/
+picrust2_tmp/
