@@ -2,7 +2,7 @@
 
 params.threads = 1
 biom_file = Channel.fromPath("data/gevers_biom.biom")
-seqs_file = Channel.fromPath("gevers_seq.fa")
+seqs_file = Channel.fromPath("data/gevers_seq.fa")
 
 process place_seqs {
     publishDir 'picrust2_tmp/', mode: 'copy'
@@ -40,25 +40,27 @@ process hidden_state {
 }
 
 process metagene_pred {
+    echo true
     publishDir 'picrust2_tmp', mode: 'copy'
     input: 
     file biom from biom_file 
     file marker from pred_marker
     file enzyme from pred_EC 
     output: 
-    file 'EC_metagenome_out/pred_metagenome_strat.tsv.gz' into output_EC, output_EC_desc 
+    file 'EC_metagenome_out/pred_metagenome_contrib.tsv.gz' into output_EC, output_EC_desc 
+    file 'EC_metagenome_out/pred_metagenome_unstrat.tsv.gz' into output_EC_unstrat
     script: 
         """
         metagenome_pipeline.py -i $biom \
-        -m ${pred_marker} \
-        -f ${pred_EC} \
+        -m $marker \
+        -f $enzyme \
         -o EC_metagenome_out \
-        --strat_out \
+        --strat_out
         """
     stub:
         """
         mkdir -p EC_metagenome_out
-        touch EC_metagenome_out/pred_metagenome_strat.tsv.gz
+        touch EC_metagenome_out/pred_metagenome_contrib.tsv.gz
         """
 }
 
@@ -68,7 +70,8 @@ process pathway_abund {
     input:
     file pred_EC from output_EC 
     output:
-    file "pathways_out/path_abun_strat.tsv.gz" into path_inferred
+    file "pathways_out/path_abun_contrib.tsv.gz" into path_inferred
+    file "pathways_out/path_abun_unstrat.tsv.gz" into path_unstrat 
     script:
         """
         pathway_pipeline.py -i ${pred_EC}\
@@ -78,7 +81,7 @@ process pathway_abund {
     stub:
         """
         mkdir -p pathways_out
-        touch pathways_out/path_abun_strat.tsv.gz
+        touch pathways_out/path_abun_contrib.tsv.gz
         """
 }
 
@@ -88,25 +91,26 @@ process add_description {
     input: 
     file path_ab from path_inferred 
     file pred_EC from output_EC_desc 
+    file pred_EC_unstrat from output_EC_unstrat
     output: 
-    file "pathways_out/path_abun_strat_desc.tsv.gz" 
-    file "EC_metagenome_out/pred_metagenome_strat_desc.tsv.gz"
+    file "pathways_out/path_abun_contrib_desc.tsv.gz" 
+    file "EC_metagenome_out/pred_metagenome_contrib_desc.tsv.gz"
     script:
     """
     add_descriptions.py -i ${path_ab} \
-    -m EC \
-    -o pathways_out/path_abun_strat_desc.tsv.gz
-    
-    add_descriptions.py -i ${pred_EC} \
     -m METACYC \
-    -o EC_metagenome_out/pred_metagenome_strat_desc.tsv.gz
+    -o pathways_out/path_abun_contrib_desc.tsv.gz
+    
+    add_descriptions.py -i ${pred_EC_unstrat} \
+    -m EC \
+    -o EC_metagenome_out/pred_metagenome_unstrat_desc.tsv.gz
     """
     stub:
     """
     mkdir -p pathways_out/
     mkdir -p EC_metagenome_out/
-    touch pathways_out/path_abun_strat_desc.tsv.gz
-    touch EC_metagenome_out/pred_metagenome_strat_desc.tsv.gz
+    touch pathways_out/path_abun_contrib_desc.tsv.gz
+    touch EC_metagenome_out/pred_metagenome_contrib_desc.tsv.gz
     """
 }
 
