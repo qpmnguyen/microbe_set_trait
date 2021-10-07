@@ -107,7 +107,7 @@ process add_description {
     -m METACYC \
     -o pathways_out/path_abun_unstrat_desc.tsv.gz
     
-    add_descriptions.py -i ${ab_ec} \
+    add_descriptions.py -i ${ab_EC} \
     -m EC \
     -o EC_metagenome_out/pred_metagenome_unstrat_desc.tsv.gz
     """
