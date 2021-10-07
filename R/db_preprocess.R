@@ -62,7 +62,6 @@ process_db <- function(agg = FALSE, thresh = 0.95){
   trait_db <- read.table(file = "data/condensed_species_NCBI.txt", sep = ",", header = TRUE)
   metadata <- colnames(trait_db)[1:8]
   traits <- c("metabolism", "pathways", "carbon_substrates", "sporulation")
-  
   # restrict databases to certain types of traits 
   trait_db <- trait_db |> as_tibble() |>
     select(all_of(metadata), all_of(traits)) |> 

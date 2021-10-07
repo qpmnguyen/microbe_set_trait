@@ -47,8 +47,8 @@ process metagene_pred {
     file marker from pred_marker
     file enzyme from pred_EC 
     output: 
-    file 'EC_metagenome_out/pred_metagenome_contrib.tsv.gz' into output_EC, output_EC_desc 
-    file 'EC_metagenome_out/pred_metagenome_unstrat.tsv.gz' into output_EC_unstrat
+    file 'EC_metagenome_out/pred_metagenome_contrib.tsv.gz' into out_EC 
+    file 'EC_metagenome_out/pred_metagenome_unstrat.tsv.gz' into out_EC_unstrat, out_EC_desc_unstrat
     script: 
         """
         metagenome_pipeline.py -i $biom \
@@ -61,6 +61,7 @@ process metagene_pred {
         """
         mkdir -p EC_metagenome_out
         touch EC_metagenome_out/pred_metagenome_contrib.tsv.gz
+        touch EC_metagenome_out/pred_metagenome_unstrat.tsv.gz
         """
 }
 
@@ -68,13 +69,18 @@ process pathway_abund {
     echo true 
     publishDir 'picrust2_tmp', mode: 'copy'
     input:
-    file pred_EC from output_EC 
+    file pred_EC from out_EC 
+    file pred_EC_unstrat from out_EC_unstrat
     output:
-    file "pathways_out/path_abun_contrib.tsv.gz" into path_inferred
-    file "pathways_out/path_abun_unstrat.tsv.gz" into path_unstrat 
+    file "pathways_out/path_abun_contrib.tsv.gz" into out_path
+    file "pathways_out/path_abun_unstrat.tsv.gz" into out_path_unstrat 
     script:
         """
         pathway_pipeline.py -i ${pred_EC}\
+        -o pathways_out \
+        -p ${params.threads}
+
+        pathway_pipeline.py -i ${pred_EC_unstrat} \
         -o pathways_out \
         -p ${params.threads}
         """
@@ -82,6 +88,7 @@ process pathway_abund {
         """
         mkdir -p pathways_out
         touch pathways_out/path_abun_contrib.tsv.gz
+        touch pathways_out/path_abun_unstrat.tsv.gz
         """
 }
 
@@ -89,19 +96,18 @@ process add_description {
     echo true 
     publishDir 'picrust2_tmp', mode: 'copy'
     input: 
-    file path_ab from path_inferred 
-    file pred_EC from output_EC_desc 
-    file pred_EC_unstrat from output_EC_unstrat
+    file ab_path from out_path_unstrat
+    file ab_EC from out_EC_desc_unstrat
     output: 
-    file "pathways_out/path_abun_contrib_desc.tsv.gz" 
-    file "EC_metagenome_out/pred_metagenome_contrib_desc.tsv.gz"
+    file "pathways_out/path_abun_unstrat_desc.tsv.gz" 
+    file "EC_metagenome_out/pred_metagenome_unstrat_desc.tsv.gz"
     script:
     """
-    add_descriptions.py -i ${path_ab} \
+    add_descriptions.py -i ${ab_path} \
     -m METACYC \
-    -o pathways_out/path_abun_contrib_desc.tsv.gz
+    -o pathways_out/path_abun_unstrat_desc.tsv.gz
     
-    add_descriptions.py -i ${pred_EC_unstrat} \
+    add_descriptions.py -i ${ab_ec} \
     -m EC \
     -o EC_metagenome_out/pred_metagenome_unstrat_desc.tsv.gz
     """
@@ -109,8 +115,8 @@ process add_description {
     """
     mkdir -p pathways_out/
     mkdir -p EC_metagenome_out/
-    touch pathways_out/path_abun_contrib_desc.tsv.gz
-    touch EC_metagenome_out/pred_metagenome_contrib_desc.tsv.gz
+    touch pathways_out/path_abun_unstrat_desc.tsv.gz
+    touch EC_metagenome_out/pred_metagenome_unstrat_desc.tsv.gz
     """
 }
 
