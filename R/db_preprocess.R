@@ -45,8 +45,10 @@ retr_sets <- function(db, trait_vec, filt_term, id_col, genus_agg = FALSE, thres
         summarise(t_count = sum(t_bool, na.rm = TRUE), n = n()) |> 
         mutate(prop = t_count/n) |> 
         filter(prop >= threshold) |> 
-        mutate(ncbi_id = call_id(genus)) |> 
-        pull(ncbi_id) |> as.character()
+        mutate(ncbi_id = list(call_id(genus))) |>
+        pull(ncbi_id) |>
+        flatten_chr()
+        
     } else {
       db_inter |> filter(t_bool == TRUE) |> pull(!!sym(id_col)) |> as.character()
     }
