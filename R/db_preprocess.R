@@ -17,8 +17,9 @@ if (!file.exists(tdb_cache$list())){
 call_id <- function(ids){
   ncbi <- map_chr(ids, ~{
     res <- name2taxid(.x, out_type = "summary")
-    return(as.character(res[1,2]))
+    return(pull(res, "id"))
   })
+  print(ncbi)
   return(ncbi)
 }
 
@@ -38,7 +39,7 @@ retr_sets <- function(db, trait_vec, filt_term, id_col, genus_agg = FALSE, thres
         mutate(t_bool = str_detect(string = !!sym(filt_term), pattern = .x)) |> 
         ungroup() 
     } else{
-      db_inter <- db |> mutate(t_bool = !!sym(filt_term) == .x)
+      db_inter <- db |> mutate(t_bool = ifelse(!!sym(filt_term) == .x, TRUE, FALSE))
     }
     if (genus_agg == TRUE){
       db_inter |> group_by(genus) |> 
@@ -48,7 +49,6 @@ retr_sets <- function(db, trait_vec, filt_term, id_col, genus_agg = FALSE, thres
         mutate(ncbi_id = list(call_id(genus))) |>
         pull(ncbi_id) |>
         flatten_chr()
-        
     } else {
       db_inter |> filter(t_bool == TRUE) |> pull(!!sym(id_col)) |> as.character()
     }
@@ -108,3 +108,6 @@ process_metacyc <- function(){
 }
 
 
+test <- retr_sets(trait_db, trait_test, 
+          filt_term = "metabolism", 
+          id_col = "species_tax_id", genus_agg = TRUE, threshold= 0.95)

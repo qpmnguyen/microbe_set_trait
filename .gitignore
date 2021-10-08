@@ -11,3 +11,4 @@ large_files/
 .nextflow.log*
 work/
 picrust2_tmp/
+prototype.R
