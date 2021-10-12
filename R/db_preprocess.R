@@ -7,7 +7,7 @@ library(taxizedb)
 library(reticulate)
 library(glue)
 
-if (!file.exists(tdb_cache$list())){
+if (length(tdb_cache$list()) == 0){
   taxizedb::db_download_ncbi(verbose = FALSE, overwrite = FALSE)
 }
 
@@ -93,7 +93,7 @@ get_trait_list <- function(trait_db){
     t_vec <- unique(trait_db |> pull(!!sym(.x)))
     if (.x %in% c("pathways", "carbon_substrates")){
       t_list <- map(t_vec, ~ str_split(.x, ",")) |> flatten() |> flatten_chr()
-      t_vec <- map_chr(t_list, ~ str_trim(.x)) |> unique() |> na.omit()
+      t_vec <- map_chr(t_list, ~ str_trim(.x)) |> unique() |> na.omit() |> as.vector()
     } else {
       t_vec <- na.omit(t_vec)
     }
@@ -130,4 +130,6 @@ process_metacyc <- function(){
   names(inst) <- subclass
   return(inst)
 }
+
+
 
