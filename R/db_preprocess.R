@@ -6,6 +6,7 @@ library(BiocSet)
 library(taxizedb)
 library(reticulate)
 library(glue)
+library(dbplyr)
 
 if (length(tdb_cache$list()) == 0){
   taxizedb::db_download_ncbi(verbose = FALSE, overwrite = FALSE)
@@ -59,9 +60,8 @@ retr_sets <- function(db, trait_vec, filt_term,
     if (genus_agg == TRUE){
       db_inter |> group_by(genus) |> 
         summarise(t_count = sum(t_bool, na.rm = TRUE), n = n()) |> 
-        mutate(prop = t_count/n) |> 
-        filter(prop >= threshold) |> 
         mutate(ncbi_id = call_id(genus)) |> 
+        rowwise() |> mutate(g_rep = test_genus(ncbi_id)) |> ungroup() |>
         pull(ncbi_id) |>
         flatten_chr()
     } else {
@@ -131,5 +131,49 @@ process_metacyc <- function(){
   return(inst)
 }
 
+#' n_spec is not part of the function since it is an expensive operation that
+#' should be done only once 
+#' @param genus_id NCBI identifier for genus as string or numeric values. If 
+#'     string, convert to numeric 
+#' @param db_nspec Total number of species in the trait database, considered to be
+#'     equivalent to the paramter k in a hypergeometric distribution 
+#' @param db_ngenus Total number of species assigned to the genus, considered to be 
+#'     equivalent to the parameter q in a hypergeometric distribution 
+#' @param ncbi_nspec Total number of species in NCBI. Considered to be m + n parameter (or nn)
+#'     in a hypergeometric distribution 
+test_genus <- function(genus_id, db_nspec, db_ngenus, ncbi_nspec){
+  if (!is.vector(genus_id)){
+    genus_id <- as.vector(genus_id)
+  }
+  genus_id <- map_dbl(genus_id, as.numeric)
+  p_vals <- map_dbl(genus_id, function(x){
+    con <- DBI::dbConnect(RSQLite::SQLite(), taxizedb::tdb_cache$list()[1])
+    tbl <- tbl(con, sql("SELECT tax_id, parent_tax_id, rank FROM nodes"))
+    ncbi_ngenus <- tbl |> filter(rank == "species", parent_tax_id == x) |> 
+      tally() |> pull(n)
+    DBI::dbDisconnect(con)
+    # hyper geometric distribution 
+    cum_prob <- phyper(q = db_ngenus, 
+                       m = ncbi_ngenus, 
+                       n = ncbi_nspec - ncbi_ngenus, 
+                       k = db_nspec,
+                       lower.tail = TRUE)
+    1 - cum_prob
+  })
+  names(p_vals) <- genus_id
+  return(p_vals)
+}
 
-
+# this function process a list of pvalues and returns NAs if
+# things go wrong 
+proc_gtest <- function(pvals){
+  if (length(pvals) == 0){
+    return(NA_character_)
+  } 
+  sig <- which(pvals < 0.05)
+  if (length(sig) == 0){
+    return(NA_character_)
+  } else {
+    return(names(pvals)[sig])
+  }
+}
