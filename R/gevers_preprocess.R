@@ -18,7 +18,8 @@ names(breakdown) <- sites
 
 # terminal illeum has the best amount of data available, with balanced evaluation between controls (no IBD) 
 # and crohn's disease. 
-sample_metadata <- gevers_metadata %>% filter(biopsy_location == "Terminal ileum") %>% select(sample_name, diagnosis) %>% 
+sample_metadata <- gevers_metadata %>% filter(biopsy_location == "Terminal ileum") %>% 
+  select(sample_name, diagnosis) %>% 
   filter(diagnosis %in% c("no", "CD")) 
 common <- intersect(sample_names, sample_metadata$sample_name)
 
