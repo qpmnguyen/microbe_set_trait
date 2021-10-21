@@ -53,13 +53,9 @@ proc_taxabun <- function(){
     })
     taxtab[i,] <- proc_names
   }
+  
 }
 
 
-# get tax id from names 
-proc_names <- function(names){
-  names <- gsub(names, pattern = "_", replacement = " ")
-  name2taxid(names)
-}
 
 
