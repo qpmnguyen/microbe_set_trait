@@ -3,7 +3,7 @@ library(RSQLite)
 library(DBI)
 library(jsonlite)
 
-filepath <- "large_files/mpa_v30_CHOCOPhlAn_201901_marker_info.txt"
+filepath <- file.path("large_files", "mpa_v30_CHOCOPhlAn_201901_marker_info.txt")
 
 #' @title Processing metaphlan3 marker information using json 
 #' @param string The string to the processed as a json file 

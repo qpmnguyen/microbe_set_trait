@@ -4,6 +4,7 @@ library(data.table)
 library(dtplyr)
 library(taxizedb)
 library(jsonlite)
+source("R/utils.R")
 
 proc_metadata <- function(){
   metadata <- fread("metadata/hmp2_metadata.csv")

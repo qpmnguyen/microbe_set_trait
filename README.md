@@ -5,8 +5,14 @@
 Most of the analyses was performed using R and the `targets` package. The entire pipeline was broken down into smaller "steps" for ease of processing. The file `run.R` contains code to choose between different pipelines to run. 
 
 Individual mini-pipelines include:   
-* `script-dada2.R` defines targets for processing raw data from Gevers et al. into ASV tables using the `dada2` method by Callahan et al. 2016.  
+* `script_dada2.R` defines targets for processing raw data from Gevers et al. into ASV tables using the `dada2` method by Callahan et al. 2016.  
+* `script_prep_data.R` defines targets for processing sequence tables from Gevers et al. and HMP data sets. 
 
+## R files  
+
+* `metaphlan_db.R` defines functions to process the MetaPhlAn3 marker information files.  
+* `db_preprocess.R` defines functions to pre-process the database into `BiocSet` format.  
+* `hmp_preprocess.R` defines functions to pre-process the HMP data data files (newest release). 
 
 ## Installing the required python packages  
 

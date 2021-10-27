@@ -1,3 +1,9 @@
 dada2:
   script: script_dada2.R
   store: store_dada2
+db_preprocess:
+  script: script_db_preprocess.R
+  store: store_db_preprocess
+prep_data:
+  script: script_prep_data.R
+  store: store_prep_data
