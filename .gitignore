@@ -6,6 +6,7 @@
 databases/
 
 store_*/
+!store_*/meta/
 large_files/
 .nextflow/
 .nextflow.log*
