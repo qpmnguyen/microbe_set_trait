@@ -9,4 +9,4 @@ tar_make(script = "script_db_preprocess.R", store = "store_db_preprocess")
 tar_make(script = "script_prep_data.R", store = "store_prep_data")
 
 
-tar_visnetwork(script = "script_db_preprocess.R", store = "store_db_preprocess")
+tar_visnetwork(script = "script_dada2.R", store = "store_dada2")

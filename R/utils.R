@@ -105,17 +105,17 @@ query_standard <- function(physeq, t_rank){
 #' @description Access relevant databases to assign NCBI ids to taxa
 #' @param seq The sequence file to manipulate  
 #' @param metaphlan (logical). To indicate whether the physeq is metaphlan results  
-translate_ncbi <- function(seq, t_rank, metaphlan = FALSE){
+translate_ncbi <- function(seq, t_rank = "genus", metaphlan = FALSE){
   if (metaphlan == TRUE){
     # the marker database only has absolute information for species 
-    if (rank != "Species"){
+    if (t_rank != "Species"){
       stop("Rank has to be species to query to metaphlan")
     }
     queried_names <- query_metaphlan(seq)
   } else {
-    queried_names <- query_standard(seq, t_rank = rank)
+    queried_names <- query_standard(seq, t_rank = t_rank)
   }
-  
+  print(queried_names)
   if (class(seq) == "phyloseq"){
     taxa_names(seq) <- queried_names
   } else if (class(seq) == "TreeSummarizedExperiment"){

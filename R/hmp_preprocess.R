@@ -6,15 +6,15 @@ library(taxizedb)
 library(jsonlite)
 source("R/utils.R")
 
-proc_metadata <- function(){
-  metadata <- fread("metadata/hmp2_metadata.csv")
+proc_metadata <- function(metadata_path="metadata/hmp2_metadata.csv"){
+  metadata <- fread(metadata_path)
   metadata <- metadata[data_type == "metagenomics" & week_num == 0,.(`External ID`, diagnosis)]
   setnames(metadata, "External ID", "ids")
   return(metadata)
 }
 
-proc_pathabun <- function(){
-  path_abun <- fread("data/pathabundances_3.tsv.gz")
+proc_pathabun <- function(pathabun_path="data/pathabundances_3.tsv.gz"){
+  path_abun <- fread(pathabun_path)
   old <- colnames(path_abun)
   new <- c("path", flatten_chr(strsplit(old[-1], split = "_pathabundance_cpm")))
   setnames(path_abun, old, new)
@@ -26,8 +26,8 @@ proc_pathabun <- function(){
 }
 
 
-proc_taxabun <- function(){
-  tax_abun <- fread("data/taxonomic_profiles_3.tsv.gz")
+proc_taxabun <- function(taxabun_path="data/taxonomic_profiles_3.tsv.gz"){
+  tax_abun <- fread(taxabun_path)
   # replace sample names by removing _profile 
   old <- colnames(tax_abun)
   new <- c("tax", flatten_chr(strsplit(old[-1], split = "_profile")))
@@ -39,7 +39,6 @@ proc_taxabun <- function(){
   # match to metadata
   metadata <- proc_metadata()
   tax_abun <- tax_abun[ids %in% metadata[,ids,],,]
-  
   
   # reformat tax names
   taxtab <- matrix(0, nrow = ncol(tax_abun) - 1, ncol = 7)

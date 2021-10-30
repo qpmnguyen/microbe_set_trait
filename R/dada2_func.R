@@ -3,6 +3,33 @@ library(ShortRead)
 library(tidyverse)
 library(rlist)
 
+#' Filter samples based on metadata for gevers et al 
+#' @return file path for input data 
+filter_samples <- function(fastq_path, metadata_path){
+  files <- list.files(fastq_path)
+  metadata <- read.table(file = metadata_path, sep = "\t", header = TRUE)
+  sample_names <- map_chr(str_split(files, pattern = ".fastq.gz"), ~{ .x[1]})
+  metadata <- metadata |> filter(biopsy_location == "Terminal ileum") |> 
+    select(sample_name, diagnosis) |> 
+    filter(diagnosis %in% c("no", "CD")) 
+  common <- intersect(sample_names, sample_metadata$sample_name)
+  # get new path
+  path_split <- strsplit(path, split = "/")[[1]]
+  path_split <- path_split[1:(length(path_split) - 1)]
+  path_split <- c(path_split, "input_data")
+  input_path <- do.call(file.path, as.list(path_split))
+  dir.create(input_path, showWarnings = FALSE, recursive = TRUE)
+  # copy files over 
+  for (i in list.files(fastq_path, full.names = TRUE)){
+    names <- strsplit(strsplit(i, "//")[[1]][2], ".fastq.gz", fixed = TRUE)[[1]]
+    if (names %in% common){
+      file.copy(i, input_path)
+    }
+  }
+  return(input_file)
+}
+
+
 #' retrieve sequences and filter and trim
 filter_and_trim <- function(path){
   fnFs <- sort(list.files(path, pattern="fastq.gz", full.names = TRUE))
