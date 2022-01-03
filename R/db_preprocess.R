@@ -84,6 +84,7 @@ get_sets <- function(ncbiid_list, trait_db, trait, g_agg=TRUE) {
         sizes <- es_elementset(sets) %>% group_by(set) %>% count()
         sets <- sets %>% mutate_set(type = trait, size = sizes$n)
     } else {
+        
 
         
     }
@@ -177,11 +178,11 @@ get_filtered_genus <- function(id_vec, trait_db){
 
 
 # PROCESS NAMES INTO NCBIIDS ####
+
 # call ncbi ids using taxizedb function 
 # Use the clean_names function from taxadb to clean names 
 #' @param vec A vector of names represented 
 #'     by ranks from superkingdom to genus
-
 call_genus_id <- function(vec) {
     c_ranks <- c(
         "superkingdom", "phylum", "class",
@@ -232,6 +233,30 @@ call_genus_id <- function(vec) {
     }
     return(id_names)
 }
+
+
+#' @title Function to use the species name to back-track genera names  
+#' @param spec_id Species NCBI identifier  
+genus_from_species <- function(spec_id){
+    query <- classification(spec_id)[[1]]
+    if (!is.data.frame(query)){
+        output <- list(
+            id = NA_character_,
+            full_name = NA_character_
+        )
+    } else {
+        output <- list(
+            id = query %>% filter(rank == "genus") %>% pull(id)
+            full_name = query %>% filter(rank == )
+        )
+        query <- query %>% filter(rank == "genus")
+    }
+    return(output)
+}
+
+
+
+
 
 # PROCESS NCBIID RESULTS ####  
 # do not run if trying to perform this reproducibly
