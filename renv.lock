@@ -348,6 +348,13 @@
       "Repository": "CRAN",
       "Hash": "b93cc2a180e844dba48c25d754e46980"
     },
+    "arkdb": {
+      "Package": "arkdb",
+      "Version": "0.0.14",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "d7608d2cb382a2a3dc2b94b69f0f1760"
+    },
     "askpass": {
       "Package": "askpass",
       "Version": "1.1",
@@ -500,6 +507,13 @@
       "Repository": "CRAN",
       "Hash": "0f22be39ec1d141fd03683c06f3a6e67"
     },
+    "contentid": {
+      "Package": "contentid",
+      "Version": "0.0.15",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "1a6637b36573e009652ff5f98280ac97"
+    },
     "cpp11": {
       "Package": "cpp11",
       "Version": "0.4.2",
@@ -513,6 +527,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "0a6a65d92bd45b47b94b84244b528d17"
+    },
+    "credentials": {
+      "Package": "credentials",
+      "Version": "1.3.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "93762d0a34d78e6a025efdbfb5c6bb41"
     },
     "crosstalk": {
       "Package": "crosstalk",
@@ -542,10 +563,10 @@
     },
     "data.table": {
       "Package": "data.table",
-      "Version": "1.14.2",
+      "Version": "1.14.3",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "36b67b5adf57b292923f5659f5f0c853"
+      "Hash": "a20969e09c722b6ee98c9ba72de56390"
     },
     "dbplyr": {
       "Package": "dbplyr",
@@ -1397,6 +1418,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "e4868558d1403b84942e30c92434e128"
+    },
+    "taxadb": {
+      "Package": "taxadb",
+      "Version": "0.1.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "e2a43a5a19924d41871e7fc4eafc6750"
     },
     "taxizedb": {
       "Package": "taxizedb",
