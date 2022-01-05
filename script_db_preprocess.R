@@ -27,7 +27,7 @@ trait_list <- cross_df(list(
 print(getDTthreads())
 
 get_path <- tar_target(db_path, get_db_path(), format = "file")
-load_db <- tar_target(db, readRDS(raw_db_file))
+load_db <- tar_target(db, readRDS(db_path))
 create_db <- tar_map(unlist = FALSE, values = trait_list, 
     tar_target(t_list, get_traits(trait_db = db, trait = traits)),
     tar_target(t_set, get_sets(ncbiid_list = t_list, 
