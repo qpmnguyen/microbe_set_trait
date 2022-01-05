@@ -7,7 +7,7 @@ library(future.batchtools)
 library(future)
 
 
-plan(batchtools_slurm, template = "slurm.tmpl")
+plan(batchtools_slurm, template = "batchtools.slurm.tmpl")
 
 source("R/db_preprocess.R")
 
@@ -37,8 +37,8 @@ create_db <- tar_map(unlist = FALSE, values = trait_list,
                    future = tar_resources_future(
                        plan = tweak(
                            batchtools_slurm,
-                           template = "slurm.tmpl",
-                           resources = list(walltime = "03:00:00", ntasks = 1, 
+                           template = "batchtools.slurm.tmpl",
+                           resources = list(walltime = "10:00:00", ntasks = 1, 
                                             ncpus = 2, memory = 1000)
                        )
                    )
