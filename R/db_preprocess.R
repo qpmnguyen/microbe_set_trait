@@ -18,7 +18,7 @@ if (length(tdb_cache$list()) == 0) {
     taxizedb::db_download_ncbi(verbose = FALSE, overwrite = FALSE)
 }
 
-setDTthreads(3)
+setDTthreads(2)
 
 
 # PROCESS THE TRAIT DATABASE ####   
