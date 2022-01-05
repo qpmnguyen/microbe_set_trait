@@ -383,6 +383,20 @@
       "Repository": "CRAN",
       "Hash": "543776ae6848fde2f48ff3816d0628bc"
     },
+    "base64url": {
+      "Package": "base64url",
+      "Version": "1.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0c54cf3a08cc0e550fbd64ad33166143"
+    },
+    "batchtools": {
+      "Package": "batchtools",
+      "Version": "0.9.15",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "1f8105b6e7c01c37b58559fbf91425e3"
+    },
     "beachmat": {
       "Package": "beachmat",
       "Version": "2.10.0",
@@ -430,6 +444,13 @@
       "Repository": "CRAN",
       "Hash": "dc5f7a6598bb025d20d66bb758f12879"
     },
+    "brew": {
+      "Package": "brew",
+      "Version": "1.0-6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "92a5f887f9ae3035ac7afde22ba73ee9"
+    },
     "broom": {
       "Package": "broom",
       "Version": "0.7.10",
@@ -464,6 +485,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "f61dbaec772ccd2e17705c1e872e9e7c"
+    },
+    "checkmate": {
+      "Package": "checkmate",
+      "Version": "2.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a667800d5f0350371bedeb8b8b950289"
     },
     "cli": {
       "Package": "cli",
@@ -564,9 +592,14 @@
     "data.table": {
       "Package": "data.table",
       "Version": "1.14.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "a20969e09c722b6ee98c9ba72de56390"
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "Rdatatable",
+      "RemoteRepo": "data.table",
+      "RemoteRef": "master",
+      "RemoteSha": "eed712ef45fd9198de6aa1ac1b672a7347253d18",
+      "Hash": "a07e79ee8f8c947329412e36569943d9"
     },
     "dbplyr": {
       "Package": "dbplyr",
@@ -601,6 +634,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "f62678f8c708f10ee8f419862b9b008e"
+    },
+    "duckdb": {
+      "Package": "duckdb",
+      "Version": "0.3.1-1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "209719c79ec850e02212a54c23995b9d"
     },
     "ellipsis": {
       "Package": "ellipsis",
@@ -693,6 +733,27 @@
       "Repository": "CRAN",
       "Hash": "0d9bf02413ddc2bbe8da9ce369dcdd2b"
     },
+    "future": {
+      "Package": "future",
+      "Version": "1.23.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7bf6fbed7f00cae876901fd70c04f3a4"
+    },
+    "future.batchtools": {
+      "Package": "future.batchtools",
+      "Version": "0.10.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ed6d40f78a5761934d6d3ba77d7ddac2"
+    },
+    "future.callr": {
+      "Package": "future.callr",
+      "Version": "0.7.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "47e41c6b2d547b3413ec730c7d99e420"
+    },
     "gargle": {
       "Package": "gargle",
       "Version": "1.2.0",
@@ -753,8 +814,16 @@
       "Package": "ggtree",
       "Version": "3.2.1",
       "Source": "Bioconductor",
+      "RemoteType": "bioconductor",
       "Remotes": "GuangchuangYu/treeio",
-      "Hash": "f156c85173024c88e2fdfd63ccca3fd7"
+      "Hash": "c06d1d4b6b9c6be846276d74ff8c1596"
+    },
+    "globals": {
+      "Package": "globals",
+      "Version": "0.14.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "eca8023ed5ca6372479ebb9b3207f5ae"
     },
     "glue": {
       "Package": "glue",
@@ -986,6 +1055,13 @@
       "Repository": "CRAN",
       "Hash": "a6b6d352e3ed897373ab19d8395c98d0"
     },
+    "listenv": {
+      "Package": "listenv",
+      "Version": "0.8.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0bde42ee282efb18c7c4e63822f5b4f7"
+    },
     "lubridate": {
       "Package": "lubridate",
       "Version": "1.8.0",
@@ -1081,6 +1157,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "2490600671344e847c37a7f75ee458c0"
+    },
+    "parallelly": {
+      "Package": "parallelly",
+      "Version": "1.30.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "67db13907a9cea89c118cf82d448799f"
     },
     "patchwork": {
       "Package": "patchwork",
@@ -1223,10 +1306,11 @@
     },
     "renv": {
       "Package": "renv",
-      "Version": "0.14.0",
-      "Source": "Repository",
+      "Version": "0.15.0",
+      "OS_type": NA,
+      "NeedsCompilation": "no",
       "Repository": "CRAN",
-      "Hash": "30e5eba91b67f7f4d75d31de14bbfbdc"
+      "Source": "Repository"
     },
     "reprex": {
       "Package": "reprex",

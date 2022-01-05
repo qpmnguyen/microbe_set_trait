@@ -1,12 +1,36 @@
 #' Master script to run all individual pipelines
 library(targets)
 library(optparse)
+library(tarchetypes)
 
-# run the dada2 pipeline to process gevers et al
-# change input directory if data is posted elsewhere
-tar_make(script = "script_dada2.R", store = "store_dada2")
-tar_make(script = "script_db_preprocess.R", store = "store_db_preprocess")
-tar_make(script = "script_prep_data.R", store = "store_prep_data")
+option_list <- list(
+    make_option(c("-c", "--ncores"), type="integer", default=5,
+                help="Number of cores",
+                metavar="NCORES"),
+    make_option(c("-a", "--analysis"), type = "character",
+                help = "What type of analysis to perform",
+                metavar="ANALYSIS"),
+    make_option(c("-r", "--remove"), type = "logical", default=TRUE,
+                help = "Restart pipeline from scratch", metavar = "REMOVE"),
+    make_option(c("-p", "--parallel"), type = "logical", default = TRUE, 
+                help = "Run pipeline in parallel", metavar="PARALLEL")
+)
 
+opt <- parse_args(OptionParser(option_list=option_list))
 
-tar_visnetwork(script = "script_dada2.R", store = "store_dada2")
+name <- opt$analysis
+
+match.arg(name, c("dada2", "db_preprocess"))
+
+if (opt$remove == TRUE){
+    tar_destroy()
+}
+
+Sys.setenv(TAR_PROJECT = name)
+
+if (opt$parallel == TRUE){
+    tar_make_future(workers = opt$ncores)
+} else {
+    tar_make()
+}
+
