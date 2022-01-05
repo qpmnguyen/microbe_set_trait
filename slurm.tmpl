@@ -42,7 +42,8 @@ log.file = fs::path_expand(log.file)
 ## module add ...
 
 cd $SLURM_SUBMIT_DIR
-conda activate microbe_set_trait
+conda activate microbe_trait
+
 
 ## Export value of DEBUGME environemnt var to slave
 export DEBUGME=<%= Sys.getenv("DEBUGME") %>
