@@ -22,7 +22,6 @@
 log.file = fs::path_expand(log.file)
 -%>
 
-
 #SBATCH --job-name=<%= job.name %>
 #SBATCH --output=<%= log.file %>
 #SBATCH --error=<%= log.file %>
