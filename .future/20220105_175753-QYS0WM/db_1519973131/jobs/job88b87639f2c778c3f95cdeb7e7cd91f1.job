@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --job-name=db
+#SBATCH --output=/dartfs-hpc/rc/home/k/f00345k/research/microbe_set_trait/.future/20220105_175753-QYS0WM/db_1519973131/logs/job88b87639f2c778c3f95cdeb7e7cd91f1.log
+#SBATCH --error=/dartfs-hpc/rc/home/k/f00345k/research/microbe_set_trait/.future/20220105_175753-QYS0WM/db_1519973131/logs/job88b87639f2c778c3f95cdeb7e7cd91f1.log
+#SBATCH --time=
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=
+#SBATCH --mem-per-cpu=
+
+
+#SBATCH --mail-user=Quang.P.Nguyen.GR@dartmouth.edu
+#SBATCH --mail-type=END,FAIL
+cd $SLURM_SUBMIT_DIR
+conda activate microbe_trait
+export DEBUGME=
+Rscript -e 'batchtools::doJobCollection("/dartfs-hpc/rc/home/k/f00345k/research/microbe_set_trait/.future/20220105_175753-QYS0WM/db_1519973131/jobs/job88b87639f2c778c3f95cdeb7e7cd91f1.rds")'
