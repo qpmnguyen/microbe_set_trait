@@ -38,7 +38,7 @@ create_db <- tar_map(unlist = FALSE, values = trait_list,
                        plan = tweak(
                            batchtools_slurm,
                            template = "batchtools.slurm.tmpl",
-                           resources = list(walltime = "10:00:00", ntasks = 1, 
+                           resources = list(walltime = "5:00:00", ntasks = 1, 
                                             ncpus = 2, memory = 1000)
                        )
                    )
