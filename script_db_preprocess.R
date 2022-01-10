@@ -43,7 +43,8 @@ create_db <- tar_map(unlist = FALSE, values = trait_list,
                        )
                    )
                )),
-    tar_rds(save_db, saveRDS(t_set, file = file.path("output", "sets", glue("madin_{t}_{agg}.rds", t = traits, 
+    tar_rds(save_db, saveRDS(t_set, file = file.path("output", "sets", 
+                                                     glue("madin_{t}_{agg}.rds", t = traits, 
                                                                             agg = ifelse(g_agg, "genus", "species")))))
 )
 

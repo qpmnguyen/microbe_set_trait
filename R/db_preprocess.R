@@ -193,7 +193,7 @@ get_filtered_genus <- function(id_vec, trait_db, prop_thresh=0.9){
     merged_counts <- tot_counts[tr_counts][,prop := nspec_trait/nspec_overall
                                            ][prop >= prop_thresh,
                                              ][,p_value := test_genus(genus_id = genus_ncbiid, 
-                                                                      db_nspec = nrow(trait), 
+                                                                      db_nspec = nrow(trait_db), 
                                                                       db_ngenus = nspec_overall), by = .I
                                                ][, p_adj := p.adjust(p_value, method = "BH")
                                                  ][p_adj >= 0.05,]
