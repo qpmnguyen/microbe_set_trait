@@ -73,7 +73,7 @@ list(
     physeq_hmp_wgs,
     mapped_hmp_wgs,
     combined_hmp_wgs,
-    save_hmp_wgs
+    save_hmp_wgs,
     physeq_hmp_16s,
     mapped_hmp_16s,
     combined_hmp_16s,
