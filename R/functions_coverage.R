@@ -72,7 +72,7 @@ attach_ncbi_std <- function(physeq, t_rank){
 }
 
 attach_ncbi_metaphlan <- function(physeq){
-    taxtab <- as(tax_table(physeq), "matrix") %>% as.data.frame()
+    taxtab <- as(tax_table(physeq), "matrix") %>% data.frame()
     query_db <- readRDS(file = file.path("mpa_marker.rds"))
     query_db <- query_db %>% as_tibble() %>% select(ncbiID, Species)
     colnames(taxtab) <- stringr::str_to_title(colnames(taxtab))
@@ -83,8 +83,8 @@ attach_ncbi_metaphlan <- function(physeq){
         as.data.frame() %>% 
         column_to_rownames(var = "full_name") %>% 
         mutate(ncbiID = str_trim(ncbiID)) %>% 
-        rename(ncbiids = ncbiID) %>%
         as.matrix()
+    colnames(taxtab)[which(colnames(taxtab) == "ncbiID")] <- "ncbiids"
     tax_table(physeq) <- taxtab
     return(physeq)
 }

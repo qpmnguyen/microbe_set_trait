@@ -7,7 +7,7 @@ library(future.callr)
 source("R/utils.R")
 source("R/functions_coverage.R")
 
-plan(callr)
+plan(multisession)
 eval_settings <- function(analysis){
     if (analysis == "hmp_16s"){
         physeq <- retrieve_hmp_16s()
