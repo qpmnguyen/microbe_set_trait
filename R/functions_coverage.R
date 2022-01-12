@@ -72,7 +72,7 @@ attach_ncbi_std <- function(physeq, t_rank){
 }
 
 attach_ncbi_metaphlan <- function(physeq){
-    taxtab <- as(tax_table(physeq), "data.frame")
+    taxtab <- as(tax_table(physeq), "matrix") %>% as.data.frame()
     query_db <- readRDS(file = file.path("mpa_marker.rds"))
     query_db <- query_db %>% as_tibble() %>% select(ncbiID, Species)
     colnames(taxtab) <- stringr::str_to_title(colnames(taxtab))
@@ -95,7 +95,8 @@ calculate_coverage <- function(physeq, sets, type, site){
     missing_ncbi <- ntaxa(physeq) - physeq %>% 
         subset_taxa(!is.na(ncbiids)) %>% ntaxa()
     physeq <- physeq %>% subset_taxa(!is.na(ncbiids))
-    df_ids <- tax_table(physeq) %>% as(., "data.frame") %>% pull("ncbiids")
+    df_ids <- tax_table(physeq) %>% as(., "matrix") %>% 
+        as.data.frame() %>% pull("ncbiids")
     sets_lab <- es_set(sets) %>% pull(set) %>% unique()
     set2df <- map(sets_lab,~{
         set_ids <- es_elementset(sets) %>% filter(set == .x) %>% 
