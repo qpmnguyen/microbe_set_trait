@@ -62,7 +62,7 @@ mapped_hmp_wgs <- tar_map(unlist = FALSE, values = eval_settings("hmp_wgs"),
 combined_hmp_wgs <- tar_combine(comb_hmp_wgs, mapped_hmp_wgs[[3]], 
                                 command = dplyr::bind_rows(!!!.x))
 save_hmp_wgs <- tar_rds(file_hmp_wgs, saveRDS(comb_hmp_wgs, 
-                                              file = file.path("output","coverage", "hmp_16s_cov.rds")))
+                                              file = file.path("output","coverage", "hmp_wgs_cov.rds")))
 
 
 
