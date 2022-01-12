@@ -27,7 +27,7 @@ mapped_hmp_16s <- tar_map(unlist = FALSE, values = eval_settings("hmp_16s"),
         tar_target(load_hmp_16s, {
             physeq <- subset_samples(hmp_16s, body_site == site)
             # filter so that each taxa is at at least one sample 
-            physeq <- filter_taxa(physeq, function(x) sum(x > 0) >= 1)
+            physeq <- filter_taxa(physeq, function(x) sum(x > 0) >= 1, TRUE)
             physeq <- attach_ncbi_std(physeq, t_rank = "GENUS")
             return(physeq)
         }),
@@ -48,7 +48,7 @@ mapped_hmp_wgs <- tar_map(unlist = FALSE, values = eval_settings("hmp_wgs"),
         tar_target(load_hmp_wgs, {
             physeq <- subset_samples(hmp_wgs, body_site == site)
             # filter so that each taxa is at at least one sample 
-            physeq <- filter_taxa(physeq, function(x) sum(x > 0) >= 1)
+            physeq <- filter_taxa(physeq, function(x) sum(x > 0) >= 1, TRUE)
             physeq <- attach_ncbi_metaphlan(physeq)
             return(physeq)
         }),
@@ -73,7 +73,7 @@ list(
     physeq_hmp_wgs,
     mapped_hmp_wgs,
     combined_hmp_wgs,
-    save_hmp_wgs,
+    save_hmp_wgs
     physeq_hmp_16s,
     mapped_hmp_16s,
     combined_hmp_16s,

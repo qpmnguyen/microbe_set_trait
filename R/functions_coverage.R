@@ -83,7 +83,7 @@ attach_ncbi_metaphlan <- function(physeq){
         as.data.frame() %>% 
         column_to_rownames(var = "full_name") %>% 
         mutate(ncbiID = str_trim(ncbiID)) %>% 
-        rename(ncbiID = "ncbiids") %>%
+        rename(ncbiids = ncbiID) %>%
         as.matrix()
     tax_table(physeq) <- taxtab
     return(physeq)
