@@ -8,6 +8,7 @@ library(DBI)
 library(ggtree)
 library(data.table)
 library(phyloseq)
+library(taxadb)
 
 #' @title Function to take a string and initiate a query
 #' @param string The string of interest, should be of form k__Kingdom|p_Phylum

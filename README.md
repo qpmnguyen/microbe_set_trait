@@ -6,7 +6,8 @@ Most of the analyses was performed using R and the `targets` package. The entire
 
 Individual mini-pipelines include:   
 * `script_dada2.R` defines targets for processing raw data from Gevers et al. into ASV tables using the `dada2` method by Callahan et al. 2016.  
-* `script_prep_data.R` defines targets for processing sequence tables from Gevers et al. and HMP data sets. 
+* `script_prep_data.R` prepares 16S rRNA gene sequencing and WGS sequencing data sets for analysis. 
+* `script_db_preprocess.R` defines targets for pre-processing the data bases for species or genus versions.   
 
 ## R files  
 
@@ -14,7 +15,7 @@ Individual mini-pipelines include:
 * `db_preprocess.R` defines functions to pre-process the database into `BiocSet` format.  
 * `hmp_preprocess.R` defines functions to pre-process the HMP data data files (newest release). 
 
-## Installing the required python packages  
+## Python components    
 
 Certain parts of this project requires using python functions. Inter-operability with R is maintained using the `reticulate` package to call python functions in the R environment. Due to certain issues with `reticulate` and pre-specified conda environments, we suggest to create your own conda environment using specifications listed in `environment.yml`, and explicitly declare the environment variable `RETICULATE_PYTHON` to point towards the Python 3 executable associated with the conda environment. This will also correct the behavior of `renv` to point to the correct python version and associated library.  
 

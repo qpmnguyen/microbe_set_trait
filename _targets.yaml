@@ -4,6 +4,12 @@ dada2:
 db_preprocess:
   script: script_db_preprocess.R
   store: store_db_preprocess
-prep_data:
-  script: script_prep_data.R
-  store: store_prep_data
+concordance:
+  script: script_concordance.R
+  store: store_concordance
+coverage:
+  script: script_coverage.R
+  store: store_coverage
+pred:
+  script: script_pred.R
+  store: store_pred

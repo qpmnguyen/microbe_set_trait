@@ -20,7 +20,7 @@ opt <- parse_args(OptionParser(option_list=option_list))
 
 name <- opt$analysis
 
-match.arg(name, c("dada2", "db_preprocess"))
+match.arg(name, c("dada2", "db_preprocess", "coverage"))
 
 if (opt$remove == TRUE){
     tar_destroy()

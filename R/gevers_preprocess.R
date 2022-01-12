@@ -5,7 +5,7 @@ library(ape)
 library(Biostrings)
 
 #' Load the gevers et al data set and reformat
-load_and_format <- function(file_path = "data/gevers_dada2.rds") {
+load_gevers <- function(file_path = "data/gevers_dada2.rds") {
     data <- readRDS(file = file_path)
     otu_tab <- data$seqtab_nochim
     tax_tab <- data$taxa
@@ -38,8 +38,8 @@ load_and_format <- function(file_path = "data/gevers_dada2.rds") {
         seq
     )
     # let's do some filtering!
-    physeq <- physeq |>
-        filter_taxa(function(x) sum(x > 0) > (0.01 * length(x)), TRUE)
+    #physeq <- physeq |>
+    #    filter_taxa(function(x) sum(x > 0) > (0.01 * length(x)), TRUE)
     return(physeq)
 }
 
