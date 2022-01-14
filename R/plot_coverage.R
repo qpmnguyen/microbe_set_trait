@@ -3,6 +3,7 @@ library(ggthemes)
 library(ggsci)
 library(MetBrewer)
 library(tidytext)
+library(ggrepel)
 theme_nice <- function() {
     theme_minimal(base_family = "National 2") +
         theme(panel.grid.minor = element_blank(),
@@ -40,4 +41,30 @@ plot_16s <- plot_coverage(file.path("output", "coverage", "hmp_16s_cov.rds"))
 plot_wgs <- plot_coverage(file.path("output", "coverage", "hmp_wgs_cov.rds"))
 plot_wgs
 
+plot_cov_granular <- function(file_path){
+    results <- readRDS(file = file_path)
+    results <- results %>%
+        filter(type %in% c("carbon_substrates", "pathways")) %>%
+        mutate(major_site = map_chr(site, ~{str_split(.x, ":")[[1]][1]})) %>% 
+        mutate(minor_site = map_chr(site, ~{str_split(.x, ":")[[1]][2]})) %>% 
+        mutate(type = str_to_title(str_replace(type, pattern = "_", replacement = " "))) %>% 
+        mutate(minor_site = str_to_title(str_replace(minor_site, pattern = "_", replacement = " ")))
+    
+    results <- results %>% unnest(by_set) %>% mutate(label = "") %>% group_by(type, site) %>% 
+        mutate(r = rank(-prop)) %>% ungroup() %>%
+        mutate(label = if_else(r <= 3, set_names, ""))
+    
+    plt <- ggplot(results, aes(y = prop, x = minor_site, col = major_site, label = label)) + 
+        geom_text_repel(max.overlaps = 20) +
+        geom_jitter() + 
+        scale_color_manual(values = met.brewer("Stevens")) +
+        facet_wrap(~type, nrow = 2) + coord_flip() + 
+        labs(y = "Proportion of identified taxa has an assigned trait", col = "Major Site", 
+             x = "Sites")
+    return(plt)
+}
+
+plot_gr_16s <- plot_cov_granular(file.path("output", "coverage", "hmp_16s_cov.rds"))
+plot_gr_wgs <- plot_cov_granular(file.path("output", "coverage", "hmp_wgs_cov.rds"))
+plot_gr_wgs
     

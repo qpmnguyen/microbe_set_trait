@@ -1,5 +1,20 @@
 source("R/functions_pred.R")
-
+library(tidyverse)
+library(ggthemes)
+library(ggsci)
+library(MetBrewer)
+library(tidytext)
+theme_nice <- function() {
+    theme_minimal(base_family = "National 2") +
+        theme(panel.grid.minor = element_blank(),
+              #plot.background = element_rect(fill = "white", color = NA),
+              plot.title = element_text(face = "bold"),
+              axis.title = element_text(face = "bold"),
+              strip.text = element_text(face = "bold", size = rel(0.8), hjust = 0),
+              #strip.background = element_rect(fill = "grey80", color = NA),
+              legend.title = element_text(face = "bold"))
+}
+theme_set(theme_nice())
 
 wgs <- get_ihmp(type = "traits")
 amplicon <- get_gevers()
@@ -24,8 +39,8 @@ fit_final <- function(data){
     
     best_mod <- results %>% select_best(metric = "roc_auc")
     param <- best_mod$min_n
-    best_rf <- rand_forest(min_n = !!param, trees = 3000) %>% 
-        set_engine("ranger", num_threads = !!n_threads) %>%
+    best_rf <- rand_forest(min_n = !!param, trees = 2000) %>% 
+        set_engine("ranger", num.threads = 2, importance = "impurity") %>%
         set_mode("classification")
     
     new_wkflow <- wkflow %>% update_model(best_rf)
@@ -33,5 +48,13 @@ fit_final <- function(data){
 }
 
 wgs_fit <- fit_final(wgs_gsva)
+wgs_vip_features <- wgs_fit %>% pluck(".workflow",1) %>% extract_fit_parsnip() %>% vip(num_features = 15)
+wgs_vip_features + geom_bar(fill = "steelblue", stat = "identity") + 
+    theme(axis.text.y = element_text(size = 10)) + 
+    labs(title = "Top 15 most important features for iHMP data set", subtitle = "AUROC: 0.934")
 
-
+amplicon_fit <- fit_final(amplicon_gsva)
+amplicon_vip_features <- amplicon_fit %>% pluck(".workflow", 1) %>% extract_fit_parsnip() %>% vip(num_features = 15)
+amplicon_vip_features + geom_bar(fill = "salmon", stat = "identity") + 
+    theme(axis.text.y = element_text(size = 10)) + 
+    labs(title = "Top 15 most important features for the Gevers et al. data set", subtitle = "AUROC: 0.608")

@@ -168,14 +168,17 @@ define_modelflow <- function(data, n_threads){
 
 complete_fit <- function(df, grid_size, init_wkflow, annotate = NULL, n_threads){
     nested_eval <- nested_cv(df, outside = vfold_cv(v = 10), inside = vfold_cv(v = 5))
-    
+    print("Starting fit...")
     outer_fit <- pmap_dfr(nested_eval, function(splits, id, inner_resamples){
+        print("Starting tune...")
         tune <- fit_models(resamp = inner_resamples, 
                            wkflow = init_wkflow, grid_size = grid_size, 
                            n_threads = n_threads)
+        print("Ending tune ...")
         tune$adj_wkflow %>% last_fit(splits) %>% collect_metrics() %>% 
             filter(.metric == "roc_auc")
     })
+    print("Finished fitting...")
     if (!is.null(annotate)){
         outer_fit <- outer_fit %>% mutate(annotate = annotate)
     }
@@ -194,7 +197,7 @@ fit_models <- function(resamp, wkflow, grid_size, n_threads){
     
     param <- best_mod$min_n
     best_mod <- rand_forest(min_n = !!param, trees = 3000) %>% 
-        set_engine("ranger", num_threads = !!n_threads) %>%
+        set_engine("ranger", num.threads = !!n_threads) %>%
         set_mode("classification")
     return(list(
         overall = results %>% collect_metrics(),

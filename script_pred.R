@@ -6,7 +6,7 @@ library(future)
 library(future.callr)
 library(future.batchtools)
 source("R/functions_pred.R")
-
+tidymodels_prefer()
 #plan(multisession)
 
 plan(batchtools_slurm, template = "batchtools.slurm.tmpl")
@@ -47,8 +47,8 @@ benchmark <- tar_map(unlist = FALSE, values = eval_settings,
                        plan = tweak(
                            batchtools_slurm,
                            template = "batchtools.slurm.tmpl",
-                           resources = list(walltime = "5:00:00", ntasks = 1, 
-                                            ncpus = 5, memory = 1000)
+                           resources = list(walltime = "10:00:00", ntasks = 1, 
+                                            ncpus = 5, memory = 2000)
                        )
                    )
     ))
