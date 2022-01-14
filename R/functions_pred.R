@@ -157,7 +157,7 @@ define_modelflow <- function(data, n_threads){
         step_normalize(all_numeric_predictors())
     
     rf_mod <- rand_forest(min_n = tune(), trees = 3000) %>% 
-        set_engine("ranger", num.threads = n_threads) %>%
+        set_engine("ranger", num.threads = !!n_threads) %>%
         set_mode("classification")
     
     wkflow <- workflow() %>%
@@ -194,7 +194,7 @@ fit_models <- function(resamp, wkflow, grid_size, n_threads){
     
     param <- best_mod$min_n
     best_mod <- rand_forest(min_n = !!param, trees = 3000) %>% 
-        set_engine("ranger", num_threads = num_threads) %>%
+        set_engine("ranger", num_threads = !!n_threads) %>%
         set_mode("classification")
     return(list(
         overall = results %>% collect_metrics(),
