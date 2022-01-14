@@ -9,6 +9,8 @@ source("R/functions_pred.R")
 tidymodels_prefer()
 #plan(multisession)
 
+tar_option_set(workspace_on_error = TRUE)
+
 plan(batchtools_slurm, template = "batchtools.slurm.tmpl")
 
 # evaluation settings 
