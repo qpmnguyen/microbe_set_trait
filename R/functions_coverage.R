@@ -71,19 +71,25 @@ attach_ncbi_std <- function(physeq, t_rank){
     return(physeq)
 }
 
-attach_ncbi_metaphlan <- function(physeq){
+attach_ncbi_metaphlan <- function(physeq, query=FALSE){
     taxtab <- as(tax_table(physeq), "matrix") %>% data.frame()
-    query_db <- readRDS(file = file.path("mpa_marker.rds"))
-    query_db <- query_db %>% as_tibble() %>% select(ncbiID, Species)
-    colnames(taxtab) <- stringr::str_to_title(colnames(taxtab))
-    taxtab <- taxtab %>% rownames_to_column(var = "full_name") %>% 
-        mutate(across(c(Phylum, Class, Order, Family, Genus, Species), 
-                      ~str_replace_all(.x, pattern = " ", replacement = "_"))) %>%
-        left_join(query_db, by = "Species")  %>%
-        as.data.frame() %>% 
-        column_to_rownames(var = "full_name") %>% 
-        mutate(ncbiID = str_trim(ncbiID)) %>% 
-        as.matrix()
+    if (query == TRUE){
+        query_db <- readRDS(file = file.path("mpa_marker.rds"))
+        query_db <- query_db %>% as_tibble() %>% select(ncbiID, Species)
+        colnames(taxtab) <- stringr::str_to_title(colnames(taxtab))
+        taxtab <- taxtab %>% rownames_to_column(var = "full_name") %>% 
+            mutate(across(c(Phylum, Class, Order, Family, Genus, Species), 
+                          ~str_replace_all(.x, pattern = " ", replacement = "_"))) %>%
+            left_join(query_db, by = "Species")  %>%
+            as.data.frame() %>% 
+            column_to_rownames(var = "full_name") %>% 
+            mutate(ncbiID = str_trim(ncbiID)) %>% 
+            as.matrix()
+    } else {
+        taxtab <- taxtab %>% rownames_to_column(var = "full_name") %>% 
+            mutate(ncbiids = species) %>% 
+            column_to_rownames(var = "full_name") %>% as.matrix()
+    }
     colnames(taxtab)[which(colnames(taxtab) == "ncbiID")] <- "ncbiids"
     tax_table(physeq) <- taxtab
     return(physeq)
