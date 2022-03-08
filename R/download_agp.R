@@ -1,9 +1,12 @@
 # Created March 7th 2022
 # Quang Nguyen 
-# This script downloads and merges AGP metadata
+# This script downloads and merges temporary
 
 library(tidyverse)
 library(piggyback)
+library(here)
+here::i_am("R/download_agp.R")
+
 
 f1 <- tempdir()
 f2 <- tempfile()
@@ -39,3 +42,6 @@ subset_manifest <- manifest %>% filter(library_strategy == "AMPLICON") %>%
 joint_metadata <- inner_join(subset_metadata, subset_manifest)
 
 saveRDS(joint_metadata, file = "metadata/agp_joint_mtd.rds")
+
+
+

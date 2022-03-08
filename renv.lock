@@ -12,6 +12,23 @@
     "Version": "3.14"
   },
   "Packages": {
+    "ANCOMBC": {
+      "Package": "ANCOMBC",
+      "Version": "1.4.0",
+      "Source": "Bioconductor",
+      "git_url": "https://git.bioconductor.org/packages/ANCOMBC",
+      "git_branch": "RELEASE_3_14",
+      "git_last_commit": "b9a7fb1",
+      "git_last_commit_date": "2021-10-26",
+      "Hash": "01d19305af91bf6cf081f8a9dfdb18d1",
+      "Requirements": [
+        "MASS",
+        "Rdpack",
+        "microbiome",
+        "nloptr",
+        "phyloseq"
+      ]
+    },
     "AnnotationDbi": {
       "Package": "AnnotationDbi",
       "Version": "1.56.2",
@@ -766,6 +783,16 @@
       "Hash": "0325b5be38a02d192828027983c7b470",
       "Requirements": []
     },
+    "Rdpack": {
+      "Package": "Rdpack",
+      "Version": "2.1.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "250b60978bbd2b7761f1dd81563e93a1",
+      "Requirements": [
+        "rbibutils"
+      ]
+    },
     "Rhdf5lib": {
       "Package": "Rhdf5lib",
       "Version": "1.16.0",
@@ -1327,6 +1354,14 @@
       "Hash": "ebaa97ac99cc2daf04e77eecc7b781d7",
       "Requirements": []
     },
+    "clisymbols": {
+      "Package": "clisymbols",
+      "Version": "1.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "96c01552bfd5661b9bbdefbc762f4bcd",
+      "Requirements": []
+    },
     "cluster": {
       "Package": "cluster",
       "Version": "2.1.2",
@@ -1662,6 +1697,26 @@
       "Hash": "dabc225759a2c2b241e60e42bf0e8e54",
       "Requirements": []
     },
+    "fgsea": {
+      "Package": "fgsea",
+      "Version": "1.20.0",
+      "Source": "Bioconductor",
+      "git_url": "https://git.bioconductor.org/packages/fgsea",
+      "git_branch": "RELEASE_3_14",
+      "git_last_commit": "b704f81",
+      "git_last_commit_date": "2021-10-26",
+      "Hash": "a4913104166e73957fa32d2e595cceef",
+      "Requirements": [
+        "BH",
+        "BiocParallel",
+        "Matrix",
+        "Rcpp",
+        "data.table",
+        "fastmatch",
+        "ggplot2",
+        "gridExtra"
+      ]
+    },
     "filelock": {
       "Package": "filelock",
       "Version": "1.0.2",
@@ -1955,6 +2010,28 @@
         "yulab.utils"
       ]
     },
+    "gh": {
+      "Package": "gh",
+      "Version": "1.3.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "38c2580abbda249bd6afeec00d14f531",
+      "Requirements": [
+        "cli",
+        "gitcreds",
+        "httr",
+        "ini",
+        "jsonlite"
+      ]
+    },
+    "gitcreds": {
+      "Package": "gitcreds",
+      "Version": "0.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f3aefccc1cc50de6338146b62f115de8",
+      "Requirements": []
+    },
     "globals": {
       "Package": "globals",
       "Version": "0.14.0",
@@ -2057,6 +2134,31 @@
       "Repository": "CRAN",
       "Hash": "5b79228594f02385d4df4979284879ae",
       "Requirements": []
+    },
+    "gt": {
+      "Package": "gt",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "e027761c361e66a24e22f9446b3dd86c",
+      "Requirements": [
+        "base64enc",
+        "bitops",
+        "checkmate",
+        "commonmark",
+        "dplyr",
+        "fs",
+        "ggplot2",
+        "glue",
+        "htmltools",
+        "magrittr",
+        "rlang",
+        "sass",
+        "scales",
+        "stringr",
+        "tibble",
+        "tidyselect"
+      ]
     },
     "gtable": {
       "Package": "gtable",
@@ -2255,6 +2357,14 @@
         "tibble",
         "tidyr"
       ]
+    },
+    "ini": {
+      "Package": "ini",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "6154ec2223172bce8162d4153cda21f7",
+      "Requirements": []
     },
     "interactiveDisplayBase": {
       "Package": "interactiveDisplayBase",
@@ -2568,6 +2678,27 @@
         "vegan"
       ]
     },
+    "microbiome": {
+      "Package": "microbiome",
+      "Version": "1.16.0",
+      "Source": "Bioconductor",
+      "git_url": "https://git.bioconductor.org/packages/microbiome",
+      "git_branch": "RELEASE_3_14",
+      "git_last_commit": "a7b74b7",
+      "git_last_commit_date": "2021-10-26",
+      "Hash": "4fd8c7b66d1b18224348a02478c81164",
+      "Requirements": [
+        "Rtsne",
+        "dplyr",
+        "ggplot2",
+        "phyloseq",
+        "reshape2",
+        "scales",
+        "tibble",
+        "tidyr",
+        "vegan"
+      ]
+    },
     "mime": {
       "Package": "mime",
       "Version": "0.12",
@@ -2663,6 +2794,14 @@
       "Requirements": [
         "lattice"
       ]
+    },
+    "nloptr": {
+      "Package": "nloptr",
+      "Version": "1.2.2.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "22eeb1eb7129a2ca17b8eb70b56a02fe",
+      "Requirements": []
     },
     "nnet": {
       "Package": "nnet",
@@ -2811,6 +2950,23 @@
         "reshape2",
         "scales",
         "vegan"
+      ]
+    },
+    "piggyback": {
+      "Package": "piggyback",
+      "Version": "0.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0cd602e7eb4288f3e78fb4eba0507ead",
+      "Requirements": [
+        "clisymbols",
+        "crayon",
+        "fs",
+        "gh",
+        "httr",
+        "jsonlite",
+        "lubridate",
+        "memoise"
       ]
     },
     "pillar": {
@@ -2974,6 +3130,14 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "5e3c5dc0b071b21fa128676560dbe94d",
+      "Requirements": []
+    },
+    "rbibutils": {
+      "Package": "rbibutils",
+      "Version": "2.2.7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "69f4a840b0c2aa99f5ce473fd7fa21bd",
       "Requirements": []
     },
     "readr": {
