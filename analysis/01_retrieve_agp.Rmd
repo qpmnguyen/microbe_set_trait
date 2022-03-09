@@ -1,0 +1,80 @@
+---
+title: "Retrieve AGP data set"
+author: "Quang Nguyen"
+date: "3/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We use `piggyback` to version the metadata file of the American Gut Project (AGP) from 2022-03-04. The manifest for all the raw data files from ENA were downloaded directly using the url. All of these files are downloaded as temporary and will be removed in the next R session.  
+
+```{r, include=FALSE}
+library(tidyverse)
+library(piggyback)
+library(here)
+here::i_am("analysis/01_retrieve_agp.Rmd")
+
+
+f1 <- tempdir()
+f2 <- tempfile()
+
+# this is the metadata file  
+pb_download(file = "agp_metadata_20220304.txt", dest = f1, tag = "0.1")
+
+# file manifest from ebi-ena
+download.file(url = "https://www.ebi.ac.uk/ena/portal/api/filereport?accession=PRJEB11419&result=read_run&fields=study_accession,sample_accession,run_accession,library_layout,library_strategy,library_source,read_count,fastq_ftp,submitted_ftp,sample_title&format=tsv&download=true&limit=0", 
+              destfile = f2)
+
+
+metadata <- read_tsv(file = file.path(f1, "agp_metadata_20220304.txt"))
+manifest <- read_table(file = f2)
+```
+
+The logic is to match the manifest data and the metadata and retreived a consensus unified data set.  
+
+For the metadata, we restrict to feces samples for the distal gut from humans. We're also interested in the BMI variable, so we're subsetting all samples such that there is at least one label for the BMI variable.  
+
+```{r}
+subset_metadata <- metadata %>% 
+    filter(host_body_site == "UBERON:feces") %>% 
+    filter(description %in% c("American Gut Project Stool Sample", "American Gut Project Stool sample"), 
+           host_taxid == "9606") %>% 
+    filter(bmi_cat %in% c("Normal", "Overweight", "Obese", "Underweight")) %>% 
+    filter(empo_1 == "Host-associated") %>% 
+    filter(empo_3 == "Animal distal gut") %>% 
+    select(sample_name, country_of_birth, 
+                    age_years, description, host_body_site, host_taxid, 
+                    diabetes, sex, ibd, ibs, ibd_diagnosis, ibd_diagnosis_refined, 
+                    bmi_cat) %>% 
+    select(-c(host_body_site, description, host_taxid)) %>% 
+    distinct()
+
+joint_ids <- subset_metadata$sample_name
+```
+
+For the ENA manifest, we're restricting read counts $\geq 1000$ and for samples with more than one sequencing run, we retrieve runs with the larges read count. We are only interested in 16S rRNA gene sequencing and therefore restricts it to "AMPLICON" for the library strategy.   
+
+```{r}
+subset_manifest <- manifest %>% 
+    filter(library_strategy == "AMPLICON") %>% 
+    filter(read_count >= 1000) %>% 
+    filter(sample_title %in% joint_ids) %>% 
+    select(sample_title, read_count, fastq_ftp, 
+           submitted_ftp, run_accession) %>% 
+    rename("sample_name" = "sample_title") %>% 
+    group_by(sample_name) %>%
+    filter(read_count == max(read_count))
+```
+
+Save the metadata-manifest combination to download raw data files.  
+
+```{r}
+joint_metadata <- inner_join(subset_metadata, subset_manifest)
+nrow(joint_metadata)
+
+saveRDS(joint_metadata, file = "metadata/agp_joint_mtd.rds")
+```
+
