@@ -1,7 +1,6 @@
 # Created March 7th 2022
 # Quang Nguyen 
 # This script downloads and merges temporary
-
 library(tidyverse)
 library(piggyback)
 library(here)

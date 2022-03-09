@@ -10,6 +10,7 @@ staging/
 .Ruserdata
 .Renviron
 databases/
+raw/
 
 store_*/
 !store_*/meta/

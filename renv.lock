@@ -3710,12 +3710,13 @@
     },
     "targets": {
       "Package": "targets",
-      "Version": "0.9.0",
+      "Version": "0.10.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "e4868558d1403b84942e30c92434e128",
+      "Hash": "bd9b5c201537ae9e9bf3e8addbeb4218",
       "Requirements": [
         "R6",
+        "base64url",
         "callr",
         "cli",
         "codetools",
