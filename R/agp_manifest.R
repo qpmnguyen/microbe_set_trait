@@ -4,7 +4,7 @@
 library(tidyverse)
 library(piggyback)
 library(here)
-here::i_am("R/download_agp.R")
+here::i_am("R/agp_manifest.R")
 
 
 f1 <- tempdir()
@@ -24,19 +24,31 @@ download.file(url = "https://www.ebi.ac.uk/ena/portal/api/filereport?accession=P
 metadata <- read_tsv(file = file.path(f1, "agp_metadata_20220304.txt"))
 manifest <- read_table(file = f2)
 
-subset_metadata <- metadata %>% select(sample_name, country_of_birth, 
-                    age_years, description, host_body_site, host_taxid, 
-                    diabetes, sex, ibd, ibs, ibd_diagnosis, ibd_diagnosis_refined) %>% 
+subset_metadata <- metadata %>% 
     filter(host_body_site == "UBERON:feces") %>% 
     filter(description %in% c("American Gut Project Stool Sample", "American Gut Project Stool sample"), 
            host_taxid == "9606") %>% 
-    select(-c(host_body_site, description, host_taxid))
+    filter(bmi_cat %in% c("Normal", "Overweight", "Obese", "Underweight")) %>% 
+    filter(empo_1 == "Host-associated") %>% 
+    filter(empo_3 == "Animal distal gut") %>% 
+    select(sample_name, country_of_birth, 
+                    age_years, description, host_body_site, host_taxid, 
+                    diabetes, sex, ibd, ibs, ibd_diagnosis, ibd_diagnosis_refined, 
+                    bmi_cat) %>% 
+    select(-c(host_body_site, description, host_taxid)) %>% 
+    distinct()
+
 joint_ids <- subset_metadata$sample_name
-subset_manifest <- manifest %>% filter(library_strategy == "AMPLICON") %>% 
+
+subset_manifest <- manifest %>% 
+    filter(library_strategy == "AMPLICON") %>% 
     filter(read_count >= 1000) %>% 
-    filter(sample_title %in% subset_ids) %>% 
-    select(sample_title, read_count, fastq_ftp, submitted_ftp) %>% 
-    rename("sample_name" = "sample_title")
+    filter(sample_title %in% joint_ids) %>% 
+    select(sample_title, read_count, fastq_ftp, 
+           submitted_ftp, run_accession) %>% 
+    rename("sample_name" = "sample_title") %>% 
+    group_by(sample_name) %>%
+    filter(read_count == max(read_count))
 
 joint_metadata <- inner_join(subset_metadata, subset_manifest)
 
