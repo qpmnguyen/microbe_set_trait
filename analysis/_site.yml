@@ -1,7 +1,7 @@
-name: "microbe_set_trait"
+name: microbe_set_trait
 output_dir: ../docs
 navbar:
-  title: "microbe_set_trait"
+  title: microbe_set_trait
   left:
   - text: Home
     href: index.html
@@ -9,6 +9,10 @@ navbar:
     href: about.html
   - text: License
     href: license.html
+  right:
+  - icon: fab fa-github
+    text: Source code
+    href: https://github.com/qpmnguyen/microbe_set_trait
 output:
   workflowr::wflow_html:
     toc: yes
