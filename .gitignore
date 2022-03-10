@@ -21,3 +21,4 @@ work/
 picrust2_tmp/
 prototype.R
 .future/
+*.out
