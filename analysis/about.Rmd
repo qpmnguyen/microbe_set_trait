@@ -7,4 +7,4 @@ editor_options:
   chunk_output_type: console
 ---
 
-Describe your project.
+This project entails analyses to assess the usage of trait databases as taxon-sets for enrichment analysis  
