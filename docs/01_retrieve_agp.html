@@ -17,7 +17,7 @@
 <script src="site_libs/header-attrs-2.12/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/darkly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -36,6 +36,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -328,7 +330,7 @@ div.tocify {
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">microbe_set_trait</a>
+      <a class="navbar-brand" href="index.html">Evaluating trait databases for taxon-set analysis</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
@@ -341,9 +343,27 @@ div.tocify {
 <li>
   <a href="license.html">License</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Supplemental
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="01_retrieve_agp.html">Downloading AGP data</a>
+    </li>
+  </ul>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/qpmnguyen/microbe_set_trait">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -471,16 +491,16 @@ This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysi
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittreec9fa80a1f7803fa0539200401350bcdaa7a550f4targetblankc9fa80aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/qpmnguyen/microbe_set_trait/tree/c9fa80a1f7803fa0539200401350bcdaa7a550f4" target="_blank">c9fa80a</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittree8500a9a9b242e1ecd5f3a1e808b941f0f19e733btargetblank8500a9aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/qpmnguyen/microbe_set_trait/tree/8500a9a9b242e1ecd5f3a1e808b941f0f19e733b" target="_blank">8500a9a</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittreec9fa80a1f7803fa0539200401350bcdaa7a550f4targetblankc9fa80aa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittree8500a9a9b242e1ecd5f3a1e808b941f0f19e733btargetblank8500a9aa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/qpmnguyen/microbe_set_trait/tree/c9fa80a1f7803fa0539200401350bcdaa7a550f4" target="_blank">c9fa80a</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/qpmnguyen/microbe_set_trait/tree/8500a9a9b242e1ecd5f3a1e808b941f0f19e733b" target="_blank">8500a9a</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -512,15 +532,10 @@ Ignored files:
     Ignored:    store_pred/
     Ignored:    work/
 
-Untracked files:
-    Untracked:  R/wgs_manifest.R
-
 Unstaged changes:
-    Modified:   R/agp_manifest.R
-    Modified:   metadata/agp_joint_mtd.rds
-    Modified:   renv.lock
-    Modified:   renv/activate.R
-    Deleted:    slurm-1091428.out
+    Modified:   analysis/_site.yml
+    Modified:   analysis/about.Rmd
+    Modified:   analysis/license.Rmd
 
 </code></pre>
 <p>
@@ -559,6 +574,57 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/qpmnguyen/microbe_set_trait/8500a9a9b242e1ecd5f3a1e808b941f0f19e733b/docs/01_retrieve_agp.html" target="_blank">8500a9a</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/qpmnguyen/microbe_set_trait/901672ba4b5166184b955174260da493593c1b7b/docs/01_retrieve_agp.html" target="_blank">901672b</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/qpmnguyen/microbe_set_trait/0616d72724ffff990b181ebf0e88fb6968cdeb8e/docs/01_retrieve_agp.html" target="_blank">0616d72</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd

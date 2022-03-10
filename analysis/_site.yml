@@ -1,7 +1,7 @@
-name: microbe_set_trait
+name: Evaluating trait databases for taxon-set analysis 
 output_dir: ../docs
 navbar:
-  title: microbe_set_trait
+  title: Evaluating trait databases for taxon-set analysis
   left:
   - text: Home
     href: index.html
@@ -9,6 +9,10 @@ navbar:
     href: about.html
   - text: License
     href: license.html
+  - text: Supplemental    
+    menu:
+      - text: "Downloading AGP data"
+        href: "01_retrieve_agp.html"
   right:
   - icon: fab fa-github
     text: Source code
@@ -17,5 +21,5 @@ output:
   workflowr::wflow_html:
     toc: yes
     toc_float: yes
-    theme: cosmo
+    theme: darkly
     highlight: textmate
