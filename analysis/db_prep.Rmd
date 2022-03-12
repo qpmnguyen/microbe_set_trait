@@ -1,0 +1,58 @@
+---
+title: "Preparing trait databases"
+author: "Quang Nguyen"
+date: "2022-03-12"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+## Introduction
+
+We're prepping the latest database for export for evaluation. For this manuscript, we're merging a couple of existing databases:  
+
+1. The comprehensive synthesis of trait-database from [Madin et al. 2020](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7275036/). This database was last updated in 2020. Most of the database's sources are static sources, with the exception of the [GOLD database](https://gold.jgi.doe.gov/downloads). As such, we're merging the existing release of the Madin et al. database with the most recent GOLD release (2022-03-12).  
+2. Manual curation of bergey's manual by [Weissman et al.](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04216-2). This database contains manual curation of the Bergey's manual specific to human-associated microbiomes.   
+
+## Analysis  
+
+Loading some packages
+
+```{r}
+library(piggyback)
+library(data.table)
+library(dtplyr)
+library(targets)
+library(here)
+here::i_am("analysis/db_prep.Rmd")
+```
+
+
+### Downloading data files  
+
+Downloading data files from respective sources and version control on GitHub using `piggyback`  
+
+```{r, eval=FALSE}
+# Not run since file is large and is already uploaded to GitHub. Code here for provenance 
+piggyback::pb_upload(file = here("large_files", "goldData.xlsx"), tag = "0.1", overwrite = TRUE)
+
+```
+
+### Processing data files  
+
+Let's process GOLD 
+
+```{r, cache=TRUE}
+pth <- here("large_files", "goldData.xlsx")
+if (!file.exists(pth)){
+    piggyback::pb_download(file = "goldData.xlsx", dest = pth, tag = "0.1")
+}
+gold <- readxl::read_xlsx(path = pth, sheet = "Organism")
+```
+
+
+
