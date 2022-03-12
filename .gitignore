@@ -23,3 +23,5 @@ prototype.R
 .future/
 *.out
 analysis/*_cache/
+_targets/
+_targets_r/
