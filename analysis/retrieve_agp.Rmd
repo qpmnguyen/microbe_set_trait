@@ -15,7 +15,7 @@ We use `piggyback` to version the metadata file of the American Gut Project (AGP
 library(tidyverse)
 library(piggyback)
 library(here)
-here::i_am("analysis/01_retrieve_agp.Rmd")
+here::i_am("analysis/retrieve_agp.Rmd")
 
 
 f1 <- tempdir()
