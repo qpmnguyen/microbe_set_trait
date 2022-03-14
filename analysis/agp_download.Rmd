@@ -28,12 +28,13 @@ new_dir <- file.path(target_path, "raw")
 
 manifest <- readRDS(file = here("metadata", "agp_joint_mtd.rds")) 
 
-purrr::map(seq_along(nrow(manifest)), ~{
-    if (.x %% 2000 == 0){
-        print(paste("Currently at", .x))
-    }
+purrr::map(seq_len(nrow(manifest)), ~{
     filename <- paste0(manifest$sample_name[.x], "_001.fastq")
     pth <- file.path(new_dir, filename)
+    if (.x %% 2000 == 0){
+        print(paste("Currently at", filename, "and", 
+                    .x, "over", nrow(manifest)))
+    }
     download.file(url = manifest$fastq_ftp[.x], destfile = pth)
     return(0)
 })
