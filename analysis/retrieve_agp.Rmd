@@ -76,5 +76,6 @@ joint_metadata <- inner_join(subset_metadata, subset_manifest)
 nrow(joint_metadata)
 
 saveRDS(joint_metadata, file = "metadata/agp_joint_mtd.rds")
+write.csv(joint_metadata, file = "metadata/agp_joint_mtd.csv")
 ```
 

@@ -1,0 +1,48 @@
+---
+title: "Download AGP data"
+author: "Quang Nguyen"
+date: "2022-03-14"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction  
+This file is to download AGP data sets from the relevant sources  
+
+```{r}
+library(here)
+library(tidyverse) 
+here::i_am("analysis/agp_download.Rmd")
+target_path <- file.path("/dartfs-hpc", "rc", "lab", "H", "HoenA", "Lab", "QNguyen", "ResultsFiles", "data", "agp")
+if (!file.exists(file.path(target_path, ".placeholder"))){
+    stop("This might not be the correct place to run this file")
+}
+```
+
+### Retrieve metadata from csv/rds file   
+
+```{r}
+dir.create(file.path(target_path, "raw"))
+new_dir <- file.path(target_path, "raw")
+
+manifest <- readRDS(file = here("metadata", "agp_joint_mtd.rds")) 
+
+purrr::map(seq_along(nrow(manifest)), ~{
+    if (.x %% 2000 == 0){
+        print(paste("Currently at", .x))
+    }
+    filename <- paste0(manifest$sample_name[.x], "_001.fastq")
+    path <- here("raw", "agp", filename)
+    download.file(url = manifest$fastq_ftp[.x], destfile = path)
+    return(0)
+})
+```
+
+
+### Finalize results  
+
+```{r}
+head(list.files(new_dir))
+```
+
