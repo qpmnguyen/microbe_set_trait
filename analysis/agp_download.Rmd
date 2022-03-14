@@ -35,8 +35,12 @@ purrr::map(seq_len(nrow(manifest)), ~{
         print(paste("Currently at", filename, "and", 
                     .x, "over", nrow(manifest)))
     }
-    download.file(url = manifest$fastq_ftp[.x], destfile = pth)
-    return(0)
+    if (file.exists(pth)){
+        return(1)
+    } else {
+        download.file(url = manifest$fastq_ftp[.x], destfile = pth)
+        return(0)
+    }
 })
 ```
 
