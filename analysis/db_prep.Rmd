@@ -152,10 +152,16 @@ process_duplicates <- function(df){
 }
 ```
 
-Let's apply it to `tbl_munge` and then re
+Let's apply it to `tbl_munge` and then merge both data frames together into one consensus trait. After this munging, the final GOLD database is processed and ready to merge into the master `base` data frame  
+
 ```{r}
 
+tbl_munge %>% 
+    mutate(traits = map(traits, process_duplicates)) %>% as_tibble() %>% 
+    unnest(traits)
 ```
+
+
 
 
 
