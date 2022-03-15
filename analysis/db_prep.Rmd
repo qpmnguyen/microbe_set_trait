@@ -8,7 +8,7 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", autodep = TRUE)
 ```
 
 ## Introduction
@@ -18,11 +18,7 @@ We're prepping the latest database for export for evaluation. For this manuscrip
 1. The comprehensive synthesis of trait-database from [Madin et al. 2020](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7275036/). This database was last updated in 2020. Most of the database's sources are static sources, with the exception of the [GOLD database](https://gold.jgi.doe.gov/downloads). As such, we're merging the existing release of the Madin et al. database with the most recent GOLD release (2022-03-12).  
 2. Manual curation of bergey's manual by [Weissman et al.](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04216-2). This database contains manual curation of the Bergey's manual specific to human-associated microbiomes.   
 
-The way we're trying to combine these disparate sources would be to perform something similar to Madin et al. using the [R code](https://github.com/bacteria-archaea-traits/bacteria-archaea-traits/blob/master/R/functions.R) on GitHub. The step-by-step workflow is:  
-
-1. Prepare and process each individual database file.  
-2. Second, concatenate all database files by row. Remember to specify data source. 
-3. 
+The way we're trying to combine these disparate sources would be to perform something similar to Madin et al. using the [R code](https://github.com/bacteria-archaea-traits/bacteria-archaea-traits/blob/master/R/functions.R) on GitHub. We're going to apply relevant transformations and mappings where apply.  
 
 ## Analysis  
 
@@ -49,26 +45,30 @@ piggyback::pb_upload(file = here("large_files", "goldData.xlsx"), tag = "0.1", o
 
 ```
 
-### Processing data files  
+### Processing data files 
 
 First, load the original Madin et al. database  
 ```{r}
 base <- read_csv(here("data", "condensed_species_NCBI.txt"))
 ```
 
+#### Processing GOLD  
 
 Let's process GOLD. First, load data from `piggyback` (this is cached). Script follows existing processing pipeline [here](https://github.com/bacteria-archaea-traits/bacteria-archaea-traits/blob/master/R/preparation/gold.R) from Madin et al.   
 
-```{r, cache=TRUE}
-pth <- here("large_files")
+```{r, warning=FALSE}
+pth <- here("large_files", "goldData.csv")
 if (!file.exists(pth)){
-    piggyback::pb_download(file = "goldData.xlsx", dest = pth, tag = "0.1")
+    piggyback::pb_download(file = "goldData.xlsx", dest = here("large_files"), tag = "0.1")
+    gold <- readxl::read_xlsx(path = here("large_files", "goldData.xlsx"), sheet = "Organism")
+    readr::write_csv(x = gold, file = pth)
 }
-gold <- readxl::read_xlsx(path = file.path(pth, "goldData.xlsx"), sheet = "Organism")
+gold <- read_csv(file = pth)
 ```
 
+Let's perform name conversions  
 
-```{r}
+```{r, cache = TRUE}
 # convert names 
 colnames(gold) <- colnames(gold) %>% 
     gsub(x = ., pattern = " ", replacement = "_") %>% 
@@ -76,31 +76,86 @@ colnames(gold) <- colnames(gold) %>%
     gsub(x = ., pattern = "organism_", replacement = "")
 
 
-
-gold %>% 
-    select(name, ncbi_tax_id, ncbi_superkingdom,  
+gold_reduced <- gold %>% 
+    select(ncbi_tax_id, ncbi_superkingdom,  
             ncbi_phylum, ncbi_order, ncbi_family, ncbi_genus, ncbi_species, 
-            gram_stain, metabolism, energy_sources, oxygen_requirement, 
+            name, gram_stain, metabolism, oxygen_requirement, 
             sporulation, motility, cell_shape) %>% 
-    # rename("species_tax_id" = ncbi_tax_id, 
-    #        "superkingdom" = ncbi_superkingdom,
-    #        "phylum" = ncbi_phylum, 
-    #        "order" = ncbi_order, 
-    #        "family" = ncbi_family, 
-    #        "genus" = ncbi_genus, 
-    #        "species" = ncbi_species, 
-    #        "pathways" = , 
-    #        "metabolism" = oxygen_requirement)
+    rename("species_tax_id" = ncbi_tax_id,
+           "superkingdom" = ncbi_superkingdom,
+           "phylum" = ncbi_phylum,
+           "order" = ncbi_order,
+           "family" = ncbi_family,
+           "genus" = ncbi_genus,
+           "species" = ncbi_species,
+           "pathways" = metabolism,
+           "metabolism" = oxygen_requirement) %>% as.data.table()
+
+# nest traits 
+tbl <- gold_reduced %>%
+    group_by(species_tax_id, superkingdom, phylum, order, 
+             family, genus, species, name) %>%
+    nest(traits = c(gram_stain, pathways, metabolism, 
+           cell_shape, motility, sporulation))
     
 
-
-
-
-
+# a subset of the table that has more than one row per trait nested values 
+tbl_munge <- tbl %>% filter(map_lgl(traits, ~{nrow(.x) > 1}))
 ```
 
+The issue is that there some species with multiple entries per species due to differences in certain characteristics. Here, we're going to loop over all of those rows and then replace them 
 
+Let's define a function that processes species that have multiple entries in GOLD 
 
+```{r}
+# This function takes a data frame and a column 
+# and selects the response with the highest frequency
+select_best <- function(df, column){
+    vec <- unlist(df[,..column])
+    freq <- as.data.frame(table(vec))
+    if (nrow(freq) == 0){
+        return(NA)
+    } else {
+        return(freq %>% filter(Freq == max(Freq)) %>% 
+                   pull(vec) %>% as.character())
+    }
+}
+
+# This function then utilizes select_best
+# to process entries with duplicates (more than one row)
+# for pathways, the goal is to concatenate them
+process_duplicates <- function(df){
+    # get only unique rows
+    df <- unique(df)
+    if (nrow(df) == 1){
+        return(as_tibble(df))
+    }
+    v <- c("gram_stain", "pathways", "metabolism", 
+           "sporulation", "motility", "cell_shape")
+    suppressMessages(res <- map_dfc(v, ~{
+        if (.x == "pathways"){
+            str_vec <- na.omit(df$pathways)
+            if (length(str_vec) == 0){
+                out <- NA
+            } else {
+                out <- str_replace(str_vec, pattern = " ", 
+                                   replacement = "_") %>% 
+                    paste(collapse = ", ")
+            }
+        } else {
+            out <- select_best(df, .x)
+        }
+        return(out)
+    }))
+    colnames(res) <- v
+    return(res)
+}
+```
+
+Let's apply it to `tbl_munge` and then re
+```{r}
+
+```
 
 
 
