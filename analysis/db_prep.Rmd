@@ -11,7 +11,7 @@ editor_options:
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", autodep = TRUE)
 ```
 
-## Introduction
+# Introduction
 
 We're prepping the latest database for export for evaluation. For this manuscript, we're merging a couple of existing databases:  
 
@@ -20,7 +20,7 @@ We're prepping the latest database for export for evaluation. For this manuscrip
 
 The way we're trying to combine these disparate sources would be to perform something similar to Madin et al. using the [R code](https://github.com/bacteria-archaea-traits/bacteria-archaea-traits/blob/master/R/functions.R) on GitHub. We're going to apply relevant transformations and mappings where apply.  
 
-## Analysis  
+# Analysis  
 
 Loading some packages
 
@@ -35,7 +35,7 @@ here::i_am("analysis/db_prep.Rmd")
 ```
 
 
-### Downloading data files  
+## Downloading data files  
 
 Downloading data files from respective sources and version control on GitHub using `piggyback`  
 
@@ -45,14 +45,14 @@ piggyback::pb_upload(file = here("large_files", "goldData.xlsx"), tag = "0.1", o
 
 ```
 
-### Processing data files 
+## Processing data files 
 
 First, load the original Madin et al. database  
 ```{r}
 base <- read_csv(here("data", "condensed_species_NCBI.txt"))
 ```
 
-#### Processing GOLD  
+### Processing GOLD  
 
 Let's process GOLD. First, load data from `piggyback` (this is cached). Script follows existing processing pipeline [here](https://github.com/bacteria-archaea-traits/bacteria-archaea-traits/blob/master/R/preparation/gold.R) from Madin et al.   
 
@@ -93,8 +93,9 @@ gold_reduced <- gold %>%
 
 # nest traits 
 tbl <- gold_reduced %>%
+    select(-name) %>%
     group_by(species_tax_id, superkingdom, phylum, order, 
-             family, genus, species, name) %>%
+             family, genus, species) %>%
     nest(traits = c(gram_stain, pathways, metabolism, 
            cell_shape, motility, sporulation))
     
@@ -103,7 +104,7 @@ tbl <- gold_reduced %>%
 tbl_munge <- tbl %>% filter(map_lgl(traits, ~{nrow(.x) > 1}))
 ```
 
-The issue is that there some species with multiple entries per species due to differences in certain characteristics. Here, we're going to loop over all of those rows and then replace them 
+The issue is that there some species with multiple entries per species due to differences in certain characteristics but also multiple strains per species. Here, we're going to loop over all of those rows and then replace them. Since the original database is at species level, we're also going to collapse from the strain level to the species level similar to Madin et al. 2020 
 
 Let's define a function that processes species that have multiple entries in GOLD 
 
@@ -128,7 +129,7 @@ process_duplicates <- function(df){
     # get only unique rows
     df <- unique(df)
     if (nrow(df) == 1){
-        return(as_tibble(df))
+        return(df)
     }
     v <- c("gram_stain", "pathways", "metabolism", 
            "sporulation", "motility", "cell_shape")
@@ -148,18 +149,87 @@ process_duplicates <- function(df){
         return(out)
     }))
     colnames(res) <- v
+    res <- as.data.table(res)
     return(res)
 }
 ```
 
 Let's apply it to `tbl_munge` and then merge both data frames together into one consensus trait. After this munging, the final GOLD database is processed and ready to merge into the master `base` data frame  
 
-```{r}
+```{r, cache = TRUE}
 
 tbl_munge <- tbl_munge %>% 
     mutate(traits = map(traits, process_duplicates)) %>% as_tibble() %>% 
     unnest(traits)
+
 ```
+
+We merge by extracting the `species_tax_id` column out of `tbl`, remove all rows with that identifier and then replace that with those from the `tbl_munge` database. 
+
+```{r}
+
+ids <- tbl_munge %>% pull(species_tax_id)
+
+gold_final <- tbl %>% filter(!species_tax_id %in% ids) %>% 
+    as_tibble() %>% 
+    unnest(traits) %>% bind_rows(tbl_munge)
+
+head(gold_final)
+```
+
+`gold_final` will now be the finalized form of the GOLD database as put into the original format of Madin et al.  
+
+### Processing Weissman et al.  
+
+```{r}
+
+weissman <- read_csv(here("data", "weissman.csv"))
+
+# select the relevant columns
+weissman <- weissman %>% select(c("taxid_species",
+                                  "kingdom", "phylum", "class", "order", "family", "genus", "species",
+                                  "Motility_general", "Oxygen.Preference", "Cell.Shape", "Cell.Aggregation",
+                                  starts_with("Enzyme.Assays"), 
+                                  starts_with("Volatile.Gas.Production"), 
+                                  starts_with("Substrate.Utilization")))
+
+```
+
+Here, we're going to re-format it similar to Madin et al. `Enzyme.Assays` and `Volatile.Gas.Production` is equivalent to `pathways` while `Substrate.Utililization` is equivalent to `carbon_substrates`. Since there might be non-carbon compounds here, we're going to rename Madin et al.'s `carbon_substrates` into just `substrate` here similar to Weissman's database.  
+
+```{r}
+weissman <- weissman %>% group_by(taxid_species, kingdom, phylum, 
+                      class, order, family, genus, species) %>%
+    nest(pathways = starts_with(c("Enzyme.Assays", "Volatile.Gas.Production")), 
+         substrate = starts_with("Substrate.Utilization")) %>% ungroup() %>% 
+    mutate(across(where(is.character), ~na_if(., "0"))) %>% 
+    rename("species_tax_id" = taxid_species, "superkingdom" = kingdom, 
+           "metabolism" = Oxygen.Preference,
+           "motility" = Motility_general, "cell_shape" = Cell.Shape, "cell_aggregation" = Cell.Aggregation)
+```
+
+Here we're going to define some functions to process the traits that is internal (collapse into one column) for pathways and for substrates  
+
+```{r}
+test <- weissman %>% select(species_tax_id, pathways) 
+test
+
+
+t_unit <- test$pathways[[1]]
+
+t_unit %>% pivot_longer(everything()) %>% 
+    mutate(func_name = map_chr(name, str_split(name, pattern = ".."))) %>% print(n = Inf)
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
