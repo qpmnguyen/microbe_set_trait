@@ -156,7 +156,7 @@ Let's apply it to `tbl_munge` and then merge both data frames together into one 
 
 ```{r}
 
-tbl_munge %>% 
+tbl_munge <- tbl_munge %>% 
     mutate(traits = map(traits, process_duplicates)) %>% as_tibble() %>% 
     unnest(traits)
 ```
