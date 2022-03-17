@@ -15,7 +15,8 @@ navbar:
         href: "retrieve_agp.html"
       - text: "Downloading AGP"
         href: "agp_download.html"
-  - text: Database and data preprocessing  
+  - text: Database and data preprocessing 
+    menu:
       - text: "Updating Madin et al."
         href: "db_prep.html"
   right:
