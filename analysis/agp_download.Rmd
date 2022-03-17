@@ -28,7 +28,7 @@ new_dir <- file.path(target_path, "raw")
 
 manifest <- readRDS(file = here("metadata", "agp_joint_mtd.rds")) 
 
-purrr::map(seq_len(nrow(manifest)), ~{
+res <- purrr::map(seq_len(nrow(manifest)), ~{
     filename <- paste0(manifest$sample_name[.x], "_001.fastq")
     pth <- file.path(new_dir, filename)
     if (.x %% 2000 == 0){
