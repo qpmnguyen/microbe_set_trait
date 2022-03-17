@@ -9,16 +9,20 @@ navbar:
     href: about.html
   - text: License
     href: license.html
-  - text: Data downloads     
+  - text: Preparation     
     menu:
       - text: "AGP data manifest"
         href: "retrieve_agp.html"
       - text: "Downloading AGP"
         href: "agp_download.html"
-  - text: Database and data preprocessing 
-    menu:
-      - text: "Updating Madin et al."
+      - text: "Updating database"        
         href: "db_prep.html"
+  - text: Main Analyses 
+    menu:
+      - text: "Coverage analyses"
+      - text: "Concordance analyses"
+      - text: "Predictive analyses"
+
   right:
   - icon: fab fa-github
     text: Source code
