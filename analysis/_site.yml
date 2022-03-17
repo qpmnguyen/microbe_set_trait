@@ -9,10 +9,15 @@ navbar:
     href: about.html
   - text: License
     href: license.html
-  - text: Supplemental    
+  - text: Data downloads     
     menu:
-      - text: "Downloading AGP data"
-        href: "01_retrieve_agp.html"
+      - text: "AGP data manifest"
+        href: "retrieve_agp.html"
+      - text: "Downloading AGP"
+        href: "agp_download.html"
+  - text: Database and data preprocessing  
+      - text: "Updating Madin et al."
+        href: "db_prep.html"
   right:
   - icon: fab fa-github
     text: Source code

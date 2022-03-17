@@ -11,7 +11,7 @@ staging/
 .Renviron
 databases/
 raw/
-
+*.Rproj
 store_*/
 !store_*/meta/
 large_files/
