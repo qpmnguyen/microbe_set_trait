@@ -13,6 +13,7 @@
 
 <title>About</title>
 
+<script src="site_libs/header-attrs-2.12/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/darkly.min.css" rel="stylesheet" />
@@ -41,6 +42,8 @@ div.section {
   padding-top: 12px;
 }
 </style>
+
+
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -317,47 +320,42 @@ $(document).ready(function () {
 
 
 <p>
-<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report"
-  data-toggle="collapse" data-target="#workflowr-report">
-  
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
 <span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 </button>
 </p>
-
 <div id="workflowr-report" class="collapse">
 <ul class="nav nav-tabs">
-  <li class="active">
+<li class="active">
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
-  <li>
+<li>
 <a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
 </li>
-  <li>
+<li>
 <a data-toggle="tab" href="#versions">Past versions</a>
 </li>
 </ul>
-
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
-  <p>
+<p>
 <strong>Last updated:</strong> 2022-03-18
 </p>
-  <p>
+<p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
 </p>
-  <p>
+<p>
 <strong>Knit directory:</strong> <code>microbe_set_trait/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
 </p>
-  <p>
-  
+<p>
 This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
   href="https://github.com/workflowr/workflowr">workflowr</a> (version 1.7.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
 <div id="checks" class="tab-pane fade">
-  <div class="panel-group" id="workflowr-checks">
-  <div class="panel panel-default">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
 <a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
@@ -365,7 +363,6 @@ This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysi
 </div>
 <div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
 <div class="panel-body">
-  
 <p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
 </div>
 </div>
@@ -373,43 +370,53 @@ This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysi
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittree624d0bf6b2a27975f814b9c89173a7fb50778167targetblank624d0bfa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/qpmnguyen/microbe_set_trait/tree/624d0bf6b2a27975f814b9c89173a7fb50778167" target="_blank">624d0bf</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittree8ccd1ff819484e02a61fb51208191b6f51de6673targetblank8ccd1ffa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/qpmnguyen/microbe_set_trait/tree/8ccd1ff819484e02a61fb51208191b6f51de6673" target="_blank">8ccd1ff</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittree624d0bf6b2a27975f814b9c89173a7fb50778167targetblank624d0bfa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittree8ccd1ff819484e02a61fb51208191b6f51de6673targetblank8ccd1ffa" class="panel-collapse collapse">
 <div class="panel-body">
-  
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
-
 <p>
-The results in this page were generated with repository version <a href="https://github.com/qpmnguyen/microbe_set_trait/tree/624d0bf6b2a27975f814b9c89173a7fb50778167" target="_blank">624d0bf</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/qpmnguyen/microbe_set_trait/tree/8ccd1ff819484e02a61fb51208191b6f51de6673" target="_blank">8ccd1ff</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
-
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 </p>
-
 <pre><code>
 Ignored files:
-    Ignored:    .future/
+    Ignored:    .DS_Store
+    Ignored:    .Renviron
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    .nextflow.log
+    Ignored:    .nextflow.log.1
+    Ignored:    .nextflow.log.2
+    Ignored:    .nextflow.log.3
+    Ignored:    .nextflow.log.4
+    Ignored:    .nextflow.log.5
+    Ignored:    .nextflow.log.6
+    Ignored:    .nextflow/
+    Ignored:    R/prototype.R
     Ignored:    _targets/
-    Ignored:    _targets_r/
-    Ignored:    nohup.out
-    Ignored:    renv/library/
+    Ignored:    analysis/db_prep_cache/
+    Ignored:    databases/
+    Ignored:    large_files/
+    Ignored:    picrust2_tmp/
+    Ignored:    python/.ipynb_checkpoints/
+    Ignored:    python/data/
     Ignored:    renv/staging/
-    Ignored:    sets/
     Ignored:    store_coverage/
+    Ignored:    store_dada2/
     Ignored:    store_db_preprocess/
     Ignored:    store_pred/
+    Ignored:    work/
 
 </code></pre>
-
 <p>
-Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
 </p>
-
 </div>
 </div>
 </div>
@@ -417,9 +424,9 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in th
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-  
+
 <p>
-These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/about.Rmd</code>) and HTML (<code>docs/about.html</code>) files. If you've configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/about.Rmd</code>) and HTML (<code>docs/about.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
 </p>
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
@@ -443,6 +450,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/qpmnguyen/microbe_set_trait/2c32ce16fae8adacf2b38028dbefc86e25cc66ef/docs/about.html" target="_blank">2c32ce1</a>
+</td>
+<td>
+qpmnguyen
+</td>
+<td>
+2022-03-18
+</td>
+<td>
+New files
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -582,15 +606,10 @@ Start workflowr project.
 </tbody>
 </table>
 </div>
-
 <hr>
 </div>
 </div>
 </div>
-
-
-
-
 <p>This project entails analyses to assess the usage of trait databases as taxon-sets for enrichment analysis</p>
 
 
@@ -605,6 +624,8 @@ footer is added to webpages before the MathJax javascript. -->
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
 </script>
+
+
 
 
 
