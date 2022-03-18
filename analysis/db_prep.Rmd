@@ -30,6 +30,7 @@ library(data.table)
 library(dtplyr)
 library(targets)
 library(here)
+library(stringdist)
 library(tidyverse)
 here::i_am("analysis/db_prep.Rmd")
 ```
@@ -49,7 +50,11 @@ piggyback::pb_upload(file = here("large_files", "goldData.xlsx"), tag = "0.1", o
 
 First, load the original Madin et al. database  
 ```{r}
-base <- read_csv(here("data", "condensed_species_NCBI.txt"))
+base <- read_csv(here("data", "condensed_species_NCBI.txt")) %>% 
+    select(species_tax_id, superkingdom, phylum, class, order, family, 
+           genus, species, metabolism, gram_stain, pathways, 
+           carbon_substrates, sporulation, motility, cell_shape) %>% 
+    rename("substrate" = carbon_substrates)
 ```
 
 ### Processing GOLD  
@@ -210,7 +215,7 @@ weissman <- weissman %>% group_by(taxid_species, kingdom, phylum,
 
 Here we're going to define some functions to process the traits that is internal (collapse into one column) for pathways and for substrates  
 
-```{r, cache = TRUE}
+```{r}
 #' @param unit A single unit from a list of trait data frames
 proc_pathways <- function(unit){
     string <- unit %>% pivot_longer(everything()) %>% 
@@ -226,7 +231,9 @@ proc_pathways <- function(unit){
             mutate(name = str_replace_all(name, pattern = "\\.", "_")) %>% 
             rowwise() %>%
             mutate(name = if_else(str_detect(name, "synthesis_"), 
-                                  true = paste(rev(str_split(name, pattern = "_", n = 2)[[1]]), collapse = "_"),
+                                  true = paste(rev(str_split(name, pattern = "_", 
+                                                             n = 2)[[1]]), 
+                                               collapse = "_"),
                                   false = name)) %>% 
             ungroup() %>%
             pull(name) %>% paste(., collapse = ", ")
@@ -236,27 +243,78 @@ proc_pathways <- function(unit){
 }
 
 proc_substrate <- function(unit){
-    string <- unit %>% pivot_longer(everything())
-    
-    string %>% mutate(name = str_replace(name, "^(.*)\\.\\.", "")) %>%
-        print(n = Inf)
-    
-    
+    string <- unit %>% pivot_longer(everything()) %>% filter(value != 0)
+    if (nrow(string) == 0){
+        return(NA)
+    } else {
+        string <- string %>% mutate(name = str_split(name, pattern = "\\.\\.", 
+                                           n = 2, simplify = TRUE)[,2]) %>%
+            mutate(name = str_replace(name, "(\\.\\.|\\.)$", "")) %>% 
+            mutate(name = str_replace_all(name, "(\\.\\.|\\.)", "_")) %>% 
+            pull(name) %>% paste(., collapse = ", ")
+    }
+    return(string)
 }
-
-test <- weissman %>% select(species_tax_id, substrate)
-unit <- test$substrate[[1]]
-
-
-
-test %>% mutate(pathways = map_chr(pathways, proc_pathways))
 
 ```
 
 
+Map it over the two columns in the original data frame.   
+
+```{r, cache=TRUE}
+substr <- map_chr(weissman$substrate, proc_substrate)
+pthway <- map_chr(weissman$pathways, proc_pathways)
+
+weissman <- weissman %>% select(-c(pathways, substrate)) %>% 
+  mutate(substrate = substr, pathways = pthway)
+```
 
 
+### Combining the databases 
 
+First, we define a function to check for similar sounding names across all the unique pathways and substrates for all the data sets. Here, we use the `stringdist` function from the `stringdist` package. We use the standard OSA metric (also called the Damerau-Levenshtein distance) to query for potential similarly sounding names of identical pathways or compounds.   
+
+```{r}
+
+check_matches <- function(df, type=c("pathways","substrates")){
+    b_val <- base %>% pull(!!type) %>% unique() %>% str_split(pattern = ", ") %>%
+        unlist() %>% unique() %>% na.omit() %>% as.vector()
+    
+    q_val <- df %>% pull(!!type) %>% unique() %>% str_split(pattern = ", ") %>% 
+        unlist() %>% unique() %>% na.omit() %>% as.vector()
+    
+    check <- map(q_val, ~{
+        match <- stringdist(a = .x, b = b_val)
+        # match 0 is the same, and match > 2 is too different 
+        ret <- b_val[match > 0 & match <= 2]
+        if (length(ret) == 0){
+            return(NA)
+        } else {
+            out <- tibble(
+                query = rep(.x, length(ret)),
+                ref = ret
+            )
+        }
+    })
+    check <- check[!sapply(check, function(x) all(is.na(x)))]
+    
+    return(check)
+}
+
+```
+
+
+Check Weissman et al. database  
+
+```{r}
+check_matches(weissman, "pathways")
+check_matches(weissman, "substrate")
+
+```
+
+We can see that for a lot of the compounds the names might be the same but they're actually different. However, there are certain conventions such as "_" for spaces or "-" that we might need to address for the final merge.  
+
+Let's check the GOLD database for similar sounding names  
 
 
 
