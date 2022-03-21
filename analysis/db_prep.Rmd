@@ -83,12 +83,13 @@ colnames(gold) <- colnames(gold) %>%
 
 gold_reduced <- gold %>% 
     select(ncbi_tax_id, ncbi_superkingdom,  
-            ncbi_phylum, ncbi_order, ncbi_family, ncbi_genus, ncbi_species, 
+            ncbi_phylum, ncbi_class, ncbi_order, ncbi_family, ncbi_genus, ncbi_species, 
             name, gram_stain, metabolism, oxygen_requirement, 
             sporulation, motility, cell_shape) %>% 
     rename("species_tax_id" = ncbi_tax_id,
            "superkingdom" = ncbi_superkingdom,
            "phylum" = ncbi_phylum,
+           "class" = ncbi_class,
            "order" = ncbi_order,
            "family" = ncbi_family,
            "genus" = ncbi_genus,
@@ -179,7 +180,38 @@ gold_final <- tbl %>% filter(!species_tax_id %in% ids) %>%
     as_tibble() %>% 
     unnest(traits) %>% bind_rows(tbl_munge)
 
+# final cleaning
+gold_final <- gold_final %>% 
+    mutate(metabolism = tolower(metabolism), 
+           gram_stain = if_else(gram_stain == "Gram-", "negative", "positive"), 
+           sporulation = if_else(sporulation == "Nonsporulating", "no", "yes"), 
+           motility = case_when(
+               motility == "Nonmotile" ~ "no", 
+               motility == "Motile" ~ "yes", 
+               TRUE ~ motility
+           ), 
+           cell_shape = tolower(str_replace(cell_shape,"-shaped","")),
+           cell_shape = case_when(
+               cell_shape %in% c("rod") ~ "bacillus",
+               cell_shape %in% c("sphere", "oval", 
+                                 "bean", "coccoid", "ovoid", 
+                                 "spore") ~ "coccus", 
+               cell_shape %in% c("helical") ~ "spiral", 
+               cell_shape %in% c("curved") ~ "vibrio", 
+               cell_shape %in% c("flask", "open-ring", "lancet") ~ "irregular", 
+               # only Mycoplasma genitalium for flask and 
+               # only Thiomicrospira cyclica for open-ring
+               # only Nitrolancea hollandica for lancet
+               TRUE ~ cell_shape
+           ))
+
 head(gold_final)
+# pray not to crash
+rm(gold)
+rm(gold_reduced)
+rm(tbl)
+rm(tbl_munge)
+gc()
 ```
 
 `gold_final` will now be the finalized form of the GOLD database as put into the original format of Madin et al.  
@@ -211,6 +243,24 @@ weissman <- weissman %>% group_by(taxid_species, kingdom, phylum,
     rename("species_tax_id" = taxid_species, "superkingdom" = kingdom, 
            "metabolism" = Oxygen.Preference,
            "motility" = Motility_general, "cell_shape" = Cell.Shape, "cell_aggregation" = Cell.Aggregation)
+
+# motility, cell shape, metabolism
+weissman$cell_shape %>% unique()
+
+weissman <- weissman %>% 
+    mutate(motility = if_else(motility == "non-motile", "yes", "no"), 
+                    cell_shape = case_when(
+                        cell_shape == "rod" ~ "bacillus",
+                        cell_shape == "ovoid/coccobacillus" ~ "coccus", 
+                        cell_shape == "spirillum/corkscrew" ~ "spiral",
+                        TRUE ~ cell_shape
+                    ), 
+                    metabolism = case_when(
+                        metabolism == "microaerophile" ~ "microaerophilic",
+                        TRUE ~ metabolism
+                    ), 
+                    metabolism = str_replace(metabolism, 
+                                             pattern = "obe$", replacement = "obic"))
 ```
 
 Here we're going to define some functions to process the traits that is internal (collapse into one column) for pathways and for substrates  
@@ -270,7 +320,7 @@ weissman <- weissman %>% select(-c(pathways, substrate)) %>%
 ```
 
 
-### Combining the databases 
+### Checking for duplicates  
 
 First, we define a function to check for similar sounding names across all the unique pathways and substrates for all the data sets. Here, we use the `stringdist` function from the `stringdist` package. We use the standard OSA metric (also called the Damerau-Levenshtein distance) to query for potential similarly sounding names of identical pathways or compounds.   
 
@@ -307,14 +357,62 @@ check_matches <- function(df, type=c("pathways","substrates")){
 Check Weissman et al. database  
 
 ```{r}
-check_matches(weissman, "pathways")
-check_matches(weissman, "substrate")
+Reduce(check_matches(weissman, "pathways"), f = rbind)
+Reduce(check_matches(weissman, "substrate"), f = rbind)
 
 ```
 
 We can see that for a lot of the compounds the names might be the same but they're actually different. However, there are certain conventions such as "_" for spaces or "-" that we might need to address for the final merge.  
 
-Let's check the GOLD database for similar sounding names  
+Let's check the GOLD database for similar sounding names. Since GOLD does not have substrate information, we only check for pathways
+
+```{r}
+Reduce(check_matches(gold_final, "pathways"), f = rbind)
+```
+
+We can see a similar pattern here. Essentially we need to wrangle the columns such that spaces are replaced with underscores and all names should be to lower case.  
+
+```{r}
+trim_path <- function(vec){
+    vec <- vec %>% tolower() %>% 
+        str_split(pattern = "(, |\\|)") %>% 
+        map(~{
+            str_trim(.x) %>% str_replace_all("\\-", "") %>%
+                str_replace_all(" ", "_") %>% unique()
+        })
+    return(vec)
+}
+
+
+gold_final$pathways <- trim_path(gold_final$pathways)
+base$pathways <- trim_path(base$pathways)
+weissman$pathways <- trim_path(weissman$pathways)
+weissman$substrate <- trim_path(weissman$substrate)
+base$substrate <- trim_path(base$substrate)
+```
+
+### Combine all data frames  
+
+After munging, let's combine all of the names! The strategy is very similar to handling multiple entries for GOLD. First, we bind all of our databases together. Then, we `group_by` and nest all our trait data into a list. Then we process these lists and return `unique` rows (deduplicated). If the rows are not unique, then we process the non-unique rows by either concatenating the traits together or vote on consensus using the top most represented trait.  
+
+```{r}
+complete <- bind_rows(
+    base %>% mutate(source = "madin"), 
+    gold_final %>% mutate(source = "gold"), 
+    weissman %>% mutate(source = "weissman")
+)
+
+test <- complete %>% filter(!is.na(species)) %>% 
+    group_by(species_tax_id, superkingdom, phylum, class, order, 
+             family, genus, species) %>% 
+    tally()
+
+test$gram_stain[[1]]
+```
+
+
+
+
 
 
 
