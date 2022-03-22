@@ -346,14 +346,32 @@ div.tocify {
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Supplemental
+    Preparation
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="01_retrieve_agp.html">Downloading AGP data</a>
+      <a href="retrieve_agp.html">AGP data manifest</a>
     </li>
+    <li>
+      <a href="agp_download.html">Downloading AGP</a>
+    </li>
+    <li>
+      <a href="db_prep.html">Updating database</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Main Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Coverage analyses</li>
+    <li class="dropdown-header">Concordance analyses</li>
+    <li class="dropdown-header">Predictive analyses</li>
   </ul>
 </li>
       </ul>
@@ -383,7 +401,9 @@ div.tocify {
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -392,7 +412,9 @@ div.tocify {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -401,17 +423,27 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2022-03-14
+<strong>Last updated:</strong> 2022-03-21
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
 </p>
 <p>
-<strong>Knit directory:</strong> <code>microbe_set_trait/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+<strong>Knit directory:</strong> <code>microbe_set_trait/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
 </p>
 <p>
-This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/workflowr/workflowr">workflowr</a> (version 1.7.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
@@ -420,91 +452,149 @@ This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysi
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
 <div class="panel-body">
-<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
 </p>
 </div>
 <div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220309code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20220309)</code> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220309code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20220309)</code> </a>
 </p>
 </div>
-<div id="strongSeedstrongcodesetseed20220309code" class="panel-collapse collapse">
+<div id="strongSeedstrongcodesetseed20220309code"
+class="panel-collapse collapse">
 <div class="panel-body">
-<p>The command <code>set.seed(20220309)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+<p>The command <code>set.seed(20220309)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
 </p>
 </div>
-<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongdetected">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>Cache:</strong> detected </a>
 </p>
 </div>
-<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div id="strongCachestrongdetected" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+The following chunks had caches available:
+<ul>
+<li>
+unnamed-chunk-4
+</li>
+<li>
+unnamed-chunk-5
+</li>
+</ul>
+<p>To ensure reproducibility of the results, delete the cache directory
+<code>db_prep_cache</code> and re-run the analysis. To have workflowr
+automatically delete the cache directory prior to building the file, set
+<code>delete_cache = TRUE</code> when running <code>wflow_build()</code>
+or <code>wflow_publish()</code>.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
 </p>
 </div>
 <div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittree7175fe96505114d870bc34e069628e1aa6e259d8targetblank7175fe9a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/qpmnguyen/microbe_set_trait/tree/7175fe96505114d870bc34e069628e1aa6e259d8" target="_blank">7175fe9</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittree154a960604fe05b408324c5d17e689f6477ff635targetblank154a960a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/tree/154a960604fe05b408324c5d17e689f6477ff635" target="_blank">154a960</a>
+</a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittree7175fe96505114d870bc34e069628e1aa6e259d8targetblank7175fe9a" class="panel-collapse collapse">
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittree154a960604fe05b408324c5d17e689f6477ff635targetblank154a960a"
+class="panel-collapse collapse">
 <div class="panel-body">
 <p>
-Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/qpmnguyen/microbe_set_trait/tree/7175fe96505114d870bc34e069628e1aa6e259d8" target="_blank">7175fe9</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version
+<a href="https://github.com/qpmnguyen/microbe_set_trait/tree/154a960604fe05b408324c5d17e689f6477ff635" target="_blank">154a960</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
 </p>
 <p>
-Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
 </p>
 <pre><code>
 Ignored files:
@@ -522,6 +612,7 @@ Ignored files:
     Ignored:    .nextflow/
     Ignored:    R/prototype.R
     Ignored:    _targets/
+    Ignored:    analysis/db_prep_cache/
     Ignored:    databases/
     Ignored:    large_files/
     Ignored:    picrust2_tmp/
@@ -534,12 +625,11 @@ Ignored files:
     Ignored:    store_pred/
     Ignored:    work/
 
-Unstaged changes:
-    Modified:   analysis/db_prep.Rmd
-
 </code></pre>
 <p>
-Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
 </p>
 </div>
 </div>
@@ -550,7 +640,12 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <div id="versions" class="tab-pane fade">
 
 <p>
-These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/db_prep.Rmd</code>) and HTML (<code>docs/db_prep.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/db_prep.Rmd</code>) and HTML
+(<code>docs/db_prep.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
 </p>
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
@@ -574,6 +669,176 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/blob/154a960604fe05b408324c5d17e689f6477ff635/analysis/db_prep.Rmd" target="_blank">154a960</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-21
+</td>
+<td>
+workflowr::wflow_publish("analysis/db_prep.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/blob/cf04966d791f29f5ac7d557846db307a7994c5db/analysis/db_prep.Rmd" target="_blank">cf04966</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-20
+</td>
+<td>
+More db prep work
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/blob/8ccd1ff819484e02a61fb51208191b6f51de6673/analysis/db_prep.Rmd" target="_blank">8ccd1ff</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-18
+</td>
+<td>
+Switching dbs
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/blob/624d0bf6b2a27975f814b9c89173a7fb50778167/analysis/db_prep.Rmd" target="_blank">624d0bf</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-17
+</td>
+<td>
+Adding more details to db_prep
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/blob/7ce15a739ff55ff4b9c5bc6ef18a8f2be8fcc09f/analysis/db_prep.Rmd" target="_blank">7ce15a7</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-17
+</td>
+<td>
+new db_prep
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/blob/d42b3f0d3e0de0965406a25a41b972c321cf9b5a/analysis/db_prep.Rmd" target="_blank">d42b3f0</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-16
+</td>
+<td>
+Reorganizng site and adding new files
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/blob/85f49e075cd737c0dc423a64cca3bba12ade531a/analysis/db_prep.Rmd" target="_blank">85f49e0</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-15
+</td>
+<td>
+Still more db prep
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/blob/e3e031d14a1ffc10f92358f5875b62af8b2becfa/analysis/db_prep.Rmd" target="_blank">e3e031d</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-15
+</td>
+<td>
+More dbprep
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/blob/9cc43817da1110e1ae2725df07b9e066f1dcc9f5/analysis/db_prep.Rmd" target="_blank">9cc4381</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-15
+</td>
+<td>
+Starting db_prep
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/qpmnguyen/microbe_set_trait/9cc43817da1110e1ae2725df07b9e066f1dcc9f5/docs/db_prep.html" target="_blank">9cc4381</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-03-15
+</td>
+<td>
+Starting db_prep
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -639,7 +904,7 @@ Quang Nguyen
 2022-03-12
 </td>
 <td>
-workflowr::wflow_publish(“analysis/db_prep.Rmd”)
+workflowr::wflow_publish("analysis/db_prep.Rmd")
 </td>
 </tr>
 </tbody>
@@ -649,24 +914,32 @@ workflowr::wflow_publish(“analysis/db_prep.Rmd”)
 </div>
 </div>
 </div>
-<div id="introduction" class="section level2">
-<h2>Introduction</h2>
-<p>We’re prepping the latest database for export for evaluation. For this manuscript, we’re merging a couple of existing databases:</p>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>We’re prepping the latest database for export for evaluation. For
+this manuscript, we’re merging a couple of existing databases:</p>
 <ol style="list-style-type: decimal">
-<li>The comprehensive synthesis of trait-database from <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7275036/">Madin et al. 2020</a>. This database was last updated in 2020. Most of the database’s sources are static sources, with the exception of the <a href="https://gold.jgi.doe.gov/downloads">GOLD database</a>. As such, we’re merging the existing release of the Madin et al. database with the most recent GOLD release (2022-03-12).<br />
+<li>The comprehensive synthesis of trait-database from <a
+href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7275036/">Madin et
+al. 2020</a>. This database was last updated in 2020. Most of the
+database’s sources are static sources, with the exception of the <a
+href="https://gold.jgi.doe.gov/downloads">GOLD database</a>. As such,
+we’re merging the existing release of the Madin et al. database with the
+most recent GOLD release (2022-03-12).<br />
 </li>
-<li>Manual curation of bergey’s manual by <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04216-2">Weissman et al.</a>. This database contains manual curation of the Bergey’s manual specific to human-associated microbiomes.</li>
+<li>Manual curation of bergey’s manual by <a
+href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04216-2">Weissman
+et al.</a>. This database contains manual curation of the Bergey’s
+manual specific to human-associated microbiomes.</li>
 </ol>
-<p>The way we’re trying to combine these disparate sources would be to perform something similar to Madin et al. using the <a href="https://github.com/bacteria-archaea-traits/bacteria-archaea-traits/blob/master/R/functions.R">R code</a> on GitHub. The step-by-step workflow is:</p>
-<ol style="list-style-type: decimal">
-<li>Prepare and process each individual database file.<br />
-</li>
-<li>Second, concatenate all database files by row. Remember to specify data source.</li>
-<li></li>
-</ol>
+<p>The way we’re trying to combine these disparate sources would be to
+perform something similar to Madin et al. using the <a
+href="https://github.com/bacteria-archaea-traits/bacteria-archaea-traits/blob/master/R/functions.R">R
+code</a> on GitHub. We’re going to apply relevant transformations and
+mappings where apply.</p>
 </div>
-<div id="analysis" class="section level2">
-<h2>Analysis</h2>
+<div id="analysis" class="section level1">
+<h1>Analysis</h1>
 <p>Loading some packages</p>
 <pre class="r"><code>library(piggyback)
 library(data.table)
@@ -674,6 +947,7 @@ library(dtplyr)
 library(targets)
 library(here)
 #&gt; here() starts at /Users/quangnguyen/research/microbe_set_trait
+library(stringdist)
 library(tidyverse)
 #&gt; ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 #&gt; ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
@@ -682,6 +956,7 @@ library(tidyverse)
 #&gt; ✓ readr   2.1.2     ✓ forcats 0.5.1
 #&gt; ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 #&gt; x dplyr::between()   masks data.table::between()
+#&gt; x tidyr::extract()   masks stringdist::extract()
 #&gt; x dplyr::filter()    masks stats::filter()
 #&gt; x dplyr::first()     masks data.table::first()
 #&gt; x dplyr::lag()       masks stats::lag()
@@ -689,17 +964,22 @@ library(tidyverse)
 #&gt; x purrr::transpose() masks data.table::transpose()
 here::i_am(&quot;analysis/db_prep.Rmd&quot;)
 #&gt; here() starts at /Users/quangnguyen/research/microbe_set_trait</code></pre>
-<div id="downloading-data-files" class="section level3">
-<h3>Downloading data files</h3>
-<p>Downloading data files from respective sources and version control on GitHub using <code>piggyback</code></p>
+<div id="downloading-data-files" class="section level2">
+<h2>Downloading data files</h2>
+<p>Downloading data files from respective sources and version control on
+GitHub using <code>piggyback</code></p>
 <pre class="r"><code># Not run since file is large and is already uploaded to GitHub. Code here for provenance 
 piggyback::pb_upload(file = here(&quot;large_files&quot;, &quot;goldData.xlsx&quot;), tag = &quot;0.1&quot;, overwrite = TRUE)
 </code></pre>
 </div>
-<div id="processing-data-files" class="section level3">
-<h3>Processing data files</h3>
+<div id="processing-data-files" class="section level2">
+<h2>Processing data files</h2>
 <p>First, load the original Madin et al. database</p>
-<pre class="r"><code>base &lt;- read_csv(here(&quot;data&quot;, &quot;condensed_species_NCBI.txt&quot;))
+<pre class="r"><code>base &lt;- read_csv(here(&quot;data&quot;, &quot;condensed_species_NCBI.txt&quot;)) %&gt;% 
+    select(species_tax_id, superkingdom, phylum, class, order, family, 
+           genus, species, metabolism, gram_stain, pathways, 
+           carbon_substrates, sporulation, motility, cell_shape) %&gt;% 
+    rename(&quot;substrate&quot; = carbon_substrates)
 #&gt; Rows: 14893 Columns: 79
 #&gt; ── Column specification ────────────────────────────────────────────────────────
 #&gt; Delimiter: &quot;,&quot;
@@ -708,235 +988,30 @@ piggyback::pb_upload(file = here(&quot;large_files&quot;, &quot;goldData.xlsx&qu
 #&gt; 
 #&gt; ℹ Use `spec()` to retrieve the full column specification for this data.
 #&gt; ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<div id="processing-gold" class="section level4">
-<h4>Processing GOLD</h4>
-<p>Let’s process GOLD. First, load data from <code>piggyback</code> (this is cached). Script follows existing processing pipeline <a href="https://github.com/bacteria-archaea-traits/bacteria-archaea-traits/blob/master/R/preparation/gold.R">here</a> from Madin et al. </p>
-<pre class="r"><code>pth &lt;- here(&quot;large_files&quot;)
+<div id="processing-gold" class="section level3">
+<h3>Processing GOLD</h3>
+<p>Let’s process GOLD. First, load data from <code>piggyback</code>
+(this is cached). Script follows existing processing pipeline <a
+href="https://github.com/bacteria-archaea-traits/bacteria-archaea-traits/blob/master/R/preparation/gold.R">here</a>
+from Madin et al. </p>
+<pre class="r"><code>pth &lt;- here(&quot;large_files&quot;, &quot;goldData.csv&quot;)
 if (!file.exists(pth)){
-    piggyback::pb_download(file = &quot;goldData.xlsx&quot;, dest = pth, tag = &quot;0.1&quot;)
+    piggyback::pb_download(file = &quot;goldData.xlsx&quot;, dest = here(&quot;large_files&quot;), tag = &quot;0.1&quot;)
+    gold &lt;- readxl::read_xlsx(path = here(&quot;large_files&quot;, &quot;goldData.xlsx&quot;), sheet = &quot;Organism&quot;)
+    readr::write_csv(x = gold, file = pth)
 }
-gold &lt;- readxl::read_xlsx(path = file.path(pth, &quot;goldData.xlsx&quot;), sheet = &quot;Organism&quot;)
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM4230 / R4230C39: got &#39;Phenanthrene, Formic acid, gluconic
-#&gt; acid, malonic acid&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM6852 / R6852C39: got &#39;CO2, Acetate&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM10492 / R10492C39: got &#39;Sweet sugar&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM11601 / R11601C39: got &#39;d-fructose, d-galactose, d-
-#&gt; glucose, lactose, raffinose and sucrose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM11931 / R11931C39: got &#39;Carbohydrates, peptides&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM11950 / R11950C39: got &#39;Mono- and polysaccharides&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM12150 / R12150C39: got &#39;Glucose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM16410 / R16410C39: got &#39;Heterotroph (galactose, glucose,
-#&gt; tryptic soy broth, fructose, yeast extract)&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM27499 / R27499C39: got &#39;Glucose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM28889 / R28889C39: got &#39;Sucrose, glucose, fructose,
-#&gt; galactose, maltose, mannitol, mannose, arabitol&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM33787 / R33787C39: got &#39;carbohydrates, amino-acids,
-#&gt; organic acid anions and alcohols&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM35459 / R35459C39: got &#39;polycyclic aromatic hydrocarbons&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM35962 / R35962C39: got &#39;Heterotroph&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM52183 / R52183C39: got &#39;Fructose, lactose, acetate&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM59612 / R59612C39: got &#39;Sucrose, glucose, fructose,
-#&gt; galactose, maltose, mannitol, mannose, arabitol&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM63996 / R63996C39: got &#39;Glucose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM66310 / R66310C39: got &#39;amino acids&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK83277 / R83277C37: got &#39;0–30 MPa (Optimal 10MPa)&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK84355 / R84355C37: got &#39;normal&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK228232 / R228232C37: got &#39;10 MPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK240466 / R240466C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK266739 / R266739C37: got &#39;1 atm&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK267650 / R267650C37: got &#39;107.55.82&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK267717 / R267717C37: got &#39;107.55.82&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK267719 / R267719C37: got &#39;107.55.82&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274564 / R274564C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274565 / R274565C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274566 / R274566C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274567 / R274567C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274568 / R274568C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274569 / R274569C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274570 / R274570C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274571 / R274571C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274572 / R274572C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274573 / R274573C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274574 / R274574C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274575 / R274575C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274576 / R274576C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274577 / R274577C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274578 / R274578C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274579 / R274579C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274580 / R274580C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274581 / R274581C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274621 / R274621C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274622 / R274622C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274623 / R274623C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274624 / R274624C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274625 / R274625C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274626 / R274626C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274627 / R274627C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274628 / R274628C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274629 / R274629C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274630 / R274630C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274631 / R274631C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274632 / R274632C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274633 / R274633C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274634 / R274634C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274635 / R274635C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274636 / R274636C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274637 / R274637C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274638 / R274638C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274639 / R274639C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274640 / R274640C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274641 / R274641C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274642 / R274642C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274643 / R274643C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274644 / R274644C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274645 / R274645C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274646 / R274646C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274647 / R274647C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274648 / R274648C37: got &#39;14532 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK274649 / R274649C37: got &#39;101.3 kPa&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK279601 / R279601C37: got &#39;1 atm&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK283545 / R283545C37: got &#39;atmospheric pressure&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM312483 / R312483C39: got &#39;CO, fructose, galactose,
-#&gt; glucose, mannose, raffinose, ribose, sucrose &amp; xylose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM312514 / R312514C39: got &#39;citrate, cellobiose, malate,
-#&gt; fumarate, malonate&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM332160 / R332160C39: got &#39;cellobiose, l-fucose, dextrin,
-#&gt; lactose, d-galactose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM333300 / R333300C39: got &#39;d-glucose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM338846 / R338846C39: got &#39;Urea, Raffinose, p-Hydroxy-
-#&gt; phenylacetic acid, Methyl-pyruvate, l-Galactonic acid lactone&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM343777 / R343777C39: got &#39;methanol, formate&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK360146 / R360146C37: got &#39;1atm&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK360147 / R360147C37: got &#39;1atm&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK362424 / R362424C37: got &#39;1 atm&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM365586 / R365586C39: got &#39;Dextrin, Gentiobiose, Pectin&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM365658 / R365658C39: got &#39;d-Mannitol, d-Sorbitol&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM372436 / R372436C39: got &#39;glucose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM373837 / R373837C39: got &#39;cellobiose, fructose, maltose,
-#&gt; dextrin, N-acetylglucosamine, gluconate and glycerol&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK375118 / R375118C37: got &#39;1 atm&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK375119 / R375119C37: got &#39;1 atm&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK375120 / R375120C37: got &#39;1 atm&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK375121 / R375121C37: got &#39;1 atm&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AK375122 / R375122C37: got &#39;1 atm&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM375867 / R375867C39: got &#39;Trehalose, Cellobiose,
-#&gt; Turanose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM375889 / R375889C39: got &#39;Cellobiose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM376213 / R376213C39: got &#39;dextrin, glucose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM376238 / R376238C39: got &#39;Raffinose, Lactose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM378962 / R378962C39: got &#39;glucose, lactose, maltose and
-#&gt; mannose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM380421 / R380421C39: got &#39;d-Galactose, d-glucose,
-#&gt; mannitol, ribose, sucrose, trehalose and xylan&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM382545 / R382545C39: got &#39;d-Glucose, Mannose&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i =
-#&gt; sheet, : Expecting logical in AM383476 / R383476C39: got &#39;d-fructose, maltose,
-#&gt; cellobiose, sucrose, raffinose and l-asparagine&#39;
-#&gt; Warning in read_fun(path = enc2native(normalizePath(path)), sheet_i = sheet, :
-#&gt; Expecting logical in AM383720 / R383720C39: got &#39;d-Fructose, lactose and
-#&gt; maltose&#39;
-
-
-# convert names 
+gold &lt;- read_csv(file = pth)
+#&gt; Rows: 428241 Columns: 42
+#&gt; ── Column specification ────────────────────────────────────────────────────────
+#&gt; Delimiter: &quot;,&quot;
+#&gt; chr (35): ORGANISM GOLD ID, ORGANISM NAME, ORGANISM NCBI SUPERKINGDOM, ORGAN...
+#&gt; dbl  (4): ORGANISM NCBI TAX ID, ORGANISM ISOLATION PUBMED ID, ORGANISM ECOSY...
+#&gt; lgl  (3): ORGANISM SALINITY CONCENTRATION, ORGANISM PRESSURE, ORGANISM CARBO...
+#&gt; 
+#&gt; ℹ Use `spec()` to retrieve the full column specification for this data.
+#&gt; ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>Let’s perform name conversions</p>
+<pre class="r"><code># convert names 
 colnames(gold) &lt;- colnames(gold) %&gt;% 
     gsub(x = ., pattern = &quot; &quot;, replacement = &quot;_&quot;) %&gt;% 
     tolower() %&gt;% 
@@ -945,47 +1020,423 @@ colnames(gold) &lt;- colnames(gold) %&gt;%
 
 gold_reduced &lt;- gold %&gt;% 
     select(ncbi_tax_id, ncbi_superkingdom,  
-            ncbi_phylum, ncbi_order, ncbi_family, ncbi_genus, ncbi_species, 
+            ncbi_phylum, ncbi_class, ncbi_order, ncbi_family, ncbi_genus, ncbi_species, 
             name, gram_stain, metabolism, oxygen_requirement, 
             sporulation, motility, cell_shape) %&gt;% 
     rename(&quot;species_tax_id&quot; = ncbi_tax_id,
            &quot;superkingdom&quot; = ncbi_superkingdom,
            &quot;phylum&quot; = ncbi_phylum,
+           &quot;class&quot; = ncbi_class,
            &quot;order&quot; = ncbi_order,
            &quot;family&quot; = ncbi_family,
            &quot;genus&quot; = ncbi_genus,
            &quot;species&quot; = ncbi_species,
            &quot;pathways&quot; = metabolism,
            &quot;metabolism&quot; = oxygen_requirement) %&gt;% as.data.table()
-    
 
-tbl &lt;- gold_reduced[1:1000,] %&gt;% as_tibble() %&gt;%
+# nest traits 
+tbl &lt;- gold_reduced %&gt;%
+    select(-name) %&gt;%
     group_by(species_tax_id, superkingdom, phylum, order, 
-             family, genus, species, name) %&gt;%
+             family, genus, species) %&gt;%
     nest(traits = c(gram_stain, pathways, metabolism, 
            cell_shape, motility, sporulation))
+    
 
-tbl_munge &lt;- tbl %&gt;% filter(map_lgl(traits, ~{nrow(.x) &gt; 1}))
+# a subset of the table that has more than one row per trait nested values 
+tbl_munge &lt;- tbl %&gt;% filter(map_lgl(traits, ~{nrow(.x) &gt; 1}))</code></pre>
+<p>The issue is that there some species with multiple entries per
+species due to differences in certain characteristics but also multiple
+strains per species. Here, we’re going to loop over all of those rows
+and then replace them. Since the original database is at species level,
+we’re also going to collapse from the strain level to the species level
+similar to Madin et al. 2020</p>
+<p>Let’s define a function that processes species that have multiple
+entries in GOLD</p>
+<pre class="r"><code># This function takes a data frame and a column 
+# and selects the response with the highest frequency
+select_best &lt;- function(df, column){
+    vec &lt;- unlist(df[,..column])
+    freq &lt;- as.data.frame(table(vec))
+    if (nrow(freq) == 0){
+        return(NA_character_)
+    } else {
+        freq &lt;- freq %&gt;% mutate(prop = Freq/sum(Freq)) %&gt;%
+            filter(prop &gt;= 0.5) %&gt;% top_n(n = 1, wt = prop)
+        return(freq %&gt;% pull(vec) %&gt;% as.vector())
+    }
+}
 
-tbl_munge
-#&gt; # A tibble: 2 × 9
-#&gt; # Groups:   species_tax_id, superkingdom, phylum, order, family, genus,
-#&gt; #   species, name [2]
-#&gt;   species_tax_id superkingdom phylum   order family genus species name  traits  
-#&gt;   &lt;chr&gt;          &lt;chr&gt;        &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; &lt;list&gt;  
-#&gt; 1 5011           Eukaryota    Ascomyc… Taph… Taphr… Taph… Taphri… Taph… &lt;tibble&gt;
-#&gt; 2 62977          Bacteria     Proteob… Mora… Morax… Acin… Acinet… Acin… &lt;tibble&gt;</code></pre>
-<div class="alert alert-warning">
-<p>
-<strong>Warning:</strong> The above code chunk cached its results, but it won’t be re-run if previous chunks it depends on are updated. If you need to use caching, it is highly recommended to also set <code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the file (in a chunk that is not cached). Alternatively, you can customize the option <code>dependson</code> for each individual chunk that is cached. Using either <code>autodep</code> or <code>dependson</code> will remove this warning. See the <a href="https://yihui.name/knitr/options/#cache"
->knitr cache options</a> for more details.
-</p>
+# This function then utilizes select_best
+# to process entries with duplicates (more than one row)
+# for pathways, the goal is to concatenate them
+process_duplicates &lt;- function(df){
+    # get only unique rows
+    df &lt;- unique(df)
+    if (nrow(df) == 1){
+        return(df)
+    }
+    v &lt;- c(&quot;gram_stain&quot;, &quot;pathways&quot;, &quot;metabolism&quot;, 
+           &quot;sporulation&quot;, &quot;motility&quot;, &quot;cell_shape&quot;)
+    suppressMessages(res &lt;- map_dfc(v, ~{
+        if (.x == &quot;pathways&quot;){
+            str_vec &lt;- na.omit(df$pathways) %&gt;% as.vector()
+            if (length(str_vec) == 0){
+                out &lt;- NA_character_
+            } else {
+                out &lt;- str_replace(str_vec, pattern = &quot; &quot;, 
+                                   replacement = &quot;_&quot;) %&gt;% 
+                    paste(collapse = &quot;, &quot;)
+            }
+        } else {
+            out &lt;- select_best(df, .x)
+        }
+        return(out)
+    }))
+    colnames(res) &lt;- v
+    res &lt;- as.data.table(res)
+    return(res)
+}</code></pre>
+<p>Let’s apply it to <code>tbl_munge</code> and then merge both data
+frames together into one consensus trait. After this munging, the final
+GOLD database is processed and ready to merge into the master
+<code>base</code> data frame</p>
+<pre class="r"><code>
+tbl_munge &lt;- tbl_munge %&gt;% 
+    mutate(traits = map(traits, process_duplicates)) %&gt;% as_tibble() %&gt;%
+    unnest(traits)</code></pre>
+<p>We merge by extracting the <code>species_tax_id</code> column out of
+<code>tbl</code>, remove all rows with that identifier and then replace
+that with those from the <code>tbl_munge</code> database.</p>
+<pre class="r"><code>
+ids &lt;- tbl_munge %&gt;% pull(species_tax_id)
+
+gold_final &lt;- tbl %&gt;% filter(!species_tax_id %in% ids) %&gt;% 
+    as_tibble() %&gt;% 
+    unnest(traits) %&gt;% bind_rows(tbl_munge)
+
+# final cleaning
+gold_final &lt;- gold_final %&gt;% 
+    mutate(metabolism = tolower(metabolism), 
+           gram_stain = if_else(gram_stain == &quot;Gram-&quot;, &quot;negative&quot;, &quot;positive&quot;), 
+           sporulation = if_else(sporulation == &quot;Nonsporulating&quot;, &quot;no&quot;, &quot;yes&quot;), 
+           motility = case_when(
+               motility == &quot;Nonmotile&quot; ~ &quot;no&quot;, 
+               motility == &quot;Motile&quot; ~ &quot;yes&quot;, 
+               TRUE ~ motility
+           ), 
+           cell_shape = tolower(str_replace(cell_shape,&quot;-shaped&quot;,&quot;&quot;)),
+           cell_shape = case_when(
+               cell_shape %in% c(&quot;rod&quot;) ~ &quot;bacillus&quot;,
+               cell_shape %in% c(&quot;sphere&quot;, &quot;oval&quot;, 
+                                 &quot;bean&quot;, &quot;coccoid&quot;, &quot;ovoid&quot;, 
+                                 &quot;spore&quot;) ~ &quot;coccus&quot;, 
+               cell_shape %in% c(&quot;helical&quot;) ~ &quot;spiral&quot;, 
+               cell_shape %in% c(&quot;curved&quot;) ~ &quot;vibrio&quot;, 
+               cell_shape %in% c(&quot;flask&quot;, &quot;open-ring&quot;, &quot;lancet&quot;) ~ &quot;irregular&quot;, 
+               # only Mycoplasma genitalium for flask and 
+               # only Thiomicrospira cyclica for open-ring
+               # only Nitrolancea hollandica for lancet
+               TRUE ~ cell_shape
+           ))
+
+head(gold_final)
+#&gt; # A tibble: 6 × 14
+#&gt;   species_tax_id superkingdom phylum class order family genus species gram_stain
+#&gt;            &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;     
+#&gt; 1         515635 Bacteria     Dicty… Dict… Dict… Dicty… Dict… Dictyo… positive  
+#&gt; 2         521011 Archaea      Eurya… Meth… Meth… Metha… Meth… Methan… positive  
+#&gt; 3         498848 Bacteria     Deino… Dein… Ther… Therm… Ther… Thermu… negative  
+#&gt; 4         481743 Bacteria     Firmi… Baci… Baci… Paeni… Paen… Paenib… positive  
+#&gt; 5         634499 Bacteria     Prote… Gamm… Ente… Erwin… Erwi… Erwini… negative  
+#&gt; 6         580327 Bacteria     Firmi… Clos… Ther… Therm… Ther… Thermo… positive  
+#&gt; # … with 5 more variables: pathways &lt;chr&gt;, metabolism &lt;chr&gt;, sporulation &lt;chr&gt;,
+#&gt; #   motility &lt;chr&gt;, cell_shape &lt;chr&gt;
+# pray not to crash
+rm(gold)
+rm(gold_reduced)
+rm(tbl)
+rm(tbl_munge)
+gc()
+#&gt;           used (Mb) gc trigger  (Mb) limit (Mb) max used  (Mb)
+#&gt; Ncells 1725958 92.2    5509228 294.3         NA  6886535 367.8
+#&gt; Vcells 6699406 51.2   76208405 581.5      16384 95260506 726.8</code></pre>
+<p><code>gold_final</code> will now be the finalized form of the GOLD
+database as put into the original format of Madin et al. </p>
 </div>
-<p>Let’s define a function that processes species that have multiple entries in GOLD</p>
+<div id="processing-weissman-et-al." class="section level3">
+<h3>Processing Weissman et al. </h3>
+<pre class="r"><code>
+weissman &lt;- read_csv(here(&quot;data&quot;, &quot;weissman.csv&quot;))
+#&gt; Rows: 3369 Columns: 174
+#&gt; ── Column specification ────────────────────────────────────────────────────────
+#&gt; Delimiter: &quot;,&quot;
+#&gt; chr  (16): Organism, kingdom, phylum, class, order, family, genus, species, ...
+#&gt; dbl (158): taxid_kingdom, taxid_phylum, taxid_class, taxid_order, taxid_fami...
+#&gt; 
+#&gt; ℹ Use `spec()` to retrieve the full column specification for this data.
+#&gt; ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+# select the relevant columns
+weissman &lt;- weissman %&gt;% select(c(&quot;taxid_species&quot;,
+                                  &quot;kingdom&quot;, &quot;phylum&quot;, &quot;class&quot;, &quot;order&quot;, &quot;family&quot;, &quot;genus&quot;, &quot;species&quot;,
+                                  &quot;Motility_general&quot;, &quot;Oxygen.Preference&quot;, &quot;Cell.Shape&quot;, &quot;Cell.Aggregation&quot;,
+                                  starts_with(&quot;Enzyme.Assays&quot;), 
+                                  starts_with(&quot;Volatile.Gas.Production&quot;), 
+                                  starts_with(&quot;Substrate.Utilization&quot;)))</code></pre>
+<p>Here, we’re going to re-format it similar to Madin et
+al. <code>Enzyme.Assays</code> and <code>Volatile.Gas.Production</code>
+is equivalent to <code>pathways</code> while
+<code>Substrate.Utililization</code> is equivalent to
+<code>carbon_substrates</code>. Since there might be non-carbon
+compounds here, we’re going to rename Madin et al.’s
+<code>carbon_substrates</code> into just <code>substrate</code> here
+similar to Weissman’s database.</p>
+<pre class="r"><code>weissman &lt;- weissman %&gt;% group_by(taxid_species, kingdom, phylum, 
+                      class, order, family, genus, species) %&gt;%
+    nest(pathways = starts_with(c(&quot;Enzyme.Assays&quot;, &quot;Volatile.Gas.Production&quot;)), 
+         substrate = starts_with(&quot;Substrate.Utilization&quot;)) %&gt;% ungroup() %&gt;% 
+    mutate(across(where(is.character), ~na_if(., &quot;0&quot;))) %&gt;% 
+    rename(&quot;species_tax_id&quot; = taxid_species, &quot;superkingdom&quot; = kingdom, 
+           &quot;metabolism&quot; = Oxygen.Preference,
+           &quot;motility&quot; = Motility_general, &quot;cell_shape&quot; = Cell.Shape, &quot;cell_aggregation&quot; = Cell.Aggregation)
+
+# motility, cell shape, metabolism
+weissman$cell_shape %&gt;% unique()
+#&gt; [1] NA                    &quot;rod&quot;                 &quot;ovoid/coccobacillus&quot;
+#&gt; [4] &quot;spirillum/corkscrew&quot;
+
+weissman &lt;- weissman %&gt;% 
+    mutate(motility = if_else(motility == &quot;non-motile&quot;, &quot;yes&quot;, &quot;no&quot;), 
+                    cell_shape = case_when(
+                        cell_shape == &quot;rod&quot; ~ &quot;bacillus&quot;,
+                        cell_shape == &quot;ovoid/coccobacillus&quot; ~ &quot;coccus&quot;, 
+                        cell_shape == &quot;spirillum/corkscrew&quot; ~ &quot;spiral&quot;,
+                        TRUE ~ cell_shape
+                    ), 
+                    metabolism = case_when(
+                        metabolism == &quot;microaerophile&quot; ~ &quot;microaerophilic&quot;,
+                        TRUE ~ metabolism
+                    ), 
+                    metabolism = str_replace(metabolism, 
+                                             pattern = &quot;obe$&quot;, replacement = &quot;obic&quot;))</code></pre>
+<p>Here we’re going to define some functions to process the traits that
+is internal (collapse into one column) for pathways and for
+substrates</p>
+<pre class="r"><code>#&#39; @param unit A single unit from a list of trait data frames
+proc_pathways &lt;- function(unit){
+    string &lt;- unit %&gt;% pivot_longer(everything()) %&gt;% 
+        filter(value != 0)
+    if (nrow(string) == 0){
+        return(NA)
+    } else {
+        string &lt;- string %&gt;% 
+            mutate(name = str_replace(name, pattern = &quot;Enzyme.Assays..&quot;, replacement = &quot;&quot;)) %&gt;%
+            mutate(name = str_replace(name, pattern = &quot;Volatile.Gas.Production..&quot;, replacement = &quot;synthesis_&quot;)) %&gt;%
+            mutate(name = str_replace(name, pattern = &quot;\\.$&quot;, &quot;&quot;)) %&gt;%
+            mutate(name = str_replace(name, pattern = &quot;\\.\\.(.*)$&quot;, &quot;&quot;)) %&gt;%
+            mutate(name = str_replace_all(name, pattern = &quot;\\.&quot;, &quot;_&quot;)) %&gt;% 
+            rowwise() %&gt;%
+            mutate(name = if_else(str_detect(name, &quot;synthesis_&quot;), 
+                                  true = paste(rev(str_split(name, pattern = &quot;_&quot;, 
+                                                             n = 2)[[1]]), 
+                                               collapse = &quot;_&quot;),
+                                  false = name)) %&gt;% 
+            ungroup() %&gt;%
+            pull(name) %&gt;% paste(., collapse = &quot;, &quot;)
+    }
+        
+    return(string)
+}
+
+proc_substrate &lt;- function(unit){
+    string &lt;- unit %&gt;% pivot_longer(everything()) %&gt;% filter(value != 0)
+    if (nrow(string) == 0){
+        return(NA)
+    } else {
+        string &lt;- string %&gt;% mutate(name = str_split(name, pattern = &quot;\\.\\.&quot;, 
+                                           n = 2, simplify = TRUE)[,2]) %&gt;%
+            mutate(name = str_replace(name, &quot;(\\.\\.|\\.)$&quot;, &quot;&quot;)) %&gt;% 
+            mutate(name = str_replace_all(name, &quot;(\\.\\.|\\.)&quot;, &quot;_&quot;)) %&gt;% 
+            pull(name) %&gt;% paste(., collapse = &quot;, &quot;)
+    }
+    return(string)
+}</code></pre>
+<p>Map it over the two columns in the original data frame.</p>
+<pre class="r"><code>substr &lt;- map_chr(weissman$substrate, proc_substrate)
+pthway &lt;- map_chr(weissman$pathways, proc_pathways)
+
+weissman &lt;- weissman %&gt;% select(-c(pathways, substrate)) %&gt;% 
+  mutate(substrate = substr, pathways = pthway)</code></pre>
+</div>
+<div id="checking-for-duplicates" class="section level3">
+<h3>Checking for duplicates</h3>
+<p>First, we define a function to check for similar sounding names
+across all the unique pathways and substrates for all the data sets.
+Here, we use the <code>stringdist</code> function from the
+<code>stringdist</code> package. We use the standard OSA metric (also
+called the Damerau-Levenshtein distance) to query for potential
+similarly sounding names of identical pathways or compounds.</p>
+<pre class="r"><code>
+check_matches &lt;- function(df, type=c(&quot;pathways&quot;,&quot;substrates&quot;)){
+    b_val &lt;- base %&gt;% pull(!!type) %&gt;% unique() %&gt;% str_split(pattern = &quot;, &quot;) %&gt;%
+        unlist() %&gt;% unique() %&gt;% na.omit() %&gt;% as.vector()
+    
+    q_val &lt;- df %&gt;% pull(!!type) %&gt;% unique() %&gt;% str_split(pattern = &quot;, &quot;) %&gt;% 
+        unlist() %&gt;% unique() %&gt;% na.omit() %&gt;% as.vector()
+    
+    check &lt;- map(q_val, ~{
+        match &lt;- stringdist(a = .x, b = b_val)
+        # match 0 is the same, and match &gt; 2 is too different 
+        ret &lt;- b_val[match &gt; 0 &amp; match &lt;= 2]
+        if (length(ret) == 0){
+            return(NA)
+        } else {
+            out &lt;- tibble(
+                query = rep(.x, length(ret)),
+                ref = ret
+            )
+        }
+    })
+    check &lt;- check[!sapply(check, function(x) all(is.na(x)))]
+    
+    return(check)
+}</code></pre>
+<p>Check Weissman et al. database</p>
+<pre class="r"><code>Reduce(check_matches(weissman, &quot;pathways&quot;), f = rbind)
+#&gt; # A tibble: 2 × 2
+#&gt;   query               ref                
+#&gt;   &lt;chr&gt;               &lt;chr&gt;              
+#&gt; 1 elastin_degradation plastic_degradation
+#&gt; 2 elastin_degradation gelatin_degradation
+Reduce(check_matches(weissman, &quot;substrate&quot;), f = rbind)
+#&gt; # A tibble: 55 × 2
+#&gt;    query    ref      
+#&gt;    &lt;chr&gt;    &lt;chr&gt;    
+#&gt;  1 sucrose  fucose   
+#&gt;  2 butanol  2-butanol
+#&gt;  3 butanol  1-butanol
+#&gt;  4 ethanol  methanol 
+#&gt;  5 glucose  fucose   
+#&gt;  6 mannose  maltose  
+#&gt;  7 fructose fucose   
+#&gt;  8 lactose  lactate  
+#&gt;  9 lactose  galactose
+#&gt; 10 lactose  maltose  
+#&gt; # … with 45 more rows</code></pre>
+<p>We can see that for a lot of the compounds the names might be the
+same but they’re actually different. However, there are certain
+conventions such as “_” for spaces or “-” that we might need to address
+for the final merge.</p>
+<p>Let’s check the GOLD database for similar sounding names. Since GOLD
+does not have substrate information, we only check for pathways</p>
+<pre class="r"><code>Reduce(check_matches(gold_final, &quot;pathways&quot;), f = rbind)
+#&gt; # A tibble: 6 × 2
+#&gt;   query              ref               
+#&gt;   &lt;chr&gt;              &lt;chr&gt;             
+#&gt; 1 Nitrogen fixation  nitrogen_fixation 
+#&gt; 2 Methane oxidation  methane_oxidation 
+#&gt; 3 Chitin degradation chitin_degradation
+#&gt; 4 Chitin_degradation chitin_degradation
+#&gt; 5 Nitrogen_fixation  nitrogen_fixation 
+#&gt; 6 Methane_oxidation  methane_oxidation</code></pre>
+<p>We can see a similar pattern here. Essentially we need to wrangle the
+columns such that spaces are replaced with underscores and all names
+should be to lower case.</p>
+<pre class="r"><code>trim_path &lt;- function(vec){
+    vec &lt;- vec %&gt;% tolower() %&gt;% 
+        str_split(pattern = &quot;(, |\\|)&quot;) %&gt;% 
+        map(~{
+            str_trim(.x) %&gt;% str_replace_all(&quot;\\-&quot;, &quot;&quot;) %&gt;%
+                str_replace_all(&quot; &quot;, &quot;_&quot;) %&gt;% unique()
+        })
+    return(vec)
+}
+
+
+gold_final$pathways &lt;- trim_path(gold_final$pathways)
+base$pathways &lt;- trim_path(base$pathways)
+weissman$pathways &lt;- trim_path(weissman$pathways)
+weissman$substrate &lt;- trim_path(weissman$substrate)
+base$substrate &lt;- trim_path(base$substrate)</code></pre>
+</div>
+<div id="combine-all-data-frames" class="section level3">
+<h3>Combine all data frames</h3>
+<p>After munging, let’s combine all of the names! The strategy is very
+similar to handling multiple entries for GOLD. First, we bind all of our
+databases together. Then, we <code>group_by</code> and nest all our
+trait data into a list. Then we process these lists and return
+<code>unique</code> rows (deduplicated). If the rows are not unique,
+then we process the non-unique rows by either concatenating the traits
+together or vote on consensus using the top most represented trait.</p>
+<pre class="r"><code>complete &lt;- bind_rows(
+    base %&gt;% mutate(source = &quot;madin&quot;), 
+    gold_final %&gt;% mutate(source = &quot;gold&quot;), 
+    weissman %&gt;% mutate(source = &quot;weissman&quot;)
+)
+
+tally &lt;- complete %&gt;% filter(!is.na(species)) %&gt;% 
+    group_by(species_tax_id, superkingdom, phylum, class, order, 
+             family, genus, species) %&gt;% 
+    tally()
+
+
+multiple_rows &lt;- tally %&gt;% filter(n &gt;= 2) %&gt;% pull(species_tax_id)
+
+reconcile &lt;- complete %&gt;% filter(species_tax_id %in% multiple_rows)
+
+reconcile &lt;- reconcile %&gt;% group_by(species_tax_id, superkingdom, phylum, class, order,
+                       family, genus, species, metabolism) %&gt;%
+    nest(data = c(metabolism, gram_stain, pathways, substrate, sporulation, motility, cell_shape, cell_aggregation, source)) %&gt;% ungroup()</code></pre>
+<p>Similar to above, let’s write a function that goes through each
+element and reconcile the different sources.</p>
+<pre class="r"><code>#&#39; @param df This is a data frame of multiple columns, where the columns of 
+#&#39;     pathways and substrates are themselves lists 
+collapse_trait &lt;- function(df){
+    nonlist &lt;- c(&quot;metabolism&quot;, &quot;gram_stain&quot;, &quot;sporulation&quot;, &quot;motility&quot;, 
+                 &quot;cell_shape&quot;, &quot;cell_aggregation&quot;)    
+    out &lt;- suppressMessages(map_dfc(nonlist, ~{
+        traits &lt;- df %&gt;% pull(.x)
+        traits &lt;- as.data.frame(table(traits))
+        if (nrow(traits) &gt;= 1){
+            return(traits %&gt;% 
+                       mutate(prop = Freq/sum(Freq)) %&gt;%
+                       filter(prop == max(prop) &amp; prop &gt;= 0.5) %&gt;% 
+                       pull(traits) %&gt;% as.vector()
+            )
+        } else {
+            return(NA_character_)
+        }
+    }))
+    names(out) &lt;- nonlist
+    out$pathways &lt;- list(df %&gt;% pull(&quot;pathways&quot;) %&gt;% 
+                             Reduce(f = c, x = .) %&gt;% unique())
+    out$substrate &lt;- list(df %&gt;% pull(&quot;substrate&quot;) %&gt;% 
+                              Reduce(f = c, x = .) %&gt;% 
+                              unique())
+    return(out)
+}
+
+reconcile &lt;- reconcile %&gt;% mutate(traits = map(data, collapse_trait)) %&gt;% 
+    select(-data)</code></pre>
+<p>Let’s merge the collapsed file and save everything to a database</p>
+<pre class="r"><code>complete &lt;- bind_rows(reconcile %&gt;% unnest(traits), 
+          complete %&gt;% filter(!species_tax_id %in% multiple_rows))
+
+saveRDS(complete, file = here(&quot;output&quot;, &quot;db_merged.rds&quot;))
+complete %&gt;% mutate(
+    pathways = map_chr(pathways, ~{
+        paste(.x, collapse = &quot;, &quot;)
+    }), 
+    substrate = map_chr(substrate, ~{
+        paste(.x, collapse = &quot;, &quot;)
+    })
+) %&gt;% write_csv(x = ., file = here(&quot;output&quot;, &quot;db_merged.csv&quot;))</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
-<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
 </button>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
@@ -1007,8 +1458,8 @@ tbl_munge
 #&gt; other attached packages:
 #&gt;  [1] forcats_0.5.1     stringr_1.4.0     dplyr_1.0.8       purrr_0.3.4      
 #&gt;  [5] readr_2.1.2       tidyr_1.2.0       tibble_3.1.6      ggplot2_3.3.5    
-#&gt;  [9] tidyverse_1.3.1   here_1.0.1        targets_0.10.0    dtplyr_1.2.1     
-#&gt; [13] data.table_1.14.2 piggyback_0.1.1  
+#&gt;  [9] tidyverse_1.3.1   stringdist_0.9.8  here_1.0.1        targets_0.10.0   
+#&gt; [13] dtplyr_1.2.1      data.table_1.14.2 piggyback_0.1.1  
 #&gt; 
 #&gt; loaded via a namespace (and not attached):
 #&gt;  [1] fs_1.5.2            bit64_4.0.5         lubridate_1.8.0    
