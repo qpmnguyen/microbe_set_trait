@@ -1,6 +1,3 @@
-dada2:
-  script: script_dada2.R
-  store: store_dada2
 db_preprocess:
   script: script_db_preprocess.R
   store: store_db_preprocess
@@ -13,3 +10,6 @@ coverage:
 pred:
   script: script_pred.R
   store: store_pred
+dada2_agp:
+  script: script_dada2_agp.R
+  store: store_dada2_agp

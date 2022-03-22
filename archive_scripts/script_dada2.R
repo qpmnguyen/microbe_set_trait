@@ -16,7 +16,8 @@ path_to_metadata <- function() {
 list(
     tar_target(r_data, path_to_data(), format = "file"),
     tar_target(r_metadata, path_to_metadata(), format = "file"),
-    tar_target(r_filter_files, filter_samples(fastq_path = r_data, metadata_path = r_metadata), format = "file"),
+    tar_target(r_filter_files, filter_samples(fastq_path = r_data, metadata_path = r_metadata), 
+               format = "file"),
     tar_target(f_trim, {
         filter_and_trim(r_filter_files)
     }),

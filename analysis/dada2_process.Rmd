@@ -1,0 +1,62 @@
+---
+title: "Using `dada2` to process AGP 16S rRNA data"
+author: "Quang Nguyen"
+date: "2022-03-21"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", autodep = TRUE)
+```
+
+Here, we use `dada2` to pre-process all data from AGP and Gevers et al.  
+
+```{r basic_load}
+library(dada2)
+library(here)
+library(targets)
+library(tidyverse)
+
+Sys.setenv(TAR_PROJECT = "dada2_agp")
+tar_unscript()
+here::i_am("analysis/dada2_process.Rmd")
+base_path <- file.path("rc", "lab", "H", 
+                          "HoenA", "Lab", "QNguyen", "ResultsFiles", "data", 
+                          "agp")
+if (Sys.info()['sysname'] == "Darwin"){
+    filepath <- file.path("/Volumes", base_path)
+    if (!file.exists(file.path(filepath, ".placeholder"))){
+        stop("This folder does not exist, please mount folder")
+    } 
+} else if (Sys.info()['sysname'] == "Linux"){
+    filepath <- file.path("/dartfs-hpc", base_path)
+} else {
+    stop("OS not supported")
+}
+```
+
+First, let's visualize the quality profiles of some sample reads  
+
+```{r}
+reads <- sort(list.files(file.path(filepath, "raw"), pattern = "_001.fastq", full.names = TRUE))[1:10]
+plotQualityProfile(reads)
+```
+
+We can see that the sequencing runs are actually pretty good, so we're going to trim off the last 10 nucleotides as suggested in the [`dada2` tutorial](https://benjjneb.github.io/dada2/tutorial.html). Since AGP data is not paired end data, we skip the merging step and having to pre-process each forward and reverse read separately.    
+
+```{r}
+filt_dir <- file.path(filepath, "filtered")
+trim <- filterAndTrim(reads, filt_dir, truncLen = 140, maxEE=1, truncQ=11, rm.phix = TRUE, compress=TRUE, verbose=TRUE)
+err <- learnErrors(filts, )
+```
+
+
+
+We iterate through a basic set of samples and have the pipeline run through the entire 18,000 samples on the cluster. This is done through the usage of the `targets` package.  
+
+```{targets dada2}
+
+```
+

@@ -11,6 +11,11 @@
   "Bioconductor": {
     "Version": "3.14"
   },
+  "Python": {
+    "Version": "3.8.9",
+    "Type": "virtualenv",
+    "Name": "./renv/python/virtualenvs/renv-python-3.8"
+  },
   "Packages": {
     "ANCOMBC": {
       "Package": "ANCOMBC",
@@ -3750,6 +3755,14 @@
         "vctrs",
         "vegan"
       ]
+    },
+    "stringdist": {
+      "Package": "stringdist",
+      "Version": "0.9.8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c8b6c79c3b2d7d8475f3ab35cd99737b",
+      "Requirements": []
     },
     "stringi": {
       "Package": "stringi",
