@@ -121,10 +121,11 @@ select_best <- function(df, column){
     vec <- unlist(df[,..column])
     freq <- as.data.frame(table(vec))
     if (nrow(freq) == 0){
-        return(NA)
+        return(NA_character_)
     } else {
-        return(freq %>% filter(Freq == max(Freq)) %>% 
-                   pull(vec) %>% as.character())
+        freq <- freq %>% mutate(prop = Freq/sum(Freq)) %>%
+            filter(prop >= 0.5) %>% top_n(n = 1, wt = prop)
+        return(freq %>% pull(vec) %>% as.vector())
     }
 }
 
@@ -141,9 +142,9 @@ process_duplicates <- function(df){
            "sporulation", "motility", "cell_shape")
     suppressMessages(res <- map_dfc(v, ~{
         if (.x == "pathways"){
-            str_vec <- na.omit(df$pathways)
+            str_vec <- na.omit(df$pathways) %>% as.vector()
             if (length(str_vec) == 0){
-                out <- NA
+                out <- NA_character_
             } else {
                 out <- str_replace(str_vec, pattern = " ", 
                                    replacement = "_") %>% 
@@ -165,7 +166,7 @@ Let's apply it to `tbl_munge` and then merge both data frames together into one 
 ```{r, cache = TRUE}
 
 tbl_munge <- tbl_munge %>% 
-    mutate(traits = map(traits, process_duplicates)) %>% as_tibble() %>% 
+    mutate(traits = map(traits, process_duplicates)) %>% as_tibble() %>%
     unnest(traits)
 
 ```
@@ -402,12 +403,72 @@ complete <- bind_rows(
     weissman %>% mutate(source = "weissman")
 )
 
-test <- complete %>% filter(!is.na(species)) %>% 
+tally <- complete %>% filter(!is.na(species)) %>% 
     group_by(species_tax_id, superkingdom, phylum, class, order, 
              family, genus, species) %>% 
     tally()
 
-test$gram_stain[[1]]
+
+multiple_rows <- tally %>% filter(n >= 2) %>% pull(species_tax_id)
+
+reconcile <- complete %>% filter(species_tax_id %in% multiple_rows)
+
+reconcile <- reconcile %>% group_by(species_tax_id, superkingdom, phylum, class, order,
+                       family, genus, species, metabolism) %>%
+    nest(data = c(metabolism, gram_stain, pathways, substrate, sporulation, motility, cell_shape, cell_aggregation, source)) %>% ungroup()
+
+```
+
+Similar to above, let's write a function that goes through each element and reconcile the different sources.  
+
+```{r, cache=TRUE}
+#' @param df This is a data frame of multiple columns, where the columns of 
+#'     pathways and substrates are themselves lists 
+collapse_trait <- function(df){
+    nonlist <- c("metabolism", "gram_stain", "sporulation", "motility", 
+                 "cell_shape", "cell_aggregation")    
+    out <- suppressMessages(map_dfc(nonlist, ~{
+        traits <- df %>% pull(.x)
+        traits <- as.data.frame(table(traits))
+        if (nrow(traits) >= 1){
+            return(traits %>% 
+                       mutate(prop = Freq/sum(Freq)) %>%
+                       filter(prop == max(prop) & prop >= 0.5) %>% 
+                       pull(traits) %>% as.vector()
+            )
+        } else {
+            return(NA_character_)
+        }
+    }))
+    names(out) <- nonlist
+    out$pathways <- list(df %>% pull("pathways") %>% 
+                             Reduce(f = c, x = .) %>% unique())
+    out$substrate <- list(df %>% pull("substrate") %>% 
+                              Reduce(f = c, x = .) %>% 
+                              unique())
+    return(out)
+}
+
+reconcile <- reconcile %>% mutate(traits = map(data, collapse_trait)) %>% 
+    select(-data)
+
+```
+
+Let's merge the collapsed file and save everything to a database 
+
+```{r}
+complete <- bind_rows(reconcile %>% unnest(traits), 
+          complete %>% filter(!species_tax_id %in% multiple_rows))
+
+saveRDS(complete, file = here("output", "db_merged.rds"))
+complete %>% mutate(
+    pathways = map_chr(pathways, ~{
+        paste(.x, collapse = ", ")
+    }), 
+    substrate = map_chr(substrate, ~{
+        paste(.x, collapse = ", ")
+    })
+) %>% write_csv(x = ., file = here("output", "db_merged.csv"))
 ```
 
 
