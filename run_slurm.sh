@@ -7,10 +7,10 @@
 # Distributing jobs across 5 nodes with 20 cores each node 
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=5
+#SBATCH --cpus-per-task=10
 
 # Requesting 4000 MB of RAM
-#SBATCH --mem-per-cpu=4000
+#SBATCH --mem-per-cpu=5000
 
 # request 60 hours of wall time
 #SBATCH --time=10:00:00
@@ -30,4 +30,4 @@ cd $SLURM_SUBMIT_DIR
 
 # Run run.R as a script to start the targets pipeline
 conda activate microbe_trait
-Rscript run.R --ncores 3 --analysis coverage --remove FALSE
+Rscript run.R --ncores 10 --analysis dada2_agp --remove TRUE

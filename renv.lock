@@ -3843,10 +3843,10 @@
     },
     "targets": {
       "Package": "targets",
-      "Version": "0.10.0",
+      "Version": "0.11.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "bd9b5c201537ae9e9bf3e8addbeb4218",
+      "Hash": "bcb5125b621b728d8dc23e39f2f07428",
       "Requirements": [
         "R6",
         "base64url",

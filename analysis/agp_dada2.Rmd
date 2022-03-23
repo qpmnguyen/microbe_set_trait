@@ -1,0 +1,68 @@
+---
+title: "Using `dada2` to process AGP 16S rRNA data"
+author: "Quang Nguyen"
+date: "2022-03-21"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", autodep = TRUE)
+if (requireNamespace("knitr", quietly = TRUE)) {
+  knitr::knit_engines$set(targets = targets::tar_engine_knitr)
+}
+```
+
+Here, we use `dada2` to pre-process all data from AGP and Gevers et al.
+
+```{r basic_load}
+library(dada2)
+library(here)
+library(targets)
+library(tidyverse)
+library(tarchetypes)
+
+Sys.setenv(TAR_PROJECT = "dada2_agp")
+tar_unscript()
+here::i_am("analysis/agp_dada2.Rmd")
+base_path <- file.path("rc", "lab", "H", 
+                          "HoenA", "Lab", "QNguyen", "ResultsFiles", "data", 
+                          "agp")
+if (Sys.info()['sysname'] == "Darwin"){
+    filepath <- file.path("/Volumes", base_path)
+    if (!file.exists(file.path(filepath, ".placeholder"))){
+        stop("This folder does not exist, please mount folder")
+    } 
+} else if (Sys.info()['sysname'] == "Linux"){
+    filepath <- file.path("/dartfs-hpc", base_path)
+} else {
+    stop("OS not supported")
+}
+```
+
+First, let's visualize the quality profiles of some sample reads
+
+```{r}
+reads <- sort(list.files(file.path(filepath, "raw"), pattern = "_001.fastq", full.names = TRUE))[1:10]
+sample_names <- sapply(str_split(basename(reads), "_001.fastq"), `[`, 1)
+suppressWarnings(plotQualityProfile(reads))
+```
+
+We can see that the sequencing runs are actually pretty good, so we're going to trim off the last 10 nucleotides as suggested in the [`dada2` tutorial](https://benjjneb.github.io/dada2/tutorial.html). Since AGP data is not paired end data, we skip the merging step and having to pre-process each forward and reverse read separately.
+
+```{r}
+filt <- file.path(filepath, "filtered", paste0(sample_names, "_filt.fastq.gz"))
+trim <- filterAndTrim(reads, filt, truncLen = 145, maxEE=1, truncQ=11, rm.phix = TRUE, compress=TRUE, verbose=TRUE, multithread = TRUE)
+err <- learnErrors(filt, multithread = TRUE)
+plotErrors(err, nominalQ = TRUE)
+```
+
+We iterate through a basic set of samples and have the pipeline run through the entire 18,000 samples on the cluster. This is done through the usage of the `targets` package. The pipeline definition script can be found at `script_dada2_agp.R`  
+
+```{r}
+library(targets)
+Sys.setenv(TAR_PROJECT = "dada2_agp")
+tar_visnetwork()
+```
+

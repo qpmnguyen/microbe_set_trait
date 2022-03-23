@@ -1,8 +1,3 @@
-library(dada2)
-library(ShortRead)
-library(tidyverse)
-library(rlist)
-
 #' Filter samples based on metadata for gevers et al
 #' @return file path for input data
 filter_samples <- function(fastq_path, metadata_path) {
@@ -34,15 +29,44 @@ filter_samples <- function(fastq_path, metadata_path) {
 
 
 #' retrieve sequences and filter and trim
-filter_and_trim <- function(path) {
-    fnFs <- sort(list.files(path, pattern = "fastq.gz", full.names = TRUE))
-    sample_names <- sapply(strsplit(basename(fnFs), ".fastq.gz"), `[`, 1)
-    filt_path <- file.path(path, "filtered")
-
-    out <- dada2::filterAndTrim(fnFs, filt_path,
-        truncLen = 165, maxN = 0, maxEE = 2, truncQ = 2, rm.phix = TRUE,
-        compress = TRUE, multithread = TRUE
+#' Assumes that this is a single-end files 
+filter_and_trim <- function(path, pat="_001.fastq", control=NULL, limit=FALSE) {
+    args <- list(
+        truncLen=145,
+        maxN=0,
+        maxEE=2, 
+        truncQ=11, 
+        compress=TRUE,
+        multithread=TRUE, 
+        rm.phix = TRUE
     )
+    if (!is.null(control)){
+        if (!is(control, "list")){
+            stop("Requires control arguments to be list")
+        }
+        ref_names <- c("truncLen", "maxN", "maxEE", "truncQ", 
+                       "compress", "multithread", "rm.phix")
+        if (length(setdiff(names(control), ref_names)) >= 1){
+            warnings
+        }
+        i_names <- intersect(names(control), names(args))
+        for (i in i_names){
+            args[[i]] <- control[[i]]
+        }
+    }
+    # first, extract reads
+    reads <- sort(list.files(file.path(path, "raw"), pattern = pat, full.names = TRUE))
+    
+    if (limit) {
+        reads <- reads[1:10]
+    }
+    
+    sample_names <- sapply(strsplit(basename(reads), pat), `[`, 1)
+    filt_path <- file.path(path, "filtered", paste0(sample_names, "_filt.fastq.gz"))
+    
+    args_ftr <- c(args, list(fwd = reads, filt = filt_path))
+    
+    out <- do.call(dada2::filterAndTrim, args_ftr)
     output <- list(
         path = path,
         sample_names = sample_names,
@@ -57,11 +81,8 @@ learn_errors <- function(output) {
     if (!setequal(names(output), c("path", "sample_names", "out", "filt_path"))) {
         stop("Output does not have all the required elements!")
     }
-    if (length(list.files(output$filt_path, pattern = "fastq.gz")) != length(list.files(output$path, pattern = "fastq.gz"))) {
-        stop("No files exist!")
-    }
     err <- dada2::learnErrors(output$filt_path, multithread = TRUE)
-    output <- rlist::list.append(output, err = err)
+    output <- c(output, list(err = err))
     return(output)
 }
 
@@ -70,9 +91,13 @@ run_dada2 <- function(output) {
     if (!setequal(names(output), c("err", "path", "sample_names", "out", "filt_path"))) {
         stop("Output does not have all the required elements!")
     }
-    dada_samples <- dada2::dada(output$filt_path, err = output$err, multithread = TRUE)
+    dada_samples <- dada2::dada(output$filt_path, 
+                                err = output$err, 
+                                multithread = TRUE)
     seqtab <- dada2::makeSequenceTable(dada_samples)
-    seqtab_nochim <- dada2::removeBimeraDenovo(seqtab, method = "consensus", multithread = TRUE, verbose = TRUE)
+    seqtab_nochim <- dada2::removeBimeraDenovo(seqtab, 
+                                               method = "consensus", 
+                                               multithread = TRUE, verbose = TRUE)
 
     # track reads through the pipeline
     getN <- function(x) sum(getUniques(x))
@@ -93,18 +118,19 @@ assign_taxonomy <- function(output) {
     if (!setequal(names(output), c("err", "path", "sample_names", "filt_path", "track", "seqtab_nochim"))) {
         stop("Output does not have all the required elements!")
     }
-    if (!file.exists("databases/silva_species_assignment_v138.1.fa.gz")) {
+    if (!file.exists(here("databases", "silva_species_assignment_v138.1.fa.gz"))) {
         download.file("https://zenodo.org/record/4587955/files/silva_species_assignment_v138.1.fa.gz?download=1",
             destfile = "databases/silva_species_assignment_v138.1.fa.gz"
         )
     }
-    if (!file.exists("databases/silva_nr99_v138.1_train_set.fa.gz")) {
+    if (!file.exists(here("databases","silva_nr99_v138.1_train_set.fa.gz"))) {
         download.file("https://zenodo.org/record/4587955/files/silva_nr99_v138.1_train_set.fa.gz?download=1",
             destfile = "databases/silva_nr99_v138.1_train_set.fa.gz"
         )
     }
-    taxa <- assignTaxonomy(output$seqtab_nochim, "databases/silva_nr99_v138.1_train_set.fa.gz", multithread = TRUE)
-    taxa <- addSpecies(taxa, "databases/silva_species_assignment_v138.1.fa.gz")
+    taxa <- assignTaxonomy(output$seqtab_nochim, 
+                           here("databases", "silva_nr99_v138.1_train_set.fa.gz"), multithread = TRUE)
+    taxa <- addSpecies(taxa, here("databases", "silva_species_assignment_v138.1.fa.gz"))
     output <- rlist::list.append(output, taxa = taxa)
     return(output)
 }
