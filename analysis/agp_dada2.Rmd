@@ -63,6 +63,6 @@ We iterate through a basic set of samples and have the pipeline run through the 
 ```{r}
 library(targets)
 Sys.setenv(TAR_PROJECT = "dada2_agp")
-tar_visnetwork()
+targets::tar_visnetwork(targets_only = TRUE)
 ```
 
