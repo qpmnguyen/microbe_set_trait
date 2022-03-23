@@ -48,7 +48,7 @@ subset_metadata <- metadata %>%
     select(sample_name, country_of_birth, 
                     age_years, description, host_body_site, host_taxid, 
                     diabetes, sex, ibd, ibs, ibd_diagnosis, ibd_diagnosis_refined, 
-                    bmi_cat) %>% 
+                    bmi_cat, diabetes_type) %>% 
     select(-c(host_body_site, description, host_taxid)) %>% 
     distinct()
 
