@@ -30,12 +30,12 @@ filter_samples <- function(fastq_path, metadata_path) {
 
 #' retrieve sequences and filter and trim
 #' Assumes that this is a single-end files 
-filter_and_trim <- function(path, pat="_001.fastq", control=NULL, limit=FALSE) {
+filter_and_trim <- function(reads, base_path=NULL, pat = NULL, control=NULL) {
     args <- list(
         truncLen=145,
         maxN=0,
         maxEE=2, 
-        truncQ=11, 
+        truncQ=2, 
         compress=TRUE,
         multithread=TRUE, 
         rm.phix = TRUE
@@ -54,70 +54,53 @@ filter_and_trim <- function(path, pat="_001.fastq", control=NULL, limit=FALSE) {
             args[[i]] <- control[[i]]
         }
     }
-    # first, extract reads
-    reads <- sort(list.files(file.path(path, "raw"), pattern = pat, full.names = TRUE))
-    
-    if (limit) {
-        reads <- reads[1:10]
-    }
     
     sample_names <- sapply(strsplit(basename(reads), pat), `[`, 1)
-    filt_path <- file.path(path, "filtered", paste0(sample_names, "_filt.fastq.gz"))
+    filt_path <- file.path(base_path, "filtered", paste0(sample_names, "_filt.fastq.gz"))
     
     args_ftr <- c(args, list(fwd = reads, filt = filt_path))
     
     out <- do.call(dada2::filterAndTrim, args_ftr)
-    output <- list(
-        path = path,
-        sample_names = sample_names,
-        out = out,
-        filt_path = filt_path
-    )
-    return(output)
+    return(filt_path)
 }
 
 #' learn_errors require output from filter_and_trim function
-learn_errors <- function(output) {
-    if (!setequal(names(output), c("path", "sample_names", "out", "filt_path"))) {
-        stop("Output does not have all the required elements!")
-    }
-    err <- dada2::learnErrors(output$filt_path, multithread = TRUE)
-    output <- c(output, list(err = err))
-    return(output)
+learn_errors <- function(filt_path) {
+    print(filt_path)
+    err <- dada2::learnErrors(filt_path, multithread = TRUE, 
+                              nbases = 1e8, randomize = TRUE)
+    return(err)
 }
 
 #' Run dada2 on learned errors and return outputs with chimeric sequences removed
-run_dada2 <- function(output) {
-    if (!setequal(names(output), c("err", "path", "sample_names", "out", "filt_path"))) {
-        stop("Output does not have all the required elements!")
-    }
-    dada_samples <- dada2::dada(output$filt_path, 
-                                err = output$err, 
+run_dada2 <- function(filt_path, err) {
+    derep <- derepFastq(filt_path)
+    dada_samples <- dada2::dada(derep, 
+                                err = err, 
                                 multithread = TRUE)
-    seqtab <- dada2::makeSequenceTable(dada_samples)
-    seqtab_nochim <- dada2::removeBimeraDenovo(seqtab, 
-                                               method = "consensus", 
-                                               multithread = TRUE, verbose = TRUE)
-
-    # track reads through the pipeline
-    getN <- function(x) sum(getUniques(x))
-    track <- cbind(output$out, sapply(dada_samples, getN), rowSums(seqtab), rowSums(seqtab_nochim))
-    # If processing a single sample, remove the sapply calls: e.g. replace sapply(dadaFs, getN) with getN(dadaFs)
-    colnames(track) <- c("input", "filtered", "denoised", "w_chimeria", "nonchim")
-    rownames(track) <- output$sample_names
-    output <- rlist::list.append(output,
-        track = track,
-        seqtab_nochim = seqtab_nochim
-    )
-    output <- rlist::list.remove(output, "out")
+    sample_name <- sapply(strsplit(basename(filt_path), "_filt.fastq.gz"), `[`, 1)
+    print(sample_name)
+    out <- list(dada_samples)
+    names(out) <- sample_name
+    return(out)
 }
 
+#' @param dada_res Dada res is a list of large size 
+remove_chimera <- function(dada_res){
+    # preprocess dada_res
+    sample_names <- map_chr(dada_res, ~names(.x))
+    dada_res <- map(dada_res, pluck,1)
+    names(dada_res) <- sample_names
+    seqtab <- dada2::makeSequenceTable(dada_res)
+    seqtab_nochim <- dada2::removeBimeraDenovo(seqtab, method = "consensus", 
+                                               multithread = TRUE, verbose = TRUE)
+    return(seqtab_nochim)
+}
+
+
 #' Assign taxonomy
-assign_taxonomy <- function(output) {
+assign_taxonomy <- function(seqtab) {
     dir.create("databases", showWarnings = FALSE)
-    if (!setequal(names(output), c("err", "path", "sample_names", "filt_path", "track", "seqtab_nochim"))) {
-        stop("Output does not have all the required elements!")
-    }
     if (!file.exists(here("databases", "silva_species_assignment_v138.1.fa.gz"))) {
         download.file("https://zenodo.org/record/4587955/files/silva_species_assignment_v138.1.fa.gz?download=1",
             destfile = "databases/silva_species_assignment_v138.1.fa.gz"
@@ -128,9 +111,10 @@ assign_taxonomy <- function(output) {
             destfile = "databases/silva_nr99_v138.1_train_set.fa.gz"
         )
     }
-    taxa <- assignTaxonomy(output$seqtab_nochim, 
-                           here("databases", "silva_nr99_v138.1_train_set.fa.gz"), multithread = TRUE)
+    taxa <- assignTaxonomy(seqtab, 
+                           here("databases", "silva_nr99_v138.1_train_set.fa.gz"), 
+                           multithread = TRUE)
     taxa <- addSpecies(taxa, here("databases", "silva_species_assignment_v138.1.fa.gz"))
-    output <- rlist::list.append(output, taxa = taxa)
+    output <- list(seqtab = seqtab, taxa = taxa)
     return(output)
 }

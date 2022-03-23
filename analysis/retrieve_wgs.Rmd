@@ -1,6 +1,19 @@
-# Downloading wgs data sets for prediction  
-# Quang Nguyen 
-# Last revision: 2022-03-09
+---
+title: "Retrieve WGS data"
+author: "Quang Nguyen"
+date: "2022-03-23"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+This script attempts to retrieve relevant WGS data sets 
+
+
+
+```{r}
 library(curatedMetagenomicData)
 library(tidyverse)
 
@@ -10,3 +23,5 @@ samples <- metadata %>% filter(study_name %in% s_names, study_condition %in% c("
 
 
 control_only <- metadata %>% filter(study_condition == "control")
+```
+

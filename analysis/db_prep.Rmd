@@ -243,7 +243,8 @@ weissman <- weissman %>% group_by(taxid_species, kingdom, phylum,
     mutate(across(where(is.character), ~na_if(., "0"))) %>% 
     rename("species_tax_id" = taxid_species, "superkingdom" = kingdom, 
            "metabolism" = Oxygen.Preference,
-           "motility" = Motility_general, "cell_shape" = Cell.Shape, "cell_aggregation" = Cell.Aggregation)
+           "motility" = Motility_general, 
+           "cell_shape" = Cell.Shape, "cell_aggregation" = Cell.Aggregation)
 
 # motility, cell shape, metabolism
 weissman$cell_shape %>% unique()
