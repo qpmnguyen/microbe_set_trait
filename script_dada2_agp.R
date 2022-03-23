@@ -31,7 +31,7 @@ path_files <- function(){
 
 list(
     tar_files(raw_data, list.files(file.path(path_files(), "raw"), 
-                                    pattern = "_001.fastq", full.names = TRUE)[1:10]),
+                                    pattern = "_001.fastq", full.names = TRUE)),
     tar_target(filt_path, filter_and_trim(raw_data, base_path = path_files(), pat = "_001.fastq"),
                pattern = map(raw_data)),
     tar_files(filt_data, filt_path),
