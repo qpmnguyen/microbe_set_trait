@@ -24,3 +24,6 @@ prototype.R
 analysis/*_cache/
 _targets/
 _targets_r/
+targets/
+_targets/
+_targets_r/
