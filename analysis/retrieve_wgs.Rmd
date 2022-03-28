@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction  
 
-Here we obtain metagenomic samples from `curatedMetagenomicData` package for certain conditions. We filter the metadata and then retrieve both relative abundance and pathway abundance data sets. We're interested in different conditions of interest: CRC (colorectal cancer), T2D (type II diabetes), and IBD (inflammatory bowel disease). We also collect all samples set to be controls.  
+Here we obtain metagenomic samples from `curatedMetagenomicData` package for certain conditions. We filter the metadata and then retrieve both relative abundance and pathway abundance data sets. We're interested in different conditions of interest: CRC (colorectal cancer)  and IBD (inflammatory bowel disease). We also collect all samples set to be controls.  
 
 ## Implementation
 Load packages 
@@ -22,61 +22,43 @@ Load packages
 library(curatedMetagenomicData)
 library(tidyverse)
 library(here)
-here::i_am(file.path("analysis", "retrieve_wgs.rmd"))
+library(piggyback)
+library(qs)
+here::i_am(file.path("analysis", "retrieve_wgs.Rmd"))
 ```
 
-Here, we use the metadata to extract out samples that study three conditions of interest: CRC (colorectal cancer), T2D (type II diabetes), and IBD (inflammatory bowel disease). Additionally, we select all samples stated to be controls (without any disease).  
+Here, we use the metadata to extract out samples that study three conditions of interest: CRC (colorectal cancer), T1D (type I diabetes), and IBD (inflammatory bowel disease). Additionally, we select all samples stated to be controls (without any disease). 
+
+We are returning each data set as two `qs` files of the `TreeSummarizedExperiment` format and pathway abundances. We use `returnSamples()` to retreive all relevant data.   
 ```{r}
 metadata <- as_tibble(sampleMetadata)
-# names of studies that have these conditions as their primary indicators
-s_names <- metadata %>% 
-    filter(study_condition %in% c("CRC", "T2D", "IBD")) %>% 
-    pull(study_name) %>% unique() # nolint
 
-# retrieve data from those studies alone but also obtain matched controls per data set  
-samples <- metadata %>% 
-    filter(study_name %in% s_names, study_condition %in% c("CRC", "T2D", "IBD", "control"))
-
-print(paste(nrow(samples), "samples for the per-study data set"))
-
-# getting all control data sets  
-control_only <- metadata %>% filter(study_condition == "control")
-print(paste(nrow(control_only), "samples for the control only data set")
-
-print(head(samples))
-print(head(control_only))
-```
-
-We use `returnSamples()` to retreive all relevant data  
-
-```{r}
-
-if (!file.exists(here("large_files", "pred_wgs_cohort.rds"))){
-    pred_cohort_relabundance <- returnSamples(samples, 
-        "relative_abundance", rownames = "NCBI")
-    pred_cohort_pathabundance <- returnSamples(samples, 
-        "pathway_abundance", rownames = "NCBI")
-    out <- list(relab = pred_cohort_relabundance, 
-        pathab = pred_cohort_pathabundance)
-    saveRDS(object = out, file = here("large_files", "pred_wgs_cohort.rds"))
-    rm(pred_cohort_relabundance)
-    rm(pred_cohort_pathabundance)
-    rm(out)
-    gc()
-} 
-
-```
-
-```{r}
-if (!file.exists(here("large_files", "control_wgs_cohort.rds"))){
-    control_cohort_relabundance <- returnSamples(control_only, "relative_abundance", rownames = "NCBI")
-    control_cohort_pathabundance <- returnSamples(control_only, "pathway_abundance", rownames = "NCBI")
-    out <- list(relab = control_cohort_relabundance, pathab = pred_cohort_pathabundance)
-    saveRDS(object = out, file = here("large_files", "control_wgs_cohort.rds"))
-    rm(control_cohort_relabundance)
-    rm(control_cohort_pathabundance)
-    rm(out)
-    gc()
-
+conditions <- c("CRC", "IBD")
+for (condition in conditions){
+    s_names <- metadata %>% filter(study_condition == condition) %>% 
+        pull(study_name) %>% unique()
+    samples <- metadata %>% filter(study_name %in% s_names, study_condition %in% c(condition, "control"))
+    data <- returnSamples(samples, "relative_abundance", rownames = "NCBI")
+    colData(data) <- colData(data)[,c("study_name", "disease", "study_condition")]
+    path <- returnSamples(samples, "pathway_abundance")
+    path <- path[!str_detect(rownames(path), "\\|")]
+    colData(path) <- colData(data)[,c("study_name", "disease", "study_condition")]
+    qsave(path, file = here("data", paste0("pred_pathway_", condition, "_wgs.qs")))
+    qsave(data, file = here("data", paste0("pred_relabun_", condition, "_wgs.qs")))
+    print(paste("This data set has", dim(data)[1], "samples for condition", condition))
 }
+```
+
+This is the control data 
+```{r}
+control_only <- metadata %>% filter(study_condition == "control")
+control_cohort_relabundance <- returnSamples(control_only, "relative_abundance", rownames = "NCBI")
+colData(control_cohort_relabundance) <- colData(control_cohort_relabundance)[,c("study_name", "BMI", 
+        "age", "number_reads", "body_site")]
+print(paste("Total number of samples for control is", dim(control_cohort_relabundance)[1]))
+qsave(control_cohort_relabundance, file = here("data", "control_relabun_wgs.qs"))
+
+control_cohort_pathabundance <- returnSamples(control_only, "pathway_abundance", rownames = "NCBI")
+control_cohort_pathabundance <- control_cohort_pathabundance[!str_detect(rownames(control_cohort_pathabundance),"\\|")]
+qsave(control_cohort_pathabundance, file = here("data", "control_pathway_wgs.qs"))
 ```
