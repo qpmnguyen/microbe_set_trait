@@ -43,22 +43,11 @@ for (condition in conditions){
     path <- returnSamples(samples, "pathway_abundance")
     path <- path[!str_detect(rownames(path), "\\|")]
     colData(path) <- colData(data)[,c("study_name", "disease", "study_condition")]
-    qsave(path, file = here("data", paste0("pred_pathway_", condition, "_wgs.qs")))
-    qsave(data, file = here("data", paste0("pred_relabun_", condition, "_wgs.qs")))
+    qsave(data, here("data", paste0("pred_relabun_", condition, "_wgs.parquet")))
+    qsave(path, here("data", paste0("pred_pathway_", condition, "_wgs.parquet")))
+    
     print(paste("This data set has", dim(data)[1], "samples for condition", condition))
 }
 ```
 
-This is the control data 
-```{r}
-control_only <- metadata %>% filter(study_condition == "control")
-control_cohort_relabundance <- returnSamples(control_only, "relative_abundance", rownames = "NCBI")
-colData(control_cohort_relabundance) <- colData(control_cohort_relabundance)[,c("study_name", "BMI", 
-        "age", "number_reads", "body_site")]
-print(paste("Total number of samples for control is", dim(control_cohort_relabundance)[1]))
-qsave(control_cohort_relabundance, file = here("data", "control_relabun_wgs.qs"))
-
-control_cohort_pathabundance <- returnSamples(control_only, "pathway_abundance", rownames = "NCBI")
-control_cohort_pathabundance <- control_cohort_pathabundance[!str_detect(rownames(control_cohort_pathabundance),"\\|")]
-qsave(control_cohort_pathabundance, file = here("data", "control_pathway_wgs.qs"))
-```
+We looped through each condition and then visualize them 
