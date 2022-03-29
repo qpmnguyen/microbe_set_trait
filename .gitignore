@@ -2,7 +2,6 @@ library/
 local/
 cellar/
 lock/
-python/
 staging/
 .Rproj.user
 .Rhistory
@@ -28,3 +27,4 @@ targets/
 _targets/
 _targets_r/
 .vscode/
+.ipynb_checkpoints/
