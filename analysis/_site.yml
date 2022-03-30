@@ -11,18 +11,18 @@ navbar:
     href: license.html
   - text: Preparation     
     menu:
-      - text: "AGP data manifest"
-        href: "retrieve_agp.html"
-      - text: "Downloading AGP"
-        href: "agp_download.html"
+      - text: "WGS data manifest"
+        href: "retrieve_wgs.html"
       - text: "Updating database"        
         href: "db_prep.html"
   - text: Main Analyses 
     menu:
       - text: "Coverage analyses"
+        href: "coverage_analysis.html"
       - text: "Concordance analyses"
+        href: "concordance_analysis.html"
       - text: "Predictive analyses"
-
+        href: "predictive analyses.html"
   right:
   - icon: fab fa-github
     text: Source code

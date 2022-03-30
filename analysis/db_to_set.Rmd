@@ -1,0 +1,44 @@
+---
+title: "Converting database to set"
+author: "Quang Nguyen"
+date: "2022-03-29"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+This analysis is to convert the `rds` database file into individual genus and species level set divided by each category.  
+
+```{r}
+library(here)
+library(tidyverse)
+library(data.table)
+library(dtplyr)
+here::i_am("analysis/db_to_set.Rmd")
+source(here("R", "db_preprocess.R"))
+```
+
+```{r}
+db <- readRDS(file = here("output", "db_merged.rds"))
+tax_names <- c("species_tax_id", "superkingdom", "phylum", "class", "order", "family", "genus", "species")
+trait_names <- c("metabolism", "gram_stain", "sporulation", "motility", "cell_shape", "cell_aggregation", 
+                 "pathways", "substrate")
+```
+
+## Analysis  
+
+We loop through each trait category and generate sets at the species level  
+
+```{r}
+t <- trait_names[1]
+
+db %>% select(all_of(c(tax_names, t))) %>% 
+    unite(col = "fullname", superkingdom:species, sep = "_")
+
+```
+
+
+
+
+
