@@ -6,7 +6,6 @@ library(phyloseq)
 library(BiocSet)
 library(taxizedb)
 library(glue)
-library(taxadb)
 library(purrr)
 library(DBI)
 library(stringr)
@@ -20,37 +19,6 @@ if (length(tdb_cache$list()) == 0) {
 
 setDTthreads(2)
 
-
-# PROCESS THE TRAIT DATABASE ####   
-#' Read in trait database as a data.table  
-proc_trait <- function(){
-    trait_db <- fread(file = "data/condensed_species_NCBI.txt")
-    # retreive genus level identifiers from from species identifiers 
-    # retreieve names via ncbi reference (full name from superkingdom to genus)
-    # this is a rowwise operation which might take a while 
-    trait_db <- trait_db[, c("genus_ncbiid", "genus_ncbi_fullname") := genus_from_species(species_tax_id), 
-                         by = .I]
-
-    # traits are being queried 
-    query_traits <- c("pathways", "carbon_substrates", 
-                      "sporulation", 
-                      "gram_stain", "cell_shape", "range_tmp", 
-                      "range_salinity", 
-                      "motility", "metabolism")
-    c_ranks <- c(
-        "superkingdom", "phylum", "class",
-        "order", "family", "genus", "species"
-    )
-    
-    select_cols <- c("species_tax_id", "genus_ncbiid", "genus_ncbi_fullname", 
-                     c_ranks, query_traits)
-    # only care about bacteria 
-    trait_db <- trait_db[, ..select_cols,][superkingdom == "Bacteria",,]
-    saveRDS(trait_db, file = "data/madin_proc.rds")
-    message("Completed!")
-    return(0)
-}
-
 #' @title Retrieve ncbiids based on unique traits 
 #' @param subset_db The trait database ideally restricted to 
 #'     the trait of interest 
@@ -61,6 +29,8 @@ get_traits <- function(trait_db, trait){
                                 "gram_stain", "cell_shape", "range_tmp", 
                                 "range_salinity", 
                                 "motility", "metabolism"))
+    
+    trait_db %>% filter(!is.na())
     
     subset_db <- trait_db[!is.na(j), , env = list(j = trait)]
     idx <- ncol(subset_db)
@@ -282,10 +252,6 @@ genus_from_species <- function(spec_id){
     }
     return(output)
 }
-
-
-
-
 
 # PROCESS NCBIID RESULTS ####  
 # do not run if trying to perform this reproducibly

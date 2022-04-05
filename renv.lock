@@ -716,6 +716,14 @@
       "Hash": "d128ea05a972d3e67c6f39de52c72bd7",
       "Requirements": []
     },
+    "RApiSerialize": {
+      "Package": "RApiSerialize",
+      "Version": "0.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "96a7dca805d39693b0cb0dad099a5899",
+      "Requirements": []
+    },
     "RColorBrewer": {
       "Package": "RColorBrewer",
       "Version": "1.1-2",
@@ -3238,6 +3246,18 @@
         "rlang"
       ]
     },
+    "qs": {
+      "Package": "qs",
+      "Version": "0.25.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2a135bd3fcd62d0caf73cf1bc9270d8d",
+      "Requirements": [
+        "RApiSerialize",
+        "Rcpp",
+        "stringfish"
+      ]
+    },
     "randomForest": {
       "Package": "randomForest",
       "Version": "4.7-1",
@@ -3763,6 +3783,17 @@
       "Repository": "CRAN",
       "Hash": "c8b6c79c3b2d7d8475f3ab35cd99737b",
       "Requirements": []
+    },
+    "stringfish": {
+      "Package": "stringfish",
+      "Version": "0.15.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f5a78e4562f6390f61ddf14848a0a3d9",
+      "Requirements": [
+        "Rcpp",
+        "RcppParallel"
+      ]
     },
     "stringi": {
       "Package": "stringi",
