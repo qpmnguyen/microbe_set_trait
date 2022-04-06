@@ -1,3 +1,4 @@
+name: qiime2_2022.2
 channels:
   - qiime2/label/r2022.2
   - conda-forge

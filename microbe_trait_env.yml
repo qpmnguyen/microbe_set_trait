@@ -1,0 +1,15 @@
+name: microbe_trait
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - biopython
+  - r-base=4.1.2
+  - nlopt
+  - notebook
+  - jupyter
+  - matplotlib
+  - pandas
+  - jupyterlab
+prefix: /dartfs-hpc/rc/home/k/f00345k/.conda/envs/microbe_trait
