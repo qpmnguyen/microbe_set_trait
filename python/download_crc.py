@@ -7,15 +7,18 @@ from multiprocessing import Pool
 import time
 
 
+
 def download_sample(idx):
     failed = []
     for j in range(0,2):
         url = manifest.iloc[idx].fastq_ftp.split(";")[j]
         sname = sname = manifest.iloc[idx].sample_title.split(" ")[-1]
-        if j == 1:
-            fname = sname + "_R2_001.fastq.gz"
-        else:
+        print(j)
+        if j == 0:
             fname = sname + "_R1_001.fastq.gz"
+        elif j == 1:
+            fname = sname + "_R2_001.fastq.gz"
+        print(fname)
         fullname = crc_path + "/" + fname
         cmd = "wget {} -O {}".format(url, crc_path + "/" + fname)
         if os.path.exists(fullname):
@@ -32,7 +35,8 @@ def download_sample(idx):
                     print("This file is dud")
                     failed.append(url)
                     pass
-        return(failed)
+    print(failed)
+    return(failed)
 
 
 
@@ -45,7 +49,10 @@ if __name__ == "__main__":
     manifest = manifest[manifest.groupby("sample_title")['read_count'].transform('max') == manifest['read_count']]
     manifest = manifest.reset_index().drop('index', axis = 1)
     crc_path = basepath + "/crc_16s"
-    pool = Pool(5)
-    pool.map(download_sample, range(0, manifest.shape[0]))
-    pool.close()
-    pool.join()
+    for i in range(0, manifest.shape[0]):
+        download_sample(i)
+    
+    #pool = Pool(5)
+    #pool.map(download_sample, range(0, manifest.shape[0]))
+    #pool.close()
+    #pool.join()
