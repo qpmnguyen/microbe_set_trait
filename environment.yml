@@ -1,8 +1,0 @@
-name: microbe_set
-channels:
-  - defaults
-dependencies:
-  - python=3.9.7
-  - pandas
-prefix: E:\Software\Miniconda3\envs\microbe_set
-

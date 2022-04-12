@@ -1,2 +1,2 @@
-source("renv/activate.R")
+# source("renv/activate.R")
 # credentials::set_github_pat()
