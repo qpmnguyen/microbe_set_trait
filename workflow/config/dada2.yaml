@@ -1,0 +1,11 @@
+datasets:
+    ibd_16s: 
+        cmd: "denoise-single"
+        manifest: "metadata/ibd_qiime2_manifest.tsv"
+        params: "--p-trunc-len 160 \
+                --p-max-ee" 
+    crc_16s: 
+        cmd: "denoise-paired"
+        manifest: "metadata/ibd_qiime2_manifest.tsv"
+        params: "--p-trunc-len-f 235 --p-trunc-len-r 225 \
+                --p-max-ee-f 2 --p-max-ee-r 2"

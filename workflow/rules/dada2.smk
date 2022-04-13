@@ -1,0 +1,99 @@
+from snakemake.utils import min_version
+min_version("6.0")
+configfile: "workflow/config/dada2.yaml"
+
+rule all: 
+    output:
+        expand("output/sequence_process_16s/crc_16s/exports/taxonomy.biom", dataset=config["datasets"]),
+        expand("output/sequence_process_16s/crc_16s/exports/feature_table.biom", dataset=config["datasets"]),
+        expand("output/sequence_process_16s/crc_16s/exports/dna_sequences.fasta", dataset=config["datasets"])
+    
+rule import_manifest:
+    input: 
+        get_manifest
+    conda: 
+        "../env/qiime2-2022.2-py38-linux-conda.yml"
+    output:
+        "output/sequence_process_16s/crc_16s/paired-end-demux.qza"
+    shell:
+        """
+        qiime tools import \
+            --type 'SampleData[PairedEndSequencesWithQuality]' \
+            --input-path {input} \
+            --output-path {output} \
+            --input-format PairedEndFastqManifestPhred33V2
+        """
+
+rule dada2_run: 
+    input:
+        "output/sequence_process_16s/crc_16s/paired-end-demux.qza"
+    conda: 
+        "../env/qiime2-2022.2-py38-linux-conda.yml"
+    output:
+        table="output/sequence_process_16s/crc_16s/feature_table.qza",
+        sequences="output/sequence_process_16s/crc_16s/dna_sequences.qza", 
+        stats="output/sequence_process_16s/crc_16s/denoise_stats.qza"
+    threads: 6
+    shell:
+        """
+        qiime dada2 {config["datasets"]["cmd"]} \
+            --i-demultiplexed-seqs {input} \
+            {config["datasets"]["params"]}
+            --p-trunc-q 2 \
+            --p-pooling-method 'pseudo' \
+            --p-chimera-method 'pooled' \
+            --p-n-threads {threads} \
+            --o-table {output.table} \
+            --o-representative-sequences {output.sequences} \
+            --o-denoising-stats {output.stats}
+        """
+
+rule download_classifier: 
+    output:
+        "large_data/silva-138-99-nb-weighted-classifier.qza"
+    shell:
+        """
+        wget https://data.qiime2.org/2022.2/common/silva-138-99-nb-weighted-classifier.qza \
+            -O {output}
+        """
+        
+rule taxonomic_classification:
+    input:
+        classifier="large_data/silva-138-99-nb-weighted-classifier.qza",
+        reads="output/sequence_process_16s/crc_16s/dna_sequences.qza"
+    conda: 
+        "../env/qiime2-2022.2-py38-linux-conda.yml"
+    output:
+        "output/sequence_process_16s/crc_16s/taxonomy.qza"
+    shell:
+        """
+        qiime feature-classifier classify-sklearn \
+            --i-classifier {input.classifier} \
+            --i-reads {input.reads} \
+            --o-classification {output}
+        """
+    
+rule export:
+    input:
+        feature_table="output/sequence_process_16s/crc_16s/feature_table.qza",
+        taxonomy="output/sequence_process_16s/crc_16s/taxonomy.qza",
+        sequences="output/sequence_process_16s/crc_16s/dna_sequences.qza"
+    conda: 
+        "../env/qiime2-2022.2-py38-linux-conda.yml"
+    output:
+        directory("output/sequence_process_16s/crc_16s/exports")
+    shell:
+        """
+        qiime tools export \
+            --input-path {input.feature_table} \
+            --output-path {output}
+        
+        qiime tools export \ 
+            --input-path {input.taxonomy} \
+            --output-path {output}
+        
+        qiime tools extract \
+            --input-path {input.sequences} \
+            --output-path {output}
+        """
+        
