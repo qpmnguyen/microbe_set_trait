@@ -1,0 +1,6 @@
+{
+    "SBATCH_DEFAULTS": "account=f00345k mail-user=Quang.P.Nguyen.GR@dartmouth.edu partition=standard mail-type=END,FAIL",
+    "CLUSTER_NAME": "",
+    "CLUSTER_CONFIG": "",
+    "ADVANCED_ARGUMENT_CONVERSION": "no"
+}

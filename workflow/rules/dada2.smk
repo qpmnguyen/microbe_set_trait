@@ -1,44 +1,52 @@
 from snakemake.utils import min_version
 min_version("6.0")
-configfile: "workflow/config/dada2.yaml"
+#DATASETS=["ibd_16s", "crc_16s"]
 
 rule all: 
-    output:
-        expand("output/sequence_process_16s/crc_16s/exports/taxonomy.biom", dataset=config["datasets"]),
-        expand("output/sequence_process_16s/crc_16s/exports/feature_table.biom", dataset=config["datasets"]),
-        expand("output/sequence_process_16s/crc_16s/exports/dna_sequences.fasta", dataset=config["datasets"])
-    
+    input:
+        expand("output/sequence_process_16s/{dataset}/exports/taxonomy.biom", dataset=["ibd_16s", "crc_16s"]),
+        expand("output/sequence_process_16s/{dataset}/exports/feature_table.biom", dataset=["ibd_16s", "crc_16s"]),
+        expand("output/sequence_process_16s/{dataset}/exports/dna_sequences.fasta", dataset=["ibd_16s", "crc_16s"])
+
+
+
 rule import_manifest:
     input: 
-        get_manifest
+        lambda wildcards: config["data"][wildcards.dataset]["manifest"]
     conda: 
         "../env/qiime2-2022.2-py38-linux-conda.yml"
     output:
-        "output/sequence_process_16s/crc_16s/paired-end-demux.qza"
+        "output/sequence_process_16s/{dataset}/paired-end-demux.qza"
+    params:
+        input_type=lambda wildcards: config["data"][wildcards.dataset]["type"],
+        input_format=lambda wildcards: config["data"][wildcards.dataset]["format"]
     shell:
         """
         qiime tools import \
-            --type 'SampleData[PairedEndSequencesWithQuality]' \
+            --type {params.input_type} \
             --input-path {input} \
             --output-path {output} \
-            --input-format PairedEndFastqManifestPhred33V2
+            --input-format {params.input_format}
         """
 
-rule dada2_run: 
+rule denoise: 
     input:
-        "output/sequence_process_16s/crc_16s/paired-end-demux.qza"
+        "output/sequence_process_16s/{dataset}/paired-end-demux.qza"
     conda: 
         "../env/qiime2-2022.2-py38-linux-conda.yml"
     output:
-        table="output/sequence_process_16s/crc_16s/feature_table.qza",
-        sequences="output/sequence_process_16s/crc_16s/dna_sequences.qza", 
-        stats="output/sequence_process_16s/crc_16s/denoise_stats.qza"
-    threads: 6
+        table="output/sequence_process_16s/{dataset}/feature_table.qza",
+        sequences="output/sequence_process_16s/{dataset}/dna_sequences.qza", 
+        stats="output/sequence_process_16s/{dataset}/denoise_stats.qza"
+    threads: 10
+    params: 
+        quality=lambda wildcards: config["data"][wildcards.dataset]["params"],
+        cmd=lambda wildcards: config["data"][wildcards.dataset]["cmd"]
     shell:
         """
-        qiime dada2 {config["datasets"]["cmd"]} \
+        qiime dada2 {params.cmd} \
             --i-demultiplexed-seqs {input} \
-            {config["datasets"]["params"]}
+            {params.quality} \
             --p-trunc-q 2 \
             --p-pooling-method 'pseudo' \
             --p-chimera-method 'pooled' \
@@ -60,11 +68,11 @@ rule download_classifier:
 rule taxonomic_classification:
     input:
         classifier="large_data/silva-138-99-nb-weighted-classifier.qza",
-        reads="output/sequence_process_16s/crc_16s/dna_sequences.qza"
+        reads="output/sequence_process_16s/{dataset}/dna_sequences.qza"
     conda: 
         "../env/qiime2-2022.2-py38-linux-conda.yml"
     output:
-        "output/sequence_process_16s/crc_16s/taxonomy.qza"
+        "output/sequence_process_16s/{dataset}/taxonomy.qza"
     shell:
         """
         qiime feature-classifier classify-sklearn \
@@ -75,13 +83,15 @@ rule taxonomic_classification:
     
 rule export:
     input:
-        feature_table="output/sequence_process_16s/crc_16s/feature_table.qza",
-        taxonomy="output/sequence_process_16s/crc_16s/taxonomy.qza",
-        sequences="output/sequence_process_16s/crc_16s/dna_sequences.qza"
+        feature_table="output/sequence_process_16s/{dataset}/feature_table.qza",
+        taxonomy="output/sequence_process_16s/{dataset}/taxonomy.qza",
+        sequences="output/sequence_process_16s/{dataset}/dna_sequences.qza"
     conda: 
         "../env/qiime2-2022.2-py38-linux-conda.yml"
     output:
-        directory("output/sequence_process_16s/crc_16s/exports")
+        "output/sequence_process_16s/{dataset}/exports/taxonomy.biom", 
+        "output/sequence_process_16s/{dataset}/exports/feature_table.biom",
+        "output/sequence_process_16s/{dataset}/exports/dna_sequences.fasta"
     shell:
         """
         qiime tools export \
