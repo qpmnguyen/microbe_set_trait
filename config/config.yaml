@@ -6,11 +6,11 @@ dada2:
             format: "SingleEndFastqManifestPhred33V2"
             manifest: "metadata/ibd_qiime2_manifest.tsv"
             params: "--p-trunc-len 160 \
-                    --p-max-ee" 
+                    --p-max-ee 2" 
         crc_16s: 
             cmd: "denoise-paired"
             type: "SampleData[PairedEndSequencesWithQuality]"
             format: "PairedEndFastqManifestPhred33V2"
-            manifest: "metadata/ibd_qiime2_manifest.tsv"
+            manifest: "metadata/crc_qiime2_metadata.tsv"
             params: "--p-trunc-len-f 235 --p-trunc-len-r 225 \
                     --p-max-ee-f 2 --p-max-ee-r 2"

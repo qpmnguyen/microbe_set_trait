@@ -16,7 +16,7 @@ rule import_manifest:
     conda: 
         "../env/qiime2-2022.2-py38-linux-conda.yml"
     output:
-        "output/sequence_process_16s/{dataset}/paired-end-demux.qza"
+        "output/sequence_process_16s/{dataset}/sequence-demux.qza"
     params:
         input_type=lambda wildcards: config["data"][wildcards.dataset]["type"],
         input_format=lambda wildcards: config["data"][wildcards.dataset]["format"]
@@ -31,7 +31,7 @@ rule import_manifest:
 
 rule denoise: 
     input:
-        "output/sequence_process_16s/{dataset}/paired-end-demux.qza"
+        "output/sequence_process_16s/{dataset}/sequence-demux.qza"
     conda: 
         "../env/qiime2-2022.2-py38-linux-conda.yml"
     output:
@@ -58,7 +58,7 @@ rule denoise:
 
 rule download_classifier: 
     output:
-        "large_data/silva-138-99-nb-weighted-classifier.qza"
+        "large_files/silva-138-99-nb-weighted-classifier.qza"
     shell:
         """
         wget https://data.qiime2.org/2022.2/common/silva-138-99-nb-weighted-classifier.qza \
@@ -67,7 +67,7 @@ rule download_classifier:
         
 rule taxonomic_classification:
     input:
-        classifier="large_data/silva-138-99-nb-weighted-classifier.qza",
+        classifier="large_files/silva-138-99-nb-weighted-classifier.qza",
         reads="output/sequence_process_16s/{dataset}/dna_sequences.qza"
     conda: 
         "../env/qiime2-2022.2-py38-linux-conda.yml"
@@ -89,21 +89,19 @@ rule export:
     conda: 
         "../env/qiime2-2022.2-py38-linux-conda.yml"
     output:
-        "output/sequence_process_16s/{dataset}/exports/taxonomy.biom", 
-        "output/sequence_process_16s/{dataset}/exports/feature_table.biom",
-        "output/sequence_process_16s/{dataset}/exports/dna_sequences.fasta"
+        outtax="output/sequence_process_16s/{dataset}/exports/taxonomy.tsv", 
+        outtable="output/sequence_process_16s/{dataset}/exports/feature-table.biom",
+        outseq="output/sequence_process_16s/{dataset}/exports/dna-sequences.fasta"
     shell:
         """
         qiime tools export \
             --input-path {input.feature_table} \
-            --output-path {output}
-        
-        qiime tools export \ 
+            --output-path output/sequence_process_16s/{wildcards.dataset}/exports       
+        qiime tools export \
             --input-path {input.taxonomy} \
-            --output-path {output}
-        
-        qiime tools extract \
+            --output-path output/sequence_process_16s/{wildcards.dataset}/exports
+        qiime tools export \
             --input-path {input.sequences} \
-            --output-path {output}
+            --output-path output/sequence_process_16s/{wildcards.dataset}/exports
         """
         

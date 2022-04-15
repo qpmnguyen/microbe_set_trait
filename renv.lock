@@ -11,11 +11,6 @@
   "Bioconductor": {
     "Version": "3.14"
   },
-  "Python": {
-    "Version": "3.8.9",
-    "Type": "virtualenv",
-    "Name": "./renv/python/virtualenvs/renv-python-3.8"
-  },
   "Packages": {
     "ANCOMBC": {
       "Package": "ANCOMBC",

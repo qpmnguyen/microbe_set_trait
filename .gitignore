@@ -31,3 +31,4 @@ _targets_r/
 .ipynb_checkpoints/
 hmp_metadata
 *.log
+sequence-*.qza
