@@ -8,7 +8,7 @@ library(DBI)
 library(ggtree)
 library(data.table)
 library(phyloseq)
-library(taxadb)
+library(usethis)
 
 #' @title Function to take a string and initiate a query
 #' @param string The string of interest, should be of form k__Kingdom|p_Phylum
@@ -133,3 +133,16 @@ translate_ncbi <- function(seq, t_rank = "genus", metaphlan = FALSE) {
     }
     return(seq)
 }
+
+#' @param name Name of the package 
+#' @param version (logical). Indicate whether versions are kept together 
+record_package <- function(name, version=TRUE){
+    if (version){
+        version <- packageVersion(name)
+    } else {
+        version <- NULL
+    }
+    usethis::use_package(name, type = "Imports", min_version=version)
+}
+
+
