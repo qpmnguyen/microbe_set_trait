@@ -12,6 +12,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.0.0
 Imports: 
     ANCOMBC (>= 1.4.0),
+    BiocParallel (>= 1.28.3),
     BiocSet (>= 1.8.1),
     compositions (>= 2.0.4),
     curatedMetagenomicData (>= 3.2.3),

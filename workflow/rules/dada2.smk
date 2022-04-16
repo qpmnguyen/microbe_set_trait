@@ -16,7 +16,7 @@ rule import_manifest:
     conda: 
         "../env/qiime2-2022.2-py38-linux-conda.yml"
     output:
-        "output/sequence_process_16s/{dataset}/sequence-demux.qza"
+        temp("output/sequence_process_16s/{dataset}/sequence-demux.qza")
     params:
         input_type=lambda wildcards: config["data"][wildcards.dataset]["type"],
         input_format=lambda wildcards: config["data"][wildcards.dataset]["format"]

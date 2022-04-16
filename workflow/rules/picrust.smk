@@ -1,6 +1,6 @@
 from snakemake.utils import min_version 
 min_version("6.0")
-DATASETS = ["ibd_16s"]
+DATASETS = ["ibd_16s", "crc_16s"]
 
 rule all:
     input:
@@ -9,7 +9,9 @@ rule all:
 
 rule place_seqs:
     input: 
-        "output/sequence_process_16s/{datasets}/seqs/dna-sequences.fasta"
+        "output/sequence_process_16s/{datasets}/exports/dna-sequences.fasta"
+    conda: 
+        "../env/picrust_env.yml"
     output:
         "output/picrust2/{datasets}/placed_seqs.tre"
     threads: 4
@@ -19,6 +21,8 @@ rule place_seqs:
 rule predict_ec:
     input:
         "output/picrust2/{datasets}/placed_seqs.tre"
+    conda: 
+        "../env/picrust_env.yml"
     output:
         "output/picrust2/{datasets}/EC_predicted.tsv.gz"
     threads: 4
@@ -28,6 +32,8 @@ rule predict_ec:
 rule predict_copy:
     input: 
         "output/picrust2/{datasets}/placed_seqs.tre"
+    conda: 
+        "../env/picrust_env.yml"
     output:
         "output/picrust2/{datasets}/marker_predicted_and_nsti.tsv.gz"
     threads: 4
@@ -36,9 +42,11 @@ rule predict_copy:
 
 rule metagenome_prediction:
     input:
-        biom="output/sequence_process_16s/{datasets}/feature_table/feature-table.biom",
+        biom="output/sequence_process_16s/{datasets}/exports/feature-table.biom",
         marker="output/picrust2/{datasets}/marker_predicted_and_nsti.tsv.gz",
         ec="output/picrust2/{datasets}/EC_predicted.tsv.gz"
+    conda: 
+        "../env/picrust_env.yml"
     output:
         "output/picrust2/{datasets}/EC_metagenome_out/pred_metagenome_unstrat.tsv.gz",
         "output/picrust2/{datasets}/EC_metagenome_out/seqtab_norm.tsv.gz",
@@ -53,6 +61,8 @@ rule metagenome_prediction:
 rule predict_pathway:
     input:
         "output/picrust2/{datasets}/EC_metagenome_out/pred_metagenome_unstrat.tsv.gz"
+    conda: 
+        "../env/picrust_env.yml"
     output:
         "output/picrust2/{datasets}/pathways_out/path_abun_unstrat.tsv.gz"
     threads: 4
@@ -62,6 +72,8 @@ rule predict_pathway:
 rule add_desc:
     input:
         "output/picrust2/{datasets}/pathways_out/path_abun_unstrat.tsv.gz"
+    conda: 
+        "../env/picrust_env.yml"
     output:
         "output/picrust2/{datasets}/pathways_out/path_abun_unstrat_desc.tsv.gz"
     shell:
