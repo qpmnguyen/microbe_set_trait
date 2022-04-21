@@ -13,7 +13,7 @@ rule place_seqs:
     conda: 
         "../env/picrust_env.yml"
     output:
-        "output/picrust2/{datasets}/placed_seqs.tre"
+        temp("output/picrust2/{datasets}/placed_seqs.tre")
     threads: 4
     shell:
         "place_seqs.py -s {input} -o {output} -p {threads} --verbose -t epa-ng"
@@ -24,7 +24,7 @@ rule predict_ec:
     conda: 
         "../env/picrust_env.yml"
     output:
-        "output/picrust2/{datasets}/EC_predicted.tsv.gz"
+        temp("output/picrust2/{datasets}/EC_predicted.tsv.gz")
     threads: 4
     shell:
         "hsp.py -i EC -t {input} -o {output} -p {threads}"
@@ -35,7 +35,7 @@ rule predict_copy:
     conda: 
         "../env/picrust_env.yml"
     output:
-        "output/picrust2/{datasets}/marker_predicted_and_nsti.tsv.gz"
+        temp("output/picrust2/{datasets}/marker_predicted_and_nsti.tsv.gz")
     threads: 4
     shell:
         "hsp.py -i 16S -t {input} -o {output} -p {threads}"
@@ -49,8 +49,8 @@ rule metagenome_prediction:
         "../env/picrust_env.yml"
     output:
         "output/picrust2/{datasets}/EC_metagenome_out/pred_metagenome_unstrat.tsv.gz",
-        "output/picrust2/{datasets}/EC_metagenome_out/seqtab_norm.tsv.gz",
-        "output/picrust2/{datasets}/EC_metagenome_out/weighted_nsti.tsv.gz"
+        temp("output/picrust2/{datasets}/EC_metagenome_out/seqtab_norm.tsv.gz")
+        # "output/picrust2/{datasets}/EC_metagenome_out/weighted_nsti.tsv.gz"
     shell:
         """
         metagenome_pipeline.py -i {input.biom} -m {input.marker} \\
@@ -67,7 +67,7 @@ rule predict_pathway:
         "output/picrust2/{datasets}/pathways_out/path_abun_unstrat.tsv.gz"
     threads: 4
     shell:
-        "pathway_pipeline.py -i {input} -p output/picrust2/{wildcards.datasets}/pathways_out -p {threads}"
+        "pathway_pipeline.py -i {input} -o output/picrust2/{wildcards.datasets}/pathways_out -p {threads}"
 
 rule add_desc:
     input:
