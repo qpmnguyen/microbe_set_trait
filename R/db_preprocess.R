@@ -89,6 +89,14 @@ get_sets <- function(ncbiid_list, trait_db, trait, g_agg=TRUE, prop_thresh=0.95)
 #' @param ncbi_nspec Total number of species in NCBI. Considered to be m + n parameter (or nn)
 #'     in a hypergeometric distribution. 
 test_genus <- function(genus_id, db_nspec, db_ngenus) {
+    src <- taxizedb::src_ncbi()
+    ncbi_nspec <- sql_collect(src, "SELECT COUNT(*) FROM nodes WHERE rank = 'species'") %>%
+        pull()
+    
+    
+    
+    
+    
     if (!is.vector(genus_id)) {
         genus_id <- as.vector(genus_id)
     }

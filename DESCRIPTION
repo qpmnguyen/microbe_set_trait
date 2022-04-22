@@ -58,7 +58,8 @@ Imports:
     TreeSummarizedExperiment (>= 2.2.0),
     visNetwork (>= 2.1.0)
 Remotes:
-    mikemc/speedyseq
+    mikemc/speedyseq,
+    qpmnguyen/TaxaSetsUtils
 Depends: 
     tidyverse
 Suggests: 
