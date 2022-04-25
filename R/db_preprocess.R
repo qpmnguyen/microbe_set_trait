@@ -1,23 +1,11 @@
 # scripts to pre-process and match the metacyc and
 # taxonomic databases
+library(tidyverse)
 library(data.table)
-library(magrittr)
 library(phyloseq)
 library(BiocSet)
 library(taxizedb)
 library(glue)
-library(purrr)
-library(DBI)
-library(stringr)
-library(dplyr)
-library(dbplyr)
-library(tidyr)
-
-if (length(tdb_cache$list()) == 0) {
-    taxizedb::db_download_ncbi(verbose = FALSE, overwrite = FALSE)
-}
-
-setDTthreads(2)
 
 #' @title Retrieve ncbiids based on unique traits 
 #' @param subset_db The trait database ideally restricted to 
@@ -97,20 +85,25 @@ test_genus <- function(genus_id, full_db, db_nspec, ncbi_nspec) {
     # get total number of species in cnbi (m + n parameter)
     src <- taxizedb::src_ncbi()
     p_vals <- map_dbl(genus_id, function(x){
-        db_ngenus <- full_db %>% filter(genus_tax_id == x) %>% nrow()
-        query <- glue("SELECT tax_id, parent_tax_id, rank FROM nodes WHERE rank = 'species' AND parent_tax_id = {genus_id}", 
-                      genus_id = x)
-        tbl <- sql_collect(src, query) 
-        print("Here")
-        ncbi_ngenus <- tbl %>% tally() %>% pull(n)
-        cum_prob <- phyper(
-            q = db_ngenus, 
-            m = ncbi_ngenus, 
-            n = ncbi_nspec - ncbi_ngenus,
-            k = db_nspec, 
-            lower.tail = TRUE
-        )
-        return(cum_prob)
+        if (is.na(x)){
+            return(NA_real_)
+        } else {
+            db_ngenus <- full_db %>% filter(genus_tax_id == x) %>% nrow()
+            query <- glue("SELECT tax_id, parent_tax_id, rank FROM nodes WHERE rank = 'species' AND parent_tax_id = {genus_id}", 
+                          genus_id = x)
+            tbl <- sql_collect(src, query) 
+            ncbi_ngenus <- tbl %>% count() %>% pull(n)
+            print(ncbi_ngenus)
+            print(db_ngenus)
+            cum_prob <- phyper(
+                q = db_ngenus, 
+                m = ncbi_ngenus, 
+                n = ncbi_nspec - ncbi_ngenus,
+                k = db_nspec, 
+                lower.tail = TRUE
+            )
+            return(cum_prob)
+        }
     })
     names(p_vals) <- genus_id
     return(p_vals)

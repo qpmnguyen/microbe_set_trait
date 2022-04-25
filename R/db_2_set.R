@@ -1,5 +1,5 @@
 # Convert databases into sets 
-# Last Updated 2022-04-24
+# Last Updated 2022-04-25
 # Quang Nguyen  
 
 library(here)
@@ -42,17 +42,24 @@ if (class %in% c("metabolism", "gram_stain", "sporulation",
         set <- BiocSet::BiocSet(list_ids)
     } else if (level == "genus"){
         
-        g_df <- left_join(df, new_df, by = "species_tax_id")
-        g_nested <- g_df %>% group_by(genus_tax_id, !!sym(class)) %>% 
-            count()
+        df_nest <- df_reduced %>% group_by(genus_tax_id, !!sym(class)) %>% count() %>%
+            group_by(genus_tax_id) %>% nest(traits = c(metabolism, n))
+        start <- Sys.time()
+        df_nest <- df_nest %>% mutate(p_vals = test_genus(genus_id = genus_tax_id, full_db = df, 
+                                                          db_nspec = db_nspec, ncbi_nspec = ncbi_nspec))
+        end <- Sys.time()
+        print(paste("Total time is", end - start))
+        # adjust for p-values and then filter at 0.05 threshold
+        df_nest <- df_nest %>% mutate(p_vals = p.adjust(p_vals, method = "BH")) %>% 
+            filter(!is.na(p_vals) | p_vals <= 0.05)
+        # get species per genera across the database 
+        df_genus <- df %>% group_by(genus_tax_id) %>% drop_na(genus_tax_id) %>% 
+            count() 
+        
+        joint_df <- inner_join(df_genus, df_nest, by = "genus_tax_id")
     }
 
 }
-
-
-
-unq <- as.vector(na.omit(unique(df %>% pull(class))))
-
-df %>% group_by(!!class) %>% nest(species_tax_id)
+saveRDS(set, file = snakemake@output[[1]])
 
 
