@@ -88,43 +88,30 @@ get_sets <- function(ncbiid_list, trait_db, trait, g_agg=TRUE, prop_thresh=0.95)
 #'     considered to be equivalent to the parameter q in a hypergeometric distribution. 
 #' @param ncbi_nspec Total number of species in NCBI. Considered to be m + n parameter (or nn)
 #'     in a hypergeometric distribution. 
-test_genus <- function(genus_id, db_nspec, db_ngenus) {
-    src <- taxizedb::src_ncbi()
-    ncbi_nspec <- sql_collect(src, "SELECT COUNT(*) FROM nodes WHERE rank = 'species'") %>%
-        pull()
-    
-    
-    
-    
-    
+test_genus <- function(genus_id, full_db, db_nspec, ncbi_nspec) {
+    # check vector 
     if (!is.vector(genus_id)) {
         genus_id <- as.vector(genus_id)
     }
     genus_id <- map_dbl(genus_id, as.numeric)
-    con <- DBI::dbConnect(RSQLite::SQLite(), taxizedb::tdb_cache$list()[1])
-    ncbi_nspec <- tbl(con, sql("SELECT COUNT(*) FROM nodes WHERE rank = 'species'")) |>
-        dplyr::pull()
-    p_vals <- map_dbl(genus_id, function(x) {
-        # get the table where the rank is species and the parent tax id is the genus
-        # id that we've been talking about
-        tbl <- tbl(con, sql("SELECT tax_id, parent_tax_id, rank FROM nodes"))
-        # the total number of species assigned to that genus in ncbi database
-        ncbi_ngenus <- tbl |>
-            filter(rank == "species", parent_tax_id == x) |>
-            tally() |>
-            pull(n)
-        # hypergeometric distribution test for underrepresentation 
-        # P(X <= x) 
+    # get total number of species in cnbi (m + n parameter)
+    src <- taxizedb::src_ncbi()
+    p_vals <- map_dbl(genus_id, function(x){
+        db_ngenus <- full_db %>% filter(genus_tax_id == x) %>% nrow()
+        query <- glue("SELECT tax_id, parent_tax_id, rank FROM nodes WHERE rank = 'species' AND parent_tax_id = {genus_id}", 
+                      genus_id = x)
+        tbl <- sql_collect(src, query) 
+        print("Here")
+        ncbi_ngenus <- tbl %>% tally() %>% pull(n)
         cum_prob <- phyper(
-            q = db_ngenus,
-            m = ncbi_ngenus,
+            q = db_ngenus, 
+            m = ncbi_ngenus, 
             n = ncbi_nspec - ncbi_ngenus,
-            k = db_nspec,
+            k = db_nspec, 
             lower.tail = TRUE
         )
-        cum_prob
+        return(cum_prob)
     })
-    DBI::dbDisconnect(con)
     names(p_vals) <- genus_id
     return(p_vals)
 }
