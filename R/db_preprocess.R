@@ -7,37 +7,27 @@ library(BiocSet)
 library(taxizedb)
 library(glue)
 
-#' @title Retrieve ncbiids based on unique traits 
-#' @param subset_db The trait database ideally restricted to 
-#'     the trait of interest 
-#' @param trait String indicating the trait of interest 
-get_traits <- function(trait_db, trait){
-    trait <- match.arg(trait, c("pathways", "carbon_substrates", 
-                                "sporulation", 
-                                "gram_stain", "cell_shape", "range_tmp", 
-                                "range_salinity", 
-                                "motility", "metabolism"))
+#' Function to assess whether a genus is underrepresented in this data frame
+genus_assess <- function(df_reduced, full_db){
+    # grab some constants
+    src <- taxizedb::src_ncbi()
+    ncbi_nspec <- sql_collect(src, "SELECT COUNT(*) FROM nodes WHERE rank = 'species'") %>%
+        pull()
+    db_nspec <- nrow(full_db)
     
-    trait_db %>% filter(!is.na())
+    # obtain nesting data frame and test using the hypergeometric test for under representation
+    df_nest <- df_reduced %>% group_by(genus_tax_id, trait) %>% count() %>%
+        group_by(genus_tax_id) %>% nest(trait_set = c(trait, n)) %>% ungroup() 
+    df_nest <- df_nest %>% mutate(p_vals = test_genus(genus_id = genus_tax_id, full_db = full_db, 
+                                                      db_nspec = db_nspec, ncbi_nspec = ncbi_nspec))
+    df_nest <- df_nest %>% mutate(p_vals = p.adjust(p_vals, method = "BH")) %>% 
+        filter(!is.na(p_vals)) %>% filter(p_vals > 0.05)
     
-    subset_db <- trait_db[!is.na(j), , env = list(j = trait)]
-    idx <- ncol(subset_db)
-    if (trait %in% c("pathways", "carbon_substrates")){
-        subset_db <- subset_db[,j := map(str_split(j, ","), str_trim), 
-                               env = list(j = trait)]
-        trait_list <- subset_db[,j, env = list(j = trait)] %>% 
-            flatten_chr() %>% unique()
-    } else {
-        trait_list <- subset_db[,j, env = list(j = trait)] %>% unique()
-    }
-    # go through each trait in the trait list, retrieve a list of NCBI ids  
-    # and then return everything  
-    ncbiid_list <- map(trait_list, function(x){
-        subset_db[map_lgl(i, ~{x %in% .x}),,env = list(i = trait)] %>% 
-            pull(species_tax_id)
-    })
-    names(ncbiid_list) <- trait_list
-    return(ncbiid_list)
+    df_genus <- full_db %>% group_by(genus_tax_id) %>% drop_na(genus_tax_id) %>% 
+        count() 
+    
+    joint_df <- inner_join(df_genus, df_nest, by = "genus_tax_id") %>% ungroup()
+    return(joint_df)
 }
 
 
@@ -89,10 +79,12 @@ test_genus <- function(genus_id, full_db, db_nspec, ncbi_nspec) {
             return(NA_real_)
         } else {
             db_ngenus <- full_db %>% filter(genus_tax_id == x) %>% nrow()
-            child <- children(x, db = "ncbi")
-            ncbi_ngenus <- child[[1]] %>% filter(rank == "species") %>% nrow()
-            print(ncbi_ngenus)
-            print(db_ngenus)
+            cmd <- paste("SELECT tax_id, level, ancestor FROM hierarchy WHERE ancestor =", x)
+            tbl <- sql_collect(src, cmd)
+            ncbi_ngenus <- tbl %>% mutate(rank = taxid2rank(tax_id)) %>% filter(rank == "species") %>%
+                nrow()
+            #print(ncbi_ngenus)
+            #print(db_ngenus)
             cum_prob <- phyper(
                 q = db_ngenus, 
                 m = ncbi_ngenus, 
