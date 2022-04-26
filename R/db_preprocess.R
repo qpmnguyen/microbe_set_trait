@@ -89,10 +89,8 @@ test_genus <- function(genus_id, full_db, db_nspec, ncbi_nspec) {
             return(NA_real_)
         } else {
             db_ngenus <- full_db %>% filter(genus_tax_id == x) %>% nrow()
-            query <- glue("SELECT tax_id, parent_tax_id, rank FROM nodes WHERE rank = 'species' AND parent_tax_id = {genus_id}", 
-                          genus_id = x)
-            tbl <- sql_collect(src, query) 
-            ncbi_ngenus <- tbl %>% count() %>% pull(n)
+            child <- children(x, db = "ncbi")
+            ncbi_ngenus <- child[[1]] %>% filter(rank == "species") %>% nrow()
             print(ncbi_ngenus)
             print(db_ngenus)
             cum_prob <- phyper(

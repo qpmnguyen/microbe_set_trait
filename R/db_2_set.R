@@ -51,7 +51,7 @@ if (class %in% c("metabolism", "gram_stain", "sporulation",
         print(paste("Total time is", end - start))
         # adjust for p-values and then filter at 0.05 threshold
         df_nest <- df_nest %>% mutate(p_vals = p.adjust(p_vals, method = "BH")) %>% 
-            filter(!is.na(p_vals) | p_vals <= 0.05)
+            filter(!is.na(p_vals) | p_vals > 0.05)
         # get species per genera across the database 
         df_genus <- df %>% group_by(genus_tax_id) %>% drop_na(genus_tax_id) %>% 
             count() 
@@ -61,5 +61,6 @@ if (class %in% c("metabolism", "gram_stain", "sporulation",
 
 }
 saveRDS(set, file = snakemake@output[[1]])
+
 
 
