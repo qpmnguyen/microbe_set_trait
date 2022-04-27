@@ -14,6 +14,7 @@ Imports:
     ANCOMBC (>= 1.4.0),
     BiocParallel (>= 1.28.3),
     BiocSet (>= 1.8.1),
+    biomformat (>= 1.22.0),
     compositions (>= 2.0.4),
     curatedMetagenomicData (>= 3.2.3),
     dada2 (>= 1.22.0),

@@ -1,59 +1,53 @@
-# scripts to pre-process and match the metacyc and
-# taxonomic databases
+# Functions to process the finalized database into BiocSets for both genus and species level annotation
+# Last modified 2022-04-26
+# Quang Nguyen 
+
 library(tidyverse)
-library(data.table)
-library(phyloseq)
 library(BiocSet)
 library(taxizedb)
 library(glue)
 
 #' Function to assess whether a genus is underrepresented in this data frame
-genus_assess <- function(df_reduced, full_db){
-    # grab some constants
-    src <- taxizedb::src_ncbi()
-    ncbi_nspec <- sql_collect(src, "SELECT COUNT(*) FROM nodes WHERE rank = 'species'") %>%
-        pull()
-    db_nspec <- nrow(full_db)
-    
+genus_assess <- function(df_reduced, full_db, category, db_nspec, ncbi_nspec, filt_thresh){
     # obtain nesting data frame and test using the hypergeometric test for under representation
-    df_nest <- df_reduced %>% group_by(genus_tax_id, trait) %>% count() %>%
-        group_by(genus_tax_id) %>% nest(trait_set = c(trait, n)) %>% ungroup() 
-    df_nest <- df_nest %>% mutate(p_vals = test_genus(genus_id = genus_tax_id, full_db = full_db, 
+    # nest traits within each genus. If trait is a vector list, unnest it first
+    df_nest <- df_reduced %>% unnest(trait) %>%
+        group_by(genus_tax_id) %>% nest(trait_set = c(species_tax_id, trait)) %>% ungroup() 
+    
+    # obtain p-values by performing the hypergeometric test 
+    df_nest <- df_nest %>% mutate(p_vals = test_genus(genus_id = genus_tax_id, df_reduced = df_reduced, 
                                                       db_nspec = db_nspec, ncbi_nspec = ncbi_nspec))
+    # adjust for p-values and filter which ones are not significant at 0.05 level 
     df_nest <- df_nest %>% mutate(p_vals = p.adjust(p_vals, method = "BH")) %>% 
         filter(!is.na(p_vals)) %>% filter(p_vals > 0.05)
     
-    df_genus <- full_db %>% group_by(genus_tax_id) %>% drop_na(genus_tax_id) %>% 
+    # df_genus represent the total number of species with an annotated trait of the same 
+    # category per genus
+    df_genus <- full_db %>% drop_na(genus_tax_id) %>%
+        drop_na(!!sym(category)) %>% group_by(genus_tax_id) %>%
         count() 
     
+    # join them in to compute proportions
     joint_df <- inner_join(df_genus, df_nest, by = "genus_tax_id") %>% ungroup()
-    return(joint_df)
-}
-
-
-#' @title Getting the biocSets based on whether aggregation should be performed 
-#' @param ncbiid_list The list of ncbiids 
-#' @param g_agg Logical indicating whether aggregating to genus level 
-get_sets <- function(ncbiid_list, trait_db, trait, g_agg=TRUE, prop_thresh=0.95) {
-    trait <- match.arg(trait, c("pathways", "carbon_substrates", 
-                                "sporulation", 
-                                "gram_stain", "cell_shape", "range_tmp", 
-                                "range_salinity", 
-                                "motility", "metabolism"))
-    ncbiid_list <- map(ncbiid_list, as.character)
-    if (g_agg == FALSE){
-        sets <- BiocSet::BiocSet(ncbiid_list)
-    } else {
-        filt_genus <- imap(ncbiid_list, ~{
-            print(paste("Curently at:", .y))
-            get_filtered_genus(id_vec = .x, trait_db = trait_db, prop_thresh = prop_thresh)
-        })
-        names(filt_genus) <- names(ncbiid_list)
-        sets <- BiocSet::BiocSet(filt_genus)
-    }
-    sizes <- es_elementset(sets) %>% group_by(set) %>% count()
-    sets <- sets %>% mutate_set(type = trait, size = sizes$n)
-    return(sets)
+    
+    # count number of species having the trait for each trait 
+    final_df <- joint_df %>% mutate(trait_set = map(trait_set, ~{
+        .x %>% group_by(trait) %>% count() %>% 
+            rename("nspec" = "n") %>%
+            ungroup()
+    })) %>% unnest(trait_set)
+    
+    final_df <- final_df %>%
+        mutate(prop = nspec/n) %>% 
+        filter(prop >= filt_thresh) %>% 
+        select(-c(n, nspec, p_vals, prop)) %>% 
+        group_by(trait) %>% summarize(ids = list(genus_tax_id))
+    # for each trait that has the proportion at least 95% of total species having
+    # at least one trait within the category 
+    list_ids <- final_df %>% pull(ids)
+    names(list_ids) <- final_df %>% pull(trait)
+    str_replace_all(names(list_ids), pattern = " ", replacement = "_")
+    return(list_ids)
 }
 
 #' n_spec is not part of the function since it is an expensive operation that
@@ -66,19 +60,20 @@ get_sets <- function(ncbiid_list, trait_db, trait, g_agg=TRUE, prop_thresh=0.95)
 #'     considered to be equivalent to the parameter q in a hypergeometric distribution. 
 #' @param ncbi_nspec Total number of species in NCBI. Considered to be m + n parameter (or nn)
 #'     in a hypergeometric distribution. 
-test_genus <- function(genus_id, full_db, db_nspec, ncbi_nspec) {
+test_genus <- function(genus_id, df_reduced, db_nspec, ncbi_nspec) {
     # check vector 
     if (!is.vector(genus_id)) {
         genus_id <- as.vector(genus_id)
     }
     genus_id <- map_dbl(genus_id, as.numeric)
-    # get total number of species in cnbi (m + n parameter)
-    src <- taxizedb::src_ncbi()
+    # obtain p-values
     p_vals <- map_dbl(genus_id, function(x){
         if (is.na(x)){
             return(NA_real_)
         } else {
-            db_ngenus <- full_db %>% filter(genus_tax_id == x) %>% nrow()
+            # among the species with annotated trait, how many species are assigned
+            # to the genus
+            db_ngenus <- df_reduced %>% filter(genus_tax_id == x) %>% nrow()
             cmd <- paste("SELECT tax_id, level, ancestor FROM hierarchy WHERE ancestor =", x)
             tbl <- sql_collect(src, cmd)
             ncbi_ngenus <- tbl %>% mutate(rank = taxid2rank(tax_id)) %>% filter(rank == "species") %>%
@@ -114,122 +109,6 @@ proc_gtest <- function(pvals) {
 }
 
 
-
-#' @title Function to perform testing for each set of traits within a trait
-#'     type 
-#' @param id_vec The identifier ncbiids in vector format (NOT A LIST)
-#' @param trait_db The trait database as data.table format
-get_filtered_genus <- function(id_vec, trait_db, prop_thresh=0.9){
-    c_ranks <- c(
-        "superkingdom", "phylum", "class",
-        "order", "family", "genus"
-    )
-    # get all counts of species per genera where species has the trait 
-    tr_counts <- trait_db[species_tax_id %in% id_vec & !is.na(genus_ncbiid), 
-                       .(.N), by =c("genus_ncbiid", "genus_ncbi_fullname"), keyby = TRUE]
-    setnames(tr_counts, old = "N", new = "nspec_trait")
-    
-    # get all counts of species per genera across the entire database 
-    tot_counts <- trait_db[,.(.N), by = c("genus_ncbiid", "genus_ncbi_fullname"), keyby = TRUE]
-    setnames(tot_counts, old = "N", new = "nspec_overall")
-    
-    # first, filter by the proportion of species with the trait amongst all species assigned 
-    # assigned to the genus 
-    # second, filter by proportion at 90% threshold 
-    # third, calculate p-values for an underrepresentation test 
-    # fourth, filter by adjusted p-value at 0.05
-    merged_counts <- tot_counts[tr_counts][,prop := nspec_trait/nspec_overall
-                                           ][prop >= prop_thresh,
-                                             ][,p_value := test_genus(genus_id = genus_ncbiid, 
-                                                                      db_nspec = nrow(trait_db), 
-                                                                      db_ngenus = nspec_overall), by = .I
-                                               ][, p_adj := p.adjust(p_value, method = "BH")
-                                                 ][p_adj >= 0.05,]
-    return(merged_counts[,genus_ncbiid,])
-}
-
-
-# PROCESS NAMES INTO NCBIIDS ####
-
-# call ncbi ids using taxizedb function 
-# Use the clean_names function from taxadb to clean names 
-#' @param vec A vector of names represented 
-#'     by ranks from superkingdom to genus
-call_genus_id <- function(vec) {
-    c_ranks <- c(
-        "superkingdom", "phylum", "class",
-        "order", "family", "genus"
-    )
-    # clean names and extract genus
-    vec <- as.matrix(vec)
-    vec <- map_chr(vec, ~taxadb::clean_names(.x))
-    genus <- vec[length(vec)]
-    
-    # retrieve ncbiids
-    id_names <- name2taxid(genus, out_type = "summary")
-    
-    # if there are ambiguous idenfiers
-    if (nrow(id_names) >= 2){
-        message("Ambiguous identifiers")
-        # compare reference with new names and return a logical vector
-        # equal to the length of each match  
-        ref_name <- vec
-        check_names <- map_chr(id_names %>% pull(id), ~{
-            query <- classification(.x, db = "ncbi")[[1]]
-            if (is.data.frame(query) == FALSE){
-                return(NA_character_)
-            } else {
-                new_name <- query %>% 
-                    dplyr::filter(rank %in% c_ranks) %>% 
-                    dplyr::pull(name)
-                matching <- ref_name == new_name 
-                diff <- length(matching) - length(which(matching))
-                # handling cases where there are mismatches
-                if (diff <= 1) {
-                    return(TRUE)
-                } else {
-                    return(FALSE)
-                }
-            }
-        })
-        # filter out all false 
-        id_names <- id_names[which(check_names == TRUE & !is.na(check_names))]
-        # if there is still length larger than 1, return the top option 
-        if (nrow(id_names) >= 2){
-            id_names <- id_names$id[1]
-        } else {
-            id_names <- id_names$id
-        }
-    } else {
-        id_names <- id_names$id
-    }
-    return(id_names)
-}
-
-
-#' @title Function to use the species name to back-track genera names  
-#' @param spec_id Species NCBI identifier  
-genus_from_species <- function(spec_id){
-    c_ranks <- c(
-        "superkingdom", "phylum", "class",
-        "order", "family", "genus"
-    )
-    query <- classification(spec_id)[[1]]
-    if (!is.data.frame(query)){
-        output <- list(
-            id = NA_character_,
-            full_name = NA_character_
-        )
-    } else {
-        output <- list(
-            id = query %>% filter(rank == "genus") %>% pull(id),
-            full_name = query %>% filter(rank %in% c_ranks) %>% 
-                pull(name) %>% str_c(collapse = "_")
-        )
-        query <- query %>% filter(rank == "genus")
-    }
-    return(output)
-}
 
 # PROCESS NCBIID RESULTS ####  
 # do not run if trying to perform this reproducibly

@@ -10,6 +10,7 @@ module picrust:
     snakefile: "workflow/rules/picrust.smk"
 module db2set:
     snakefile: "workflow/rules/db2set.smk"
+    config: config
     
 
 use rule * from dada2 as dada2_*
