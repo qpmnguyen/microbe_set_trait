@@ -14,3 +14,54 @@ dada2:
             manifest: "metadata/crc_qiime2_metadata.tsv"
             params: "--p-trunc-len-f 235 --p-trunc-len-r 225 \
                     --p-max-ee-f 2 --p-max-ee-r 2"
+predict:
+    ibd_16s_picrust2:
+        feat_path: "data/pred_picrust2_ibd_feat.csv"
+        meta_path: "data/pred_picrust2_ibd_metadata.csv"
+        clr_trans: True
+        outcome_label: "diseasesubtype"
+        pos_class: "CD"
+    ibd_16s_trait:
+        feat_path: ""
+        meta_path: ""
+        clr_trans: False
+        outcome_label:
+        pos_class:
+    ibd_wgs_pathways:
+        feat_path: "data/pred_pathway_ibd_feat.csv"
+        meta_path: "data/pred_pathway_ibd_metadata.csv"
+        clr_trans: True
+        outcome_label: "study_condition"
+        pos_class: "IBD"
+    ibd_wgs_trait:
+        feat_path: ""
+        meta_path: ""
+        clr_trans: False
+        outcome_label:
+        pos_class:
+    crc_16s_picrust2:
+        feat_path: "data/pred_picrust2_crc_feat.csv"
+        meta_path: "data/pred_picrust2_crc_metadata.csv"
+        clr_trans: True
+        outcome_label: "diagnosis"
+        pos_class: "Cancer"
+    crc_16s_trait:
+        feat_path:
+        meta_path: 
+        clr_trans: False
+        outcome_label: 
+        pos_class: 
+    crc_wgs_pathways:
+        feat_path: "data/pred_pathway_crc_feat.csv"
+        meta_path: "data/pred_pathway_crc_metadata.csv"
+        clr_trans: True
+        outcome_label: "study_condition"
+        pos_class: "CRC"
+    crc_wgs_trait:
+        feat_path: ""
+        meta_path: ""
+        clr_trans: False
+        outcome_label:
+        pos_class:
+    
+            

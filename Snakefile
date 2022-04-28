@@ -11,8 +11,11 @@ module picrust:
 module db2set:
     snakefile: "workflow/rules/db2set.smk"
     config: config
-    
+module pred:
+    snakefile: "workflow/rules/pred.smk"
+    config: config['predict']
 
 use rule * from dada2 as dada2_*
 use rule * from picrust as picrust_*
 use rule * from db2set as db2set_*
+use rule * from pred as pred_*
