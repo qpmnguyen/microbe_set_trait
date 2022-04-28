@@ -15,6 +15,7 @@ Imports:
     BiocParallel (>= 1.28.3),
     BiocSet (>= 1.8.1),
     biomformat (>= 1.22.0),
+    CBEA (>= 0.99.4),
     compositions (>= 2.0.4),
     curatedMetagenomicData (>= 3.2.3),
     dada2 (>= 1.22.0),
@@ -53,6 +54,7 @@ Imports:
     stringr (>= 1.4.0),
     tarchetypes (>= 0.4.1),
     targets (>= 0.11.0),
+    TaxaSetsUtils (>= 0.99.1),
     taxizedb (>= 0.3.0),
     tibble (>= 3.1.6),
     tidyr (>= 1.2.0),
@@ -60,7 +62,8 @@ Imports:
     visNetwork (>= 2.1.0)
 Remotes:
     mikemc/speedyseq,
-    qpmnguyen/TaxaSetsUtils
+    qpmnguyen/TaxaSetsUtils,
+    qpmnguyen/CBEA@no_r_restrictions
 Depends: 
     tidyverse
 Suggests: 
