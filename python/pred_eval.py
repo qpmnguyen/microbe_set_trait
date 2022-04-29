@@ -57,13 +57,13 @@ if __name__ == "__main__":
     meta_path = snakemake.input[1]
     
     # parameters to inputs
-    outcome_label = snakemake.param[0]
-    pos_class = snakemake.param[1]
+    outcome_label = snakemake.params[0]
+    pos_class = snakemake.params[1]
     
     # clarification for outputs
-    condition = snakemake.param[2]
-    sequencing = snakemake.param[3]
-    input_type = snakemake.param[4]
+    condition = snakemake.params[2]
+    sequencing = snakemake.params[3]
+    input_type = snakemake.params[4]
     
     print(snakemake.param["clr_trans"])
     
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     
     X, y = prior_preprocess(feat, meta, outcome_label, pos_class)
     print("Create pipeline")
-    pipe = create_pipeline(clr_trans=snakemake.param[5])
+    pipe = create_pipeline(clr_trans=snakemake.params[5])
     
     print("Fit pipeline via 10-fold cross validation")
     scoring = ["neg_brier_score", "roc_auc"]
