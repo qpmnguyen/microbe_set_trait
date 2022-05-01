@@ -19,7 +19,7 @@ load_joint_sets <- function(tax_level){
     # for some reason mutate_elementset is not working for BiocSet 1.8.0
     set_list <- imap(set_list, ~{
         list_obj <- as.list(.x)
-        names(list_obj) <- paste(names(list_obj), .y, sep="_")
+        names(list_obj) <- paste(names(list_obj), .y, sep=";")
         set_obj <- BiocSet(list_obj)
         return(set_obj)
     })    

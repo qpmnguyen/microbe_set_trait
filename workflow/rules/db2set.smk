@@ -9,7 +9,7 @@ rule all:
 
 rule retrieve_sets:
     input: 
-        database="output/databases/db_merged.rds",
+        database="output/databases/madin_proc.rds",
     params:
         category="{category}",
         level="{level}",

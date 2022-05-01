@@ -1,0 +1,102 @@
+---
+title: "Coverage analysis"
+author: "Quang Nguyen"
+date: "Last compiled on: `r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, pack}
+library(TaxaSetsUtils);
+library(BiocSet);
+library(curatedMetagenomicData);
+library(HMP16SData);
+library(tidyverse);
+library(phyloseq);
+library(here);
+here::i_am("notebooks/coverage.ipynb")
+source(here("R", "generate_scores_func.R"))
+source(here("R", "functions_coverage.R"))
+options(getClass.msg = FALSE) 
+```
+
+```{r}
+data <- V35() %>% as_phyloseq();
+data
+```
+
+```{r}
+ncbi_attached <- mapid(obj = data, type = "name") 
+```
+
+
+```{r}
+sample_data(ncbi_attached) <- sample_data(ncbi_attached) %>% as(., "data.frame") %>% 
+    unite(body_site, c(HMP_BODY_SITE, HMP_BODY_SUBSITE), sep = ":")
+    
+body_subsites <- sample_data(ncbi_attached) %>% as(., "data.frame") %>% pull(body_site) %>% unique()
+trait_classes <- c("cell_shape", "gram_stain", "metabolism", "motility", "pathways", "sporulation", "substrate")
+evaluation <- cross_df(list(
+    sites = body_subsites, 
+    t_class = trait_classes
+))
+head(evaluation)
+```
+
+```{r}
+eval_func <- function(sites, t_class){
+    s_sites <- sample_data(ncbi_attached)$body_site
+    subset_physeq <- prune_samples(s_sites == sites, ncbi_attached) %>% 
+        filter_taxa(function(x) sum(x > 0) > 1, TRUE)
+    q_sets <- readRDS(file = glue("../output/sets/set_{trait}_genus.rds", trait = t_class))
+    q_sets <- recode_sets(subset_physeq, q_sets)
+    if (nrow(q_sets@element) == 0){
+        richness <- 0
+        evenness <- 0
+        n_traits <- 0 
+    } else {
+        richness <- count_tax(subset_physeq, q_sets, "richness")
+        evenness <- count_tax(subset_physeq, q_sets, "evenness")
+        n_traits <- count_traits(subset_physeq, q_sets)
+    }
+    tibble(
+        n_traits = n_traits,
+        richness = richness,
+        evenness = evenness, 
+        site = sites, 
+        class = t_class
+    )
+}
+results <- vector(mode = "list", length = nrow(evaluation))
+```
+
+
+```{r}
+for (i in seq_len(nrow(evaluation))){
+    if (!is.null(results[[i]])){
+        next 
+    } else {
+        arg1 <- evaluation[i,]$sites
+        arg2 <- evaluation[i,]$t_class
+        results[[i]] <- suppressMessages(eval_func(arg1, arg2))
+    }
+}
+```
+
+
+```{r}
+results_df <- do.call(rbind, results)
+plt <- results_df %>% pivot_longer(c(n_traits, richness, evenness)) %>% group_by(site, class, name) %>% 
+    add_count() %>% mutate(mean = mean(value), se = sd(value)/sqrt(n))
+ggplot(plt, aes(x = site, y = mean, col = class)) + 
+    geom_pointrange(aes(ymin = mean - se, ymax = mean + se), position = position_dodge(width = 0.1)) +
+    facet_wrap(~name, scales = "free") + coord_flip()
+```
+
+
+
+
+

@@ -63,7 +63,7 @@ Imports:
 Remotes:
     mikemc/speedyseq,
     qpmnguyen/TaxaSetsUtils,
-    qpmnguyen/CBEA@no_r_restrictions
+    qpmnguyen/CBEA@v101
 Depends: 
     tidyverse
 Suggests: 

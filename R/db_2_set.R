@@ -1,8 +1,7 @@
 # Convert databases into sets primary inputs for snakemake
 # Last Updated 2022-04-26
 # Quang Nguyen
-
-renv::activate()
+source(".Rprofile")
 
 library(here)
 library(tidyverse)

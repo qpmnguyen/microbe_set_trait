@@ -1,0 +1,211 @@
+---
+title: "Reprocess Madin et al. only"
+author: "Quang Nguyen"
+date: "Last compiled on: `r format(Sys.time(), '%d %B, %Y')`"
+output: html_document  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(here)
+library(taxizedb)
+here::i_am("notebooks/db_prep_madin.Rmd")
+```
+
+```{r}
+db <- read.csv(file = here("data", "condensed_species_NCBI.txt"))
+```
+
+We're going to do two things: first, double check species level ncbi identifiers; second, rename columns and split names; third, to add a genus level identifier  
+
+```{r}
+db <- db %>% select(species_tax_id, superkingdom, phylum, class, order, family, 
+           genus, species, metabolism, gram_stain, pathways, 
+           carbon_substrates, sporulation, motility, cell_shape) %>% 
+    rename("substrate" = carbon_substrates)
+
+```
+
+
+## Trim paths  
+
+```{r}
+trim_path <- function(vec){
+    vec <- vec %>% tolower() %>% 
+        str_split(pattern = "(, |\\|)") %>% 
+        map(~{
+            str_trim(.x) %>% str_replace_all("\\-", "") %>%
+                str_replace_all(" ", "_") %>% unique()
+        })
+    return(vec)
+}
+
+
+db$substrate <- trim_path(db$substrate)
+db$pathways <- trim_path(db$pathways)
+
+db <- db %>% group_by(species_tax_id) %>% 
+    nest(names = c("superkingdom", "phylum", "class", "order", "family", "genus", "species"))
+```
+
+## Reconcile names   
+
+```{r}
+#' This function takes an NCBI species_tax_id, run `classification` through it (from taxizedb) 
+#' and retrieve all the ranks from superkingdom to species
+#' @param species_tax_id A string representing NCBIids
+#' @param names A data.frame representing one or multiple hypothetical names. 
+#'     for use mostly when NCBIids do not resolve
+collapse_name <- function(species_tax_id, names, ...) {
+    names <- names %>% dplyr::distinct() 
+    query_ranks <- classification(species_tax_id, db = "ncbi", verbose = FALSE)[[1]]
+    # if query via species_tax_id does not work. 
+    # do this reverse query thing where the name is re-queried back to get NCBIids
+    if (nrow(query_ranks) == 0){
+        # first we loop through each candidate species name and
+        # annotate or return NA if there is ambiguity
+        cand_ids = vector(length = nrow(names))
+        for (i in seq_len(nrow(names))){
+            # rev_query here is a data frame
+            rev_query <- name2taxid(names$species, out_type = "summary")
+            if (nrow(rev_query) != 1){
+                # if there are ambiguous names or if there are no matches, return NA
+                cand_ids[i] <- NA_character_
+            } else {
+                cand_ids[i] <- rev_query$id
+            }
+        }
+        # remove NAs and get only unique ids
+        cand_ids <- unique(na.omit(cand_ids))
+        if (length(cand_ids) >= 2){
+            # if more than one name then just concatenate all the names together 
+            reconciled_names <- as_tibble(map(names, ~{ paste0(.x, collapse = "|") }))
+        } else if (length(cand_ids) == 1) {
+            reconciled_names <- classification(cand_ids, db = "ncbi")[[1]] %>% 
+                filter(!rank %in% c("no rank", "clade")) %>% 
+                select(-id) %>% pivot_wider(names_from = rank, values_from = name)
+        } else {
+            # create an empty final names
+            reconciled_names <- matrix(rep(NA_character_, ncol(names)), nrow = 1, ncol = ncol(names))
+            colnames(reconciled_names) <- colnames(names)
+            reconciled_names <- as_tibble(reconciled_names)
+        }
+    # second case where queried ranks do work
+    } else {
+        reconciled_names <- query_ranks %>% filter(!rank %in% c("no rank", "clade")) %>% select(-id) %>% 
+            pivot_wider(names_from = rank, values_from = name)
+    }
+    return(reconciled_names)
+}
+
+#' This function is similar to collapse_names but only there to repair
+#' tax ids that are defunct (and do not need to resolve names) 
+fix_ids <- function(species_tax_id, names, ...) {
+    names <- names %>% dplyr::distinct() 
+    query_ranks <- taxizedb::classification(species_tax_id, db = "ncbi", verbose = FALSE)[[1]]
+    if (nrow(query_ranks) == 0){
+        out <- species_tax_id
+    } else {
+        # if there is no match, we perform a reverse query
+        cand_ids = vector(length = nrow(names))
+        # for each name in the list of possible names get the identifiers 
+        for (i in seq_len(nrow(names))){
+            # rev_query here is a data frame
+            rev_query <- name2taxid(names$species, out_type = "summary")
+            if (nrow(rev_query) != 1){
+                # if there are ambiguous names or if there are no matches, return NA
+                cand_ids[i] <- NA_character_
+            } else {
+                cand_ids[i] <- rev_query$id
+            }
+        }
+        # remove NAs and get only unique ids
+        cand_ids <- unique(na.omit(cand_ids))
+        if (length(cand_ids) == 1) {
+            out <- cand_ids
+        } else {
+            # if more than one possible cand_ids, then also return NA due to unresolvable names
+            out <- NA_character_
+        }
+    }
+    return(out)
+}
+
+
+
+#' Only the reverse query part 
+#' @param spec_names rep
+rev_query <- function(names) {
+    cand_ids <- vector(length = nrow(names))
+    # spec_names is a vector 
+    for (i in seq_len(nrow(names))){
+        rev_query <- name2taxid(names %>% slice(i) %>% pull(species), out_type = "summary")
+        if (nrow(rev_query) != 1){
+            # if there are ambiguous names or if there are no matches, return NA
+            cand_ids[i] <- NA_character_
+        } else {
+            cand_ids[i] <- rev_query$id
+        } 
+    }
+    cand_ids <- unique(na.omit(cand_ids))
+    if (length(cand_ids) != 1){
+        return(NA_character_)
+    } else {
+        return(cand_ids)
+    }
+}
+```
+
+Apply to database by classifying species tax id and for those that return NAs perform the reverse queries using their names  
+
+```{r}
+class <- classification(db$species_tax_id)
+na_idx <- which(is.na(class))
+length(na_idx)
+```
+
+```{r}
+id_needs_correction <- vector(length = length(na_idx))
+for (i in seq_along(na_idx)){
+    id_needs_correction[i] <- rev_query(db$names[[na_idx[i]]])
+}
+id_needs_correction
+db$species_tax_id[na_idx] <- id_needs_correction
+```
+
+Re-do classification to get genus ids again  
+
+```{r}
+class <- classification(db$species_tax_id)
+gids <- map_chr(class, ~{
+    if (is.null(nrow(.x))) {
+        return(NA_character_)
+    } else {
+        gid <- .x %>% filter(rank == "genus") %>% pull(id)
+        if (length(gid) == 0){
+            return(NA_character_)
+        } else {
+            return(gid)
+        }
+    }
+})
+```
+
+```{r}
+db <- db %>% add_column(genus_tax_id = gids, .after = 1)
+db <- db %>% mutate(pathways = map_chr(pathways, ~paste(.x, collapse = ",")), 
+              substrate = map_chr(substrate, ~paste(.x, collapse = ",")))
+```
+
+```{r}
+saveRDS(db %>% select(-names), file = here("output", "databases", "madin_proc.rds"))
+write_csv(db %>% select(-names), file = here("output", "databases", "madin_proc.csv"))
+```
+
+
+
+
