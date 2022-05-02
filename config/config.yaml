@@ -63,5 +63,8 @@ predict:
         clr_trans: False
         outcome_label:
         pos_class:
+coverage:
+    16s: "genus"
+    wgs: "species"
     
             

@@ -29,9 +29,30 @@ count_tax <- function(physeq, q_set, mode){
     red_physeq <- prune_taxa(taxa_names(physeq) %in% p_tax, physeq)
     # use this reduced table to get a frequency table to calculate 
     if (mode == "richness"){
-        output <- specnumber(otu_table(red_physeq) %>% as.matrix(), MARGIN = 2)
+        output <- specnumber(otu_table(red_physeq) %>% as.matrix(), MARGIN = 2)/ntaxa(physeq)
     } else if (mode == "evenness"){
-        output <- diversity(otu_table(red_physeq) %>% as.matrix(), MARGIN = 2, index = "simpson")
+        #output <- diversity(otu_table(red_physeq) %>% as.matrix(), MARGIN = 2, index = "simpson")
+        output <- colSums(otu_table(red_physeq))/colSums(otu_table(physeq))
     }
     return(output) 
+}
+
+#' Evaluating the richness, eveness and number of traits  
+eval_func <- function(physeq, q_sets, sites, t_class){
+    if (nrow(q_sets@element) == 0){
+        richness <- 0
+        evenness <- 0
+        n_traits <- 0 
+    } else {
+        richness <- count_tax(physeq, q_sets, "richness")
+        evenness <- count_tax(physeq, q_sets, "evenness")
+        n_traits <- count_traits(physeq, q_sets)
+    }
+    tibble(
+        n_traits = n_traits,
+        richness = richness,
+        evenness = evenness, 
+        site = sites, 
+        class = t_class
+    )
 }

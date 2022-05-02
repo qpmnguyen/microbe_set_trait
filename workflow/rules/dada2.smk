@@ -4,9 +4,9 @@ min_version("6.0")
 
 rule all: 
     input:
-        expand("output/sequence_process_16s/{dataset}/exports/taxonomy.biom", dataset=["ibd_16s", "crc_16s"]),
-        expand("output/sequence_process_16s/{dataset}/exports/feature_table.biom", dataset=["ibd_16s", "crc_16s"]),
-        expand("output/sequence_process_16s/{dataset}/exports/dna_sequences.fasta", dataset=["ibd_16s", "crc_16s"])
+        expand("output/sequence_process_16s/{dataset}/exports/taxonomy.tsv", dataset=["ibd_16s", "crc_16s"]),
+        expand("output/sequence_process_16s/{dataset}/exports/feature-table.biom", dataset=["ibd_16s", "crc_16s"]),
+        expand("output/sequence_process_16s/{dataset}/exports/dna-sequences.fasta", dataset=["ibd_16s", "crc_16s"])
 
 
 

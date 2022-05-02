@@ -51,7 +51,6 @@ if (category %in% c("metabolism", "gram_stain", "sporulation",
         str_replace_all(names(list_ids), pattern = " ", replacement = "_")
         set <- BiocSet::BiocSet(list_ids)
     } else if (level == "genus"){
-        print(filt_thresh)
         db_nspec <- df %>% drop_na(!!sym(category)) %>% drop_na(genus_tax_id) %>% nrow()
         list_ids <- genus_assess(df_reduced = df_reduced, full_db = df, category = category, 
                                  db_nspec = db_nspec, ncbi_nspec = ncbi_nspec, 
@@ -79,7 +78,8 @@ if (category %in% c("metabolism", "gram_stain", "sporulation",
         set <- BiocSet(list_ids)
     } else if (level == "genus"){
         db_nspec <- df_reduced %>% drop_na(genus_tax_id) %>% nrow()
-        list_ids <- genus_assess(df_reduced = df_reduced, full_db = df, category = category, db_nspec = db_nspec, 
+        list_ids <- genus_assess(df_reduced = df_reduced, full_db = df, 
+                                 category = category, db_nspec = db_nspec, 
                                  ncbi_nspec = ncbi_nspec, filt_thresh = filt_thresh)
         set <- BiocSet(list_ids)
     }
