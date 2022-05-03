@@ -65,8 +65,6 @@ if __name__ == "__main__":
     sequencing = snakemake.params[3]
     input_type = snakemake.params[4]
     
-    print(snakemake.param["clr_trans"])
-    
     feat = pd.read_csv(feat_path, index_col=0)
     meta = pd.read_csv(meta_path, index_col=0)
     

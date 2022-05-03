@@ -9,94 +9,150 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r, message=FALSE, pack}
-library(TaxaSetsUtils);
-library(BiocSet);
-library(curatedMetagenomicData);
-library(HMP16SData);
-library(tidyverse);
-library(phyloseq);
-library(here);
-here::i_am("notebooks/coverage.ipynb")
-source(here("R", "generate_scores_func.R"))
-source(here("R", "functions_coverage.R"))
-options(getClass.msg = FALSE) 
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggsci)
+library(here)
+library(tidytext)
+library(patchwork)
+source(here("R", "plot_utils.R"))
 ```
 
+# Load data  
 ```{r}
-data <- V35() %>% as_phyloseq();
-data
-```
-
-```{r}
-ncbi_attached <- mapid(obj = data, type = "name") 
-```
-
-
-```{r}
-sample_data(ncbi_attached) <- sample_data(ncbi_attached) %>% as(., "data.frame") %>% 
-    unite(body_site, c(HMP_BODY_SITE, HMP_BODY_SUBSITE), sep = ":")
-    
-body_subsites <- sample_data(ncbi_attached) %>% as(., "data.frame") %>% pull(body_site) %>% unique()
-trait_classes <- c("cell_shape", "gram_stain", "metabolism", "motility", "pathways", "sporulation", "substrate")
-evaluation <- cross_df(list(
-    sites = body_subsites, 
-    t_class = trait_classes
-))
-head(evaluation)
-```
-
-```{r}
-eval_func <- function(sites, t_class){
-    s_sites <- sample_data(ncbi_attached)$body_site
-    subset_physeq <- prune_samples(s_sites == sites, ncbi_attached) %>% 
-        filter_taxa(function(x) sum(x > 0) > 1, TRUE)
-    q_sets <- readRDS(file = glue("../output/sets/set_{trait}_genus.rds", trait = t_class))
-    q_sets <- recode_sets(subset_physeq, q_sets)
-    if (nrow(q_sets@element) == 0){
-        richness <- 0
-        evenness <- 0
-        n_traits <- 0 
-    } else {
-        richness <- count_tax(subset_physeq, q_sets, "richness")
-        evenness <- count_tax(subset_physeq, q_sets, "evenness")
-        n_traits <- count_traits(subset_physeq, q_sets)
-    }
-    tibble(
-        n_traits = n_traits,
-        richness = richness,
-        evenness = evenness, 
-        site = sites, 
-        class = t_class
-    )
+files <- list.files("../output/coverage/", pattern = "coverage", full.names = TRUE)
+results <- vector(mode = "list", length = length(files))
+for (i in seq_along(files)){
+    sequencing <- str_split(files[i], "coverage")[[1]][2] %>% str_remove_all("\\/|_")
+    coverage <- readRDS(files[i])
+    results[[i]] <- coverage %>% add_column(type = rep(sequencing, nrow(coverage)), .before = 1)
 }
-results <- vector(mode = "list", length = nrow(evaluation))
+
+results <- do.call(bind_rows, results)
+results <- results %>% mutate(class = str_to_title(str_replace(class, pattern = "_", replacement = " "))) 
+```
+
+# Generate plots for 16S
+
+```{r}
+theme_set(theme_nice())
+metabar <- results %>% filter(type == "16s") %>% 
+    mutate(major_site = map_chr(site, ~str_split(.x, ":")[[1]][1]), 
+           minor_site = map_chr(site, ~str_split(.x, ":")[[1]][2]), 
+           minor_site = str_to_title(str_replace(minor_site, pattern = "_", replacement = " "))) 
+
+richness_plot <- metabar %>% group_by(site, class, major_site, minor_site) %>% 
+                       summarise(mean = mean(richness), se = sd(richness)/sqrt(n())) %>% 
+                       mutate(lower = mean - se, upper = mean + se)
+
+plot_richness_16s <- ggplot(richness_plot, 
+                            aes(x = reorder_within(minor_site, mean, class), 
+                                y = mean, col = major_site)) + 
+    geom_pointrange(aes(ymin = lower, ymax = upper)) + 
+    scale_x_reordered() +
+    facet_wrap(~class, scales = "free", ncol = 2) + 
+    coord_flip() + 
+    scale_color_npg() +
+    labs(y = "Proportion of taxa annotated to at least one trait", x = "Minor site", 
+         col = "Major site") + 
+    theme(axis.text.x = element_text(angle = 15))
+
+
+evenness_plot <- metabar %>% group_by(site, class, major_site, minor_site) %>% 
+                       summarise(mean = mean(evenness), se = sd(evenness)/sqrt(n())) %>% 
+                       mutate(lower = mean - se, upper = mean + se)
+
+
+plot_evenness_16s <- ggplot(evenness_plot, 
+                            aes(x = reorder_within(minor_site, mean, class), 
+                                y = mean, col = major_site)) + 
+    geom_pointrange(aes(ymin = lower, ymax = upper)) + 
+    facet_wrap(~class, scales = "free", ncol = 2) + 
+    scale_x_reordered() + 
+    coord_flip() + 
+    scale_color_npg() +
+    labs(y = "Proportion of reads assinged to taxa annotated to at least one trait",
+         x = "Minor site", 
+         col = "Major site") + 
+    theme(axis.text.x = element_text(angle = 15))
+
+
+coverage_16s <- plot_richness_16s + plot_evenness_16s + 
+    plot_layout(guides = "collect") + 
+    plot_annotation(tag_levels = "A") 
+
+ggsave(coverage_16s, filename = "../output/figures/coverage_16s.png", dpi = 300, width = 16, height = 10)
+ggsave(coverage_16s, filename = "../output/figures/coverage_16s.eps", dpi = 300, width = 16, height = 10, device = cairo_ps())
+```
+
+# generate nice plots for wgs    
+
+```{r}
+
+wgs <- results %>% filter(type == "wgs") %>% 
+    mutate(site = dplyr::recode(site, stool = "Stool", oralcavity = "Oral Cavity", vagina = "Vagina", 
+                         nasalcavity = "Nasal Cavity", skin = "Skin")) 
+
+richness_plot <- wgs %>% group_by(site, class) %>% 
+                       summarise(mean = mean(richness), se = sd(richness)/sqrt(n())) %>% 
+                       mutate(lower = mean - se, upper = mean + se)
+
+plot_richness_wgs <- ggplot(richness_plot, 
+                            aes(x = reorder_within(site, mean, class), 
+                                y = mean, col = site)) + 
+    geom_pointrange(aes(ymin = lower, ymax = upper)) + 
+    scale_x_reordered() +
+    facet_wrap(~class, scales = "free", ncol = 2) + 
+    coord_flip() + 
+    scale_color_npg() +
+    labs(y = "Proportion of taxa annotated at least one trait", x = "Minor site", 
+         col = "Body site")
+
+
+evenness_plot <- wgs %>% group_by(site, class) %>% 
+                       summarise(mean = mean(evenness), se = sd(evenness)/sqrt(n())) %>% 
+                       mutate(lower = mean - se, upper = mean + se)
+
+
+plot_evenness_wgs <- ggplot(evenness_plot, 
+                            aes(x = reorder_within(site, mean, class), 
+                                y = mean, col = site)) + 
+    geom_pointrange(aes(ymin = lower, ymax = upper)) + 
+    facet_wrap(~class, scales = "free", ncol = 2) + 
+    scale_x_reordered() + 
+    coord_flip() + 
+    scale_color_npg() +
+    labs(y = "Proportion of reads assigned to taxa annotated to at least one trait",
+         x = "Minor site", 
+         col = "Body Site") 
+
+
+coverage_wgs <- plot_richness_wgs + plot_evenness_wgs + 
+    plot_layout(guides = "collect") + 
+    plot_annotation(tag_levels = "A") 
+
+ggsave(coverage_wgs, filename = "../output/figures/coverage_wgs.png", dpi = 300, width = 13, height = 10)
+ggsave(coverage_wgs, filename = "../output/figures/coverage_wgs.eps", dpi = 300, width = 13, height = 10, device = cairo_ps())
+
+```
+
+```{r}
+joint_plt <- coverage_16s / coverage_wgs + plot_layout(tag_level = 'new') + 
+    plot_annotation(tag_levels = c("A", "1")) 
+ggsave(joint_plt, filename = "../output/figures/coverage_joint.png", dpi = 300, width = 13, height = 20)
+ggsave(joint_plt, filename = "../output/figures/coverage_joint.eps", 
+       dpi = 300, width = 13, height = 20, device = cairo_ps)
 ```
 
 
+
+# Final copy files   
+
 ```{r}
-for (i in seq_len(nrow(evaluation))){
-    if (!is.null(results[[i]])){
-        next 
-    } else {
-        arg1 <- evaluation[i,]$sites
-        arg2 <- evaluation[i,]$t_class
-        results[[i]] <- suppressMessages(eval_func(arg1, arg2))
-    }
+if (Sys.info()[["sysname"]] == "Windows"){
+    manu_path <- "../../microbe_trait_manuscript/bmc_template/figures/"
 }
+file.copy(from = Sys.glob("../output/figures/*.png"), to = manu_path, overwrite = TRUE, recursive = TRUE)
+file.copy(from = Sys.glob("../output/figures/*.eps"), to = manu_path, overwrite = TRUE)
 ```
-
-
-```{r}
-results_df <- do.call(rbind, results)
-plt <- results_df %>% pivot_longer(c(n_traits, richness, evenness)) %>% group_by(site, class, name) %>% 
-    add_count() %>% mutate(mean = mean(value), se = sd(value)/sqrt(n))
-ggplot(plt, aes(x = site, y = mean, col = class)) + 
-    geom_pointrange(aes(ymin = mean - se, ymax = mean + se), position = position_dodge(width = 0.1)) +
-    facet_wrap(~name, scales = "free") + coord_flip()
-```
-
-
-
-
 
