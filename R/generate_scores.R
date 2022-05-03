@@ -75,7 +75,7 @@ if (sequencing == "16s"){
     export <- export %>% filter(sample_ids %in% rownames(metadata))
 }
 
-write.csv(export, file = snakemake@output[[1]])
+write.csv(export, file = snakemake@output[[1]], row.names = FALSE)
 
 
 

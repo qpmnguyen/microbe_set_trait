@@ -26,9 +26,12 @@ def prior_preprocess(feat, meta, outcome_label, pos_class):
 """
 This function performs the clr transformation with imputation 
 """
-def clr_transform(arr):
-    # impute with multiplicative replacement
-    arr = multiplicative_replacement(arr)
+def clr_transform(arr, pseudocount=True):
+    if pseudocount == False:
+        # impute with multiplicative replacement
+        arr = multiplicative_replacement(arr)
+    else:
+        arr = arr + 10e-5
     # clr transformation 
     arr = clr(arr)
     return(arr)
@@ -44,7 +47,7 @@ def create_pipeline(clr_trans=True):
     rf = RandomForestClassifier(n_estimators=500, max_features='sqrt')
     estimators = [("calib_rf", CalibratedClassifierCV())]
     if clr_trans == True:
-        transf = FunctionTransformer(clr_transform, validate=True)
+        transf = FunctionTransformer(clr_transform, validate=True, kw_args={'pseudocount': True})
         estimators.insert(0, ("clr_transformer", transf))
     pipe = Pipeline(estimators)
     pipe.set_params(calib_rf__base_estimator=rf, calib_rf__cv=5, calib_rf__ensemble=True, 
@@ -52,6 +55,7 @@ def create_pipeline(clr_trans=True):
     return(pipe)
 
 if __name__ == "__main__":
+    np.random.seed(210595)
     print("Load and preprocess data")
     feat_path = snakemake.input[0]
     meta_path = snakemake.input[1]

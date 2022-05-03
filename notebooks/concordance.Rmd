@@ -1,0 +1,57 @@
+---
+title: "Concordance"
+author: "Quang Nguyen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, warning=FALSE}
+library(BiocSet)
+library(ANCOMBC)
+library(tidyverse)
+library(here)
+library(stringdist)
+```
+
+
+First, load some sets 
+
+```{r}
+
+sets <- list(
+    readRDS(here("output", "sets", "set_pathways_species.rds")), 
+    readRDS(here("output", "sets", "set_substrate_species.rds"))
+)
+
+metadata <- readRDS(file = "../metadata/metacyc_parse.rds")
+metadata[1:5]
+```
+Pre-process names  
+
+```{r}
+names(metadata) <- map(names(metadata), ~str_remove_all(.x, pattern = "\\|") %>% 
+                           str_replace_all("-", "_") %>% tolower())
+metadata <- map(metadata, ~str_remove_all(.x, pattern = "\\|"))
+metadata[1:5]
+```
+
+```{r}
+substrate_sets <- sets[[2]] %>% es_set() %>% pull(set) 
+pathway_sets <- sets[[1]] %>% es_set() %>% pull(set)
+
+
+compare_mat <- stringdistmatrix(a = substrate_sets, b = names(metadata), method = "lv")
+
+
+which(compare_mat <= 4, arr.ind = TRUE) %>% as.data.frame() %>% 
+    mutate(set = substrate_sets[row], db = names(metadata)[col])
+
+
+
+```
+
+
