@@ -9,9 +9,9 @@ SEQUENCING=["16s", "wgs"]
 rule all: 
     input:
         expand("output/pred/results_{condition}_{sequencing}_{input_type}.csv", zip,
-        condition=["ibd", "ibd", "crc", "crc"], 
-        sequencing=["16s", "wgs", "16s", "wgs"],
-        input_type=["picrust2", "pathways", "picrust2", "pathways"])
+        condition=["ibd", "ibd", "crc", "crc", "ibd", "ibd", "crc", "crc"], 
+        sequencing=["16s", "wgs", "16s", "wgs", "16s", "wgs", "16s", "wgs"],
+        input_type=["picrust2", "pathways", "picrust2", "pathways", "trait", "trait", "trait", "trait"])
 
 rule perform_predictions:
     conda:

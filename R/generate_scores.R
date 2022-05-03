@@ -2,7 +2,7 @@
 # Quang Nguyen 
 # Last updated 2022-04-28  
 
-renv::activate()
+source(".Rprofile")
 
 library(here)
 library(phyloseq)
@@ -23,7 +23,7 @@ source(here("R", "generate_scores_func.R"))
 # sequencing <- 'wgs'
 
 
-physeq_path <- snakemake@input[["physeq"]]
+physeq_path <- snakemake@input[[1]]
 condition <- snakemake@params[["condition"]]
 sequencing <- snakemake@params[["sequencing"]]
 
