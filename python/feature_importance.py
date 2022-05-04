@@ -1,8 +1,15 @@
+import numpy as np 
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.model_selection import KFold, cross_val_score, cross_validate, train_test_split
+from sklearn.preprocessing import FunctionTransformer
+from sklearn.metrics import accuracy_score, brier_score_loss, roc_auc_score
+from sklearn.inspection import permutation_importance
+from skbio.stats.composition import clr, multiplicative_replacement
+from sklearn.pipeline import Pipeline
+from sklearn import preprocessing
 from pred_eval import prior_preprocess, clr_transform, create_pipeline 
-
-def get_feat():
-    
-
 
 if __name__ == "__main__":
     print("Load and preprocess data")
@@ -25,18 +32,19 @@ if __name__ == "__main__":
     print("Create pipeline")
     pipe = create_pipeline(clr_trans=snakemake.params[5])
     
-    print("Fit pipeline via 10-fold cross validation")
-    scoring = ["neg_brier_score", "roc_auc"]
-    scores = cross_validate(pipe, X, y, scoring = scoring, cv=10)
+    print("Using threads:" + str(snakemake.threads))
     
-    out = pd.DataFrame({
-        "condition": np.repeat(np.array([condition]), 10),
-        "sequencing": np.repeat(np.array([sequencing]), 10),
-        "input_type": np.repeat(np.array([input_type]), 10),
-        "fold": range(1,11),
-        "brier": -1 * scores['test_neg_brier_score'],
-        "roc_auc": scores["test_roc_auc"]
-    })
+    print("Test set feature importance using permutational test")
+    X_train, X_test, y_train, y_test = train_test_split(X, y)
+    fitted_mod = pipe.fit(X_train, y_train)
     
+    r = permutation_importance(fitted_mod, X_test, y_test, n_repeats = 10, n_jobs = snakemake.threads, 
+                               scoring = "roc_auc")
+    
+    # top 15 features 
+    sorted_idx = r.importances_mean.argsort()[range(0,15)]
+    importances = r.importances[sorted_idx].T
+    labels = feat.columns[sorted_idx]
+    out = pd.DataFrame(importances, columns =labels)
     out.to_csv(snakemake.output[0])
 

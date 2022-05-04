@@ -26,7 +26,7 @@ predict:
         meta_path: "data/pred_picrust2_ibd_metadata.csv"
         clr_trans: False
         outcome_label: "diseasesubtype"
-        pos_class:
+        pos_class: "CD"
     ibd_wgs_pathways:
         feat_path: "data/pred_pathway_ibd_feat.csv"
         meta_path: "data/pred_pathway_ibd_metadata.csv"

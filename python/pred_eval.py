@@ -1,6 +1,5 @@
 import numpy as np 
 import pandas as pd
-import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import KFold, cross_val_score, cross_validate
@@ -10,7 +9,6 @@ from sklearn.inspection import permutation_importance
 from skbio.stats.composition import clr, multiplicative_replacement
 from sklearn.pipeline import Pipeline
 from sklearn import preprocessing
-import pickle 
 
 """
 This function performs some apriori preprocessing based on data set required 
@@ -31,7 +29,8 @@ def clr_transform(arr, pseudocount=True):
         # impute with multiplicative replacement
         arr = multiplicative_replacement(arr)
     else:
-        arr = arr + 10e-5
+        arr_pseudo = arr + 10e-5
+        arr = arr_pseudo/arr_pseudo.sum()
     # clr transformation 
     arr = clr(arr)
     return(arr)

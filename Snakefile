@@ -20,6 +20,9 @@ module trait_scores:
 module coverage:
     snakefile: "workflow/rules/coverage.smk"
     config: config['coverage']
+module feat_importance:
+    snakefile: "workflow/rules/feat_importance.smk"
+    config: config['predict']
 
 use rule * from dada2 as dada2_*
 use rule * from picrust as picrust_*
@@ -27,3 +30,4 @@ use rule * from db2set as db2set_*
 use rule * from pred as pred_*
 use rule * from trait_scores as trait_scores_*
 use rule * from coverage as coverage_*
+use rule * from feat_importance as feat_importance_*
