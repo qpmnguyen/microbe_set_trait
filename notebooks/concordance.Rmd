@@ -11,10 +11,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, warning=FALSE}
 library(BiocSet)
-library(ANCOMBC)
+library(Maaslin2)
 library(tidyverse)
 library(here)
 library(stringdist)
+library(phyloseq)
+source(here("R", "concordance_functions.R"))
+set.seed(160497)
 ```
 
 
@@ -43,15 +46,111 @@ metadata[1:5]
 substrate_sets <- sets[[2]] %>% es_set() %>% pull(set) 
 pathway_sets <- sets[[1]] %>% es_set() %>% pull(set)
 
+query_names <- names(metadata) %>% 
+    str_remove_all(pattern = "_(syn|metabolism|biosynthesis|degredation|deg)")
+compare_mat <- stringdistmatrix(a = substrate_sets, b = query_names, method = "lv")
 
-compare_mat <- stringdistmatrix(a = substrate_sets, b = names(metadata), method = "lv")
-
-
-which(compare_mat <= 4, arr.ind = TRUE) %>% as.data.frame() %>% 
+match_substrates <- which(compare_mat == 0, arr.ind = TRUE) %>% as.data.frame() %>% 
     mutate(set = substrate_sets[row], db = names(metadata)[col])
 
+compare_mat <- stringdistmatrix(a = pathway_sets, b = query_names, method = "lv")
 
+match_pathways <- which(compare_mat == 0, arr.ind = TRUE) %>% as.data.frame() %>% 
+    mutate(set = pathway_sets[row], db = names(metadata)[col])
+
+p_ids <- match_pathways %>% mutate(set = paste(set, "pathways", sep = "_")) 
+s_ids <- match_substrates %>% mutate(set = paste(set, "substrate", sep = "_")) 
 
 ```
+
+
+Let's load the crc data set  
+
+```{r}
+trait_data <- read.csv(file = here("data", "trait_crc_wgs_feat.csv"))
+path_data <- read.csv(file = here("data", "pred_pathway_crc_feat.csv"), row.names = 1)
+# <- path_data %>% select(-which(colSums(path_data) <= 0.001))
+met <- read.csv(file = here("data", "pred_pathway_crc_metadata.csv"), row.names = 1)
+colnames(trait_data) <- colnames(trait_data) %>% str_replace("X", "") %>% str_replace("\\.", "_")
+trait_data <- trait_data %>% dplyr::select(sample_ids, ends_with(c("pathways", "substrate"))) %>% 
+    column_to_rownames("sample_ids")
+
+# making sure that rownames match
+trait_data <- trait_data[rownames(met),]
+path_data <- path_data[rownames(met),]
+
+names_list <- colnames(path_data) %>% str_split("\\.\\.")
+path_names <- map_chr(names_list, ~.x[1] %>% str_replace_all("\\.", "-"))
+annotations <- map_chr(names_list, ~.x[-1] %>% paste(collapse = "_") %>% 
+                           str_replace_all("\\.", "_"))
+colnames(path_data) <- path_names
+
+```
+
+Let's perform proportion assessment for CRC data 
+
+```{r}
+pathway_assess_crc <- assess_traits(trait_data, path_data, met, 
+                                    ref_df = p_ids, o_var = "study_condition", 
+                                    p_class = "CRC", annotation = "pathway", metadata = metadata)
+
+substrate_assess_crc <- assess_traits(trait_data, path_data, met, 
+                                      ref_df = s_ids, o_var = "study_condition", 
+                                      p_class = "CRC", annotation = "substrate", metadata = metadata)
+```
+
+Let's do the same for IBD data 
+
+```{r}
+trait_data <- read.csv(file = here("data", "trait_ibd_wgs_feat.csv"))
+path_data <- read.csv(file = here("data", "pred_pathway_ibd_feat.csv"), row.names = 1)
+# <- path_data %>% select(-which(colSums(path_data) <= 0.001))
+met <- read.csv(file = here("data", "pred_pathway_ibd_metadata.csv"), row.names = 1)
+colnames(trait_data) <- colnames(trait_data) %>% str_replace("X", "") %>% str_replace("\\.", "_")
+trait_data <- trait_data %>% dplyr::select(sample_ids, ends_with(c("pathways", "substrate"))) %>% 
+    column_to_rownames("sample_ids")
+
+# making sure that rownames match
+trait_data <- trait_data[rownames(met),]
+path_data <- path_data[rownames(met),]
+
+names_list <- colnames(path_data) %>% str_split("\\.\\.")
+path_names <- map_chr(names_list, ~.x[1] %>% str_replace_all("\\.", "-"))
+annotations <- map_chr(names_list, ~.x[-1] %>% paste(collapse = "_") %>% 
+                           str_replace_all("\\.", "_"))
+colnames(path_data) <- path_names
+```
+
+
+```{r}
+pathway_assess_ibd <- assess_traits(trait_data, path_data, met, 
+                                    ref_df = p_ids, o_var = "study_condition", 
+                                    p_class = "IBD", annotation = "pathway", metadata = metadata)
+
+substrate_assess_ibd <- assess_traits(trait_data, path_data, met, 
+                                      ref_df = s_ids, o_var = "study_condition", 
+                                      p_class = "IBD", annotation = "substrate", metadata = metadata)
+```
+
+
+```{r}
+proportion_assessment <- bind_rows(
+    bind_rows(pathway_assess_crc, substrate_assess_crc) %>% mutate(condition = "CRC"),
+    bind_rows(pathway_assess_ibd, substrate_assess_ibd) %>% mutate(condition = "IBD")
+)
+write.csv(proportion_assessment, file = here("output", "concordance", "proportion_assessment.csv"))
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
