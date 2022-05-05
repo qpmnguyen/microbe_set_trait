@@ -50,10 +50,11 @@ if __name__ == "__main__":
     
     print("Time: ", end - start)
     # top 10 features 
-    sorted_idx = r.importances_mean.argsort()
+    sorted_idx = r.importances_mean.argsort()[range(0,11)]
+    print(sorted_idx)
     importances = r.importances[sorted_idx].T
     labels = feat.columns[sorted_idx]
-    out = pd.DataFrame(importances[range(0,11)], columns =labels[range(0,11)])
+    out = pd.DataFrame(importances, columns =labels)
     out["performance"] = np.repeat(perf_value, out.shape[0])
     
     out.to_csv(snakemake.output[0])
