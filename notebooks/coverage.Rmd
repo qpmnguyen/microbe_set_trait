@@ -29,7 +29,8 @@ for (i in seq_along(files)){
 }
 
 results <- do.call(bind_rows, results)
-results <- results %>% mutate(class = str_to_title(str_replace(class, pattern = "_", replacement = " "))) 
+results <- results %>% 
+    mutate(class = str_to_title(str_replace(class, pattern = "_", replacement = " "))) 
 ```
 
 # Generate plots for 16S

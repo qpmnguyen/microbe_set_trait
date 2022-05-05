@@ -64,7 +64,10 @@ predict:
         outcome_label: "study_condition"
         pos_class: "CRC"
 coverage:
-    16s: "genus"
-    wgs: "species"
-    
+    hmp_16s: "genus"
+    hmp_wgs: "species"
+    ibd_16s: "genus"
+    ibd_wgs: "species"
+    crc_16s: "genus"
+    crc_wgs: "species"
             

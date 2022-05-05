@@ -3,8 +3,8 @@ min_version("6.0")
 
 rule all:
     input: 
-        expand("output/coverage/{sequencing}_coverage_{category}.rds", 
-            sequencing = ["16s", "wgs"], 
+        expand("output/coverage/{dset}_coverage_{category}.rds", 
+            dset = ["hmp_16s", "hmp_wgs", "ibd_16s", "crc_16s", "ibd_wgs", "ibd_wgs"], 
             category=["metabolism", "gram_stain", "sporulation", "motility", 
                         "cell_shape", "substrate", "pathways"])
 
@@ -12,11 +12,11 @@ rule all:
 rule generate_trait_scores: 
     input: 
         set_path=lambda wildcards: "output/sets/set_" + wildcards.category + "_" + 
-                        config[wildcards.sequencing] + ".rds"
+                        config[wildcards.dset] + ".rds"
     params:
         category="{category}",
-        sequencing="{sequencing}"
+        dset="{dset}"
     output:
-        "output/coverage/{sequencing}_coverage_{category}.rds"
+        "output/coverage/{dset}_coverage_{category}.rds"
     script:
         "../../R/coverage_analysis.R"
