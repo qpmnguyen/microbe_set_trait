@@ -1,0 +1,116 @@
+---
+title: "Prediction"
+author: "Quang Nguyen"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(here)
+library(tidyverse)
+library(glue)
+library(ggsci)
+library(patchwork)
+source(here("R", "plot_utils.R"))
+
+theme_set(theme_nice())
+```
+
+## Plotting for predictive performance  
+
+```{r}
+condition <- "crc"
+sequencing <- "16s"
+
+files <- list.files(here("output", "pred"), pattern = "results", full.names = TRUE, 
+                    include.dirs = FALSE)
+
+df_list <- map(files, ~read_csv(.x) %>% dplyr::select(-1) %>% 
+                   mutate(sequencing = as.character(sequencing)))
+
+plot_df <- do.call(bind_rows, df_list) %>% 
+    mutate(sequencing = if_else(sequencing == "16", "16s", sequencing)) %>% 
+    pivot_longer(c(brier, roc_auc), names_to = "statistic", values_to = "values") %>% 
+    mutate(input_type = recode(input_type, "picrust2" = "PICRUSt2", 
+                               "trait" = "CBEA trait scores", 
+                               "pathways" = "MetaCyc pathway abundance"),
+           statistic = recode(statistic, "brier" = "Brier Score", "roc_auc" = "AUROC"), 
+           condition = recode(condition, "crc" = "Colorectal Cancer", "ibd" = "Inflammatory Bowel Disease"))
+
+
+(
+    metabar_plt <- plot_df %>% filter(sequencing == "16s") %>% 
+        ggplot(aes(x = input_type, y = values, col = input_type, fill = input_type)) + 
+        facet_grid(statistic~condition, scales = "free") +
+        scale_fill_npg() +
+        geom_boxplot(alpha = 0.5) + geom_jitter() + 
+        labs(x = "Input types", y = "Performance", title = "Metabarcoding data set") + 
+        theme(legend.position = "None")
+)
+
+(
+    wgs_plt <- plot_df %>% filter(sequencing == "wgs") %>% 
+        ggplot(aes(x = input_type, y = values, col = input_type, fill = input_type)) + 
+        facet_grid(statistic~condition, scales = "free") +
+        scale_fill_npg() +
+        geom_boxplot(alpha = 0.5) + geom_jitter() + 
+        labs(x = "Input types", y = "Performance", title = "Metagenomic data set") + 
+        theme(legend.position = "None")
+)
+
+combo_plot <- metabar_plt / wgs_plt
+
+
+ggsave(combo_plot, filename = here("output", "figures", "pred_performance.png"), dpi = 300, 
+       width = 8, height = 8)
+ggsave(combo_plot, filename = here("output", "figures", "pred_performance.eps"), dpi = 300, 
+       width = 8, height = 8, device = cairo_ps)
+```
+
+## Plot feature importances  
+```{r}
+annotation <- read_delim(file = "https://github.com/picrust/picrust2/raw/master/picrust2/default_files/description_mapfiles/metacyc_pathways_info.txt.gz", delim = "\t", col_names = FALSE)
+
+colnames(annotation) <- c("pathway", "annotation")
+```
+
+```{r}
+imp_files <- list.files(here("output", "pred"), pattern = "fimportance", full.names = TRUE)
+
+read_csv(imp_files[5]) %>% select(-1) %>% pivot_longer(everything(), names_to = "pathway") %>% 
+    left_join(annotation) %>% 
+    mutate(full_name = paste(pathway, annotation, sep = "\n")) %>% 
+    ggplot(aes(x = full_name, y = value)) + geom_jitter() + 
+    geom_boxplot() + coord_flip() + scale_x_discrete(expand = c(0.01,0.01))
+
+
+
+```
+
+
+
+
+
+
+
+
+## Copy files  
+
+```{r}
+if (Sys.info()["sysname"] == "Darwin"){
+    path_to <- "../../microbe_trait_manuscript/bmc_template/figures/"
+}
+
+file.copy(Sys.glob(here("output", "figures", "*.eps")), 
+          to = path_to,
+          recursive = TRUE, overwrite = TRUE)
+
+file.copy(Sys.glob(here("output", "figures", "*.png")), 
+          to = path_to,
+          recursive = TRUE, overwrite = TRUE)
+```
+

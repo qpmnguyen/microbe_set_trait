@@ -10,6 +10,7 @@ from skbio.stats.composition import clr, multiplicative_replacement
 from sklearn.pipeline import Pipeline
 from sklearn import preprocessing
 from pred_eval import prior_preprocess, clr_transform, create_pipeline 
+import timeit
 
 if __name__ == "__main__":
     print("Load and preprocess data")
@@ -35,16 +36,25 @@ if __name__ == "__main__":
     print("Using threads:" + str(snakemake.threads))
     
     print("Test set feature importance using permutational test")
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=160497)
     fitted_mod = pipe.fit(X_train, y_train)
     
-    r = permutation_importance(fitted_mod, X_test, y_test, n_repeats = 10, n_jobs = snakemake.threads, 
-                               scoring = "roc_auc")
+    y_pred = fitted_mod.predict(X_test)
+    perf_value = roc_auc_score(y_test, y_pred)
     
-    # top 15 features 
-    sorted_idx = r.importances_mean.argsort()[range(0,15)]
+    start = timeit.default_timer()
+    r = permutation_importance(fitted_mod, X_test, y_test, n_repeats = 20, 
+                                n_jobs = snakemake.threads, 
+                               scoring = "roc_auc", random_state=160497)
+    end = timeit.default_timer()
+    
+    print("Time: ", end - start)
+    # top 10 features 
+    sorted_idx = r.importances_mean.argsort()
     importances = r.importances[sorted_idx].T
     labels = feat.columns[sorted_idx]
-    out = pd.DataFrame(importances, columns =labels)
+    out = pd.DataFrame(importances[range(0,11)], columns =labels[range(0,11)])
+    out["performance"] = np.repeat(perf_value, out.shape[0])
+    
     out.to_csv(snakemake.output[0])
 

@@ -10,7 +10,7 @@ module picrust:
     snakefile: "workflow/rules/picrust.smk"
 module db2set:
     snakefile: "workflow/rules/db2set.smk"
-    config: config
+    config: config 
 module pred:
     snakefile: "workflow/rules/pred.smk"
     config: config['predict']
