@@ -81,21 +81,57 @@ colnames(annotation) <- c("pathway", "annotation")
 ```{r}
 imp_files <- list.files(here("output", "pred"), pattern = "fimportance", full.names = TRUE)
 
-read_csv(imp_files[5]) %>% select(-1) %>% pivot_longer(everything(), names_to = "pathway") %>% 
-    left_join(annotation) %>% 
-    mutate(full_name = paste(pathway, annotation, sep = "\n")) %>% 
-    ggplot(aes(x = full_name, y = value)) + geom_jitter() + 
-    geom_boxplot() + coord_flip() + scale_x_discrete(expand = c(0.01,0.01))
+imp_plots <- vector(mode = "list", length = length(imp_files))
+
+for (i in seq_along(imp_files)){
+    df_identifier <- str_split(imp_files[i], "\\/")[[1]] %>% .[length(.)] %>% 
+        str_remove("fimportance_") %>% str_remove(".csv") %>% 
+        str_split("_") %>% .[[1]] %>% 
+        recode(
+            "ibd" = "Inflammatory Bowel Disease", 
+            "crc" = "Colorectal Cancer", 
+            "picrust2" = "PICRUSt2",
+            "16s" = "16s rRNA metabarcoding", 
+            "wgs" = "Whole genome Metagenomic", 
+            "trait" = "CBEA trait scores", 
+            "pathways" = "Pathway abundances"
+        )
+    imp_df <- read_csv(imp_files[i]) 
+    plot_imp_df <- imp_df %>% select(-1) %>% 
+        select(-performance) %>% 
+        pivot_longer(everything(), names_to = "pathway") %>%
+        left_join(annotation) %>% 
+        mutate(full_name = paste(pathway, annotation, sep = "-")) %>% 
+        mutate(full_name = str_remove_all(full_name, "-NA")) %>%
+        group_by(full_name) %>% 
+        summarise(m = mean(value), sd = sd(value)) %>% 
+        arrange(m) %>% slice(1:10) %>% 
+        mutate(u = m + sd, l = m - sd)
+    
+    
+    perf <- imp_df$performance %>% unique()
+    
+    imp_plots[[i]] <- ggplot(plot_imp_df, aes(x = str_wrap(full_name, width = 30), 
+                            y = m, col = full_name)) + 
+        geom_pointrange(aes(ymin = l, ymax = u)) + 
+        coord_flip() + scale_x_discrete(expand = c(0.01,0.01)) + 
+        scale_color_npg() +
+        labs(y = "AUROC increase when feature is shuffled (20 iterations)", 
+             x = "Features", 
+             title = glue("{condition} - {sequencing}: {input}", 
+                          condition = df_identifier[1], 
+                          sequencing = df_identifier[2], 
+                          input = df_identifier[3]), 
+             subtitle = glue("Test set AUROC: {perf}", perf = round(perf,2))) + 
+        theme(legend.position = "none")
+    
+}
+
+
 
 
 
 ```
-
-
-
-
-
-
 
 
 ## Copy files  
