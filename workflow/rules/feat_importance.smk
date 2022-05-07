@@ -36,7 +36,7 @@ rule feature_importance:
         clr_trans=lambda wildcards: config[wildcards.condition + "_" +
                                                wildcards.sequencing + "_" +
                                                wildcards.input_type]["clr_trans"]
-    threads: 10
+    threads: 1
     output:
         "output/pred/fimportance_{condition}_{sequencing}_{input_type}.csv"
     script:

@@ -120,7 +120,7 @@ plot_imp_df <- imp_metadata %>% mutate(path = imp_files) %>%
             group_by(full_name) %>% 
             summarise(m = mean(value), 
                       se = sd(value)/sqrt(n())) %>% 
-            arrange(m) %>% slice(1:10) %>% 
+            arrange(-m) %>% 
             mutate(u = m + se, l = m - se)
     })) %>%
     mutate(performance = map_chr(path, ~{
@@ -128,7 +128,7 @@ plot_imp_df <- imp_metadata %>% mutate(path = imp_files) %>%
         imp_df %>% pull(performance) %>% unique()
     })) %>% 
     unnest(data) %>% 
-    rename("features" = "full_name") %>% 
+    dplyr::rename("features" = "full_name") %>% 
     mutate(features = str_replace(features, ";", "; ") %>% str_replace_all("_", " "))
 
 wgs_imp <- plot_imp_df %>% filter(seq == "Whole genome metagenomics")
@@ -138,13 +138,19 @@ plot_grid <- cross_df(list(
 ))
 plots_list <- pmap(plot_grid, function(ipt, cond, ...){
         pltdf <- wgs_imp %>% filter(condition == {{ cond }}, 
-                           input == {{ ipt }})
+                           input == {{ ipt }}) %>% 
+            arrange(m) %>% dplyr::slice(1:10) %>% 
+            mutate(features = factor(str_wrap(features, width = 30), 
+                                     levels = str_wrap(features, width = 30)))
+        print(pltdf)
+        
         perf <- pltdf %>% pull(performance) %>% unique() %>% as.numeric()
+        
         out <- ggplot(pltdf, 
-                      aes(x = str_wrap(features, width = 30), y = m)) + 
+                      aes(x = features, y = m)) + 
             geom_pointrange(aes(ymin = l, ymax = u)) +
             coord_flip() +
-            labs(y = "AUROC increase when feature is shuffled (20 iterations)", 
+            labs(y = "Feature Importance (10-fold cross validation)", 
                 x = "Features", 
                 title = glue("{cond}", cond = cond, ipt = ipt), 
                 caption = glue("Test set AUROC: {perf}", 
@@ -158,7 +164,7 @@ plots_list <- pmap(plot_grid, function(ipt, cond, ...){
 gt <- patchwork::patchworkGrob(Reduce("+", plots_list))
 
 x_axis <- text_grob("Features", family = "Source Sans Pro", face = "bold",rot = 90)
-y_axis <- text_grob("AUROC difference when feature is shuffled (20 iterations)",
+y_axis <- text_grob("Feature importance (10-fold cross-validation)",
                     family = "Source Sans Pro", face = "bold") 
 
 feat_importance_wgs <- gridExtra::grid.arrange(gt, left = x_axis, 
@@ -184,14 +190,16 @@ plot_grid <- cross_df(list(
 
 plots_list <- pmap(plot_grid, function(ipt, cond, ...){
         pltdf <- metabar_imp %>% filter(condition == {{ cond }}, 
-                           input == {{ ipt }})
-        print(head(pltdf))
+                           input == {{ ipt }}) %>% 
+            arrange(m) %>% dplyr::slice(1:10) %>% 
+            mutate(features = factor(str_wrap(features, width = 30), 
+                                     levels = str_wrap(features, width = 30)))
         perf <- pltdf %>% pull(performance) %>% unique() %>% as.numeric()
         out <- ggplot(pltdf, 
-                      aes(x = str_wrap(features, width = 30), y = m)) + 
+                      aes(x = features, y = m)) + 
             geom_pointrange(aes(ymin = l, ymax = u)) +
             coord_flip() +
-            labs(y = "AUROC increase when feature is shuffled (20 iterations)", 
+            labs(y = "Feature importance (10-fold cross-validation)", 
                 x = "Features", 
                 title = glue("{cond}", cond = cond, ipt = ipt), 
                 caption = glue("Test set AUROC: {perf}", 
@@ -205,7 +213,7 @@ plots_list <- pmap(plot_grid, function(ipt, cond, ...){
 gt <- patchwork::patchworkGrob(Reduce("+", plots_list))
 
 x_axis <- text_grob("Features", family = "Source Sans Pro", face = "bold",rot = 90)
-y_axis <- text_grob("AUROC difference when feature is shuffled (20 iterations)",
+y_axis <- text_grob("Feature importance (10-fold cross-validation)",
                     family = "Source Sans Pro", face = "bold") 
 
 feat_importance_16s <- gridExtra::grid.arrange(gt, left = x_axis, 

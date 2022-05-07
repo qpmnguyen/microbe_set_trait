@@ -94,49 +94,20 @@ assess_correlation <- function(trait_data, path_data, ref_df, metadata){
     results <- results %>% left_join(annotation_df) %>% drop_na(corr)
     results <- results %>% mutate(pnames = str_wrap(paste(pathway, annotation, sep = ": "), width = 20))
     
+    corr_mat <- results %>% select(trait, corr, pnames) %>% 
+        pivot_wider(names_from = "pnames", values_from = "corr") %>% 
+        column_to_rownames("trait") %>% as.matrix()
     
-    map(colnames(trait_data))
-    sig_db <- ref_df %>% filter(set %in% sig_traits) %>% pull(db)
-    
-    
-    # extract pathways 
-    subset_metadata <- metadata[sig_db]
-    retrieve_pathways <- map(subset_metadata, ~which(colnames(path_data) %in% .x))
-    
-    imap(retrieve_pathways, ~{
-        if (length(.x) == 0){
-            out <- tibble(trait = .y, corr = NA_real_, size = NA_real_)
-        } else {
-            for (i in seq_along(.x)){
-                t_vec <- path_data[,.x[i]]
-                t_vec <- asin(sqrt(abs(t_vec/sum(t_vec))))
-                corr <- cor()
-            }
-        }
-    })
-    
-    results <- imap(retrieve_pathways, ~{
-        if (length(.x) == 0){
-            out <- tibble(trait = .y, corr = NA_real_, size = NA_real_)
-        } else {
-            # per model 
-            p_values <- vector(length = length(.x))
-            t_out <- ifelse(met %>% pull(o_var) == p_class,1,0)
-            for (i in seq_along(.x)){
-                t_vec <- path_data[,.x[i]]
-                t_vec <- asin(sqrt(abs(t_vec/sum(t_vec))))
-                mod <- lm(t_vec ~ as.factor(t_out))
-                p_values[i] <- coef(summary(mod))[,4][-1]
-            }
-            p_values <- p.adjust(p_values, method = "BH")
-            prop <- length(which(p_values <= 0.05))/length(p_values)
-            out <- tibble(trait = .y, prop = prop, size = length(.x))
-        } 
-        return(out)
-    })
-    results <- do.call(bind_rows, results)
-    results <- results %>% mutate(type = rep(annotation, nrow(results)))
-    return(results)
+    p_mat <- results %>% select(trait, pval, pnames) %>% 
+        pivot_wider(names_from = "pnames", values_from = "pval") %>% 
+        column_to_rownames("trait") %>% as.matrix()
+    return(
+        list(
+            results = results, 
+            corr_mat = corr_mat, 
+            p_mat = p_mat
+        )
+    )
 }
 
 

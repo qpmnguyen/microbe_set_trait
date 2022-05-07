@@ -113,7 +113,8 @@ substrate_cor_crc <- assess_correlation(trait_data, path_data, met, ref_df = s_i
                                         metadata = metadata, annotation = "substrate")
 
 
-ggcorrplot(t(corr_mat), lab = TRUE, method = "circle")
+ggcorrplot(corr_mat, lab = TRUE, method = "circle", show.legend = FALSE, 
+           outline.color = "white", tl.cex = 5)
 
 
 ```
