@@ -11,11 +11,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, warning=FALSE}
 library(BiocSet)
-library(Maaslin2)
 library(tidyverse)
 library(here)
 library(stringdist)
 library(phyloseq)
+library(ggcorrplot)
 source(here("R", "concordance_functions.R"))
 set.seed(160497)
 ```
@@ -98,6 +98,27 @@ substrate_assess_crc <- assess_traits(trait_data, path_data, met,
                                       ref_df = s_ids, o_var = "study_condition", 
                                       p_class = "CRC", annotation = "substrate", metadata = metadata)
 ```
+
+Let's perform spearman correlation assessment for CRC data  
+
+```{r}
+annotation_df <- read_delim(file = "https://github.com/picrust/picrust2/raw/master/picrust2/default_files/description_mapfiles/metacyc_pathways_info.txt.gz", delim = "\t", col_names = FALSE)
+
+colnames(annotation_df) <- c("pathway", "annotation")
+
+pathway_cor_crc <- assess_correlation(trait_data, path_data, met, ref_df = p_ids, 
+                                      annotation = "pathway", metadata = metadata)
+
+substrate_cor_crc <- assess_correlation(trait_data, path_data, met, ref_df = s_ids, 
+                                        metadata = metadata, annotation = "substrate")
+
+
+ggcorrplot(t(corr_mat), lab = TRUE, method = "circle")
+
+
+```
+
+
 
 Let's do the same for IBD data 
 

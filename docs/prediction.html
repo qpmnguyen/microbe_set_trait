@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Quang Nguyen" />
+
+<meta name="date" content="2022-05-06" />
+
+<title>Prediction</title>
+
+<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/darkly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Evaluating trait databases for taxon-set analysis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Preparation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="retrieve_wgs.html">WGS data manifest</a>
+    </li>
+    <li>
+      <a href="db_prep.html">Updating database</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Main Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="coverage_analysis.html">Coverage analyses</a>
+    </li>
+    <li>
+      <a href="concordance_analysis.html">Concordance analyses</a>
+    </li>
+    <li>
+      <a href="predictive analyses.html">Predictive analyses</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/qpmnguyen/microbe_set_trait">
+    <span class="fab fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Prediction</h1>
+<h4 class="author">Quang Nguyen</h4>
+<h4 class="date">2022-05-06</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-05-06
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 2
+</p>
+<p>
+<strong>Knit directory:</strong>
+<code>~/research/microbe_set_trait/notebooks/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted
+changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown file has unstaged changes. To know which version of
+the R Markdown file created these results, you’ll want to first commit
+it to the Git repo. If you’re still working on the analysis, you can
+ignore this warning. When you’re finished, you can run
+<code>wflow_publish</code> to commit the R Markdown file and build the
+HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongobjectspresent">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>Environment:</strong> objects present
+</a>
+</p>
+</div>
+<div id="strongEnvironmentstrongobjectspresent"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+The global environment had objects present when the code in the R
+Markdown file was run. These objects can affect the analysis in your R
+Markdown file in unknown ways. For reproduciblity it’s best to always
+run the code in an empty environment. Use <code>wflow_publish</code> or
+<code>wflow_build</code> to ensure that the code is always run in an
+empty environment.
+</p>
+<p>
+The following objects were defined in the global environment when these
+results were created:
+</p>
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th style="text-align:left;">
+Name
+</th>
+<th style="text-align:left;">
+Class
+</th>
+<th style="text-align:left;">
+Size
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+owd
+</td>
+<td style="text-align:left;">
+character
+</td>
+<td style="text-align:left;">
+168 bytes
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed12345code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(12345)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed12345code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(12345)</code> was run prior to running the
+code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittreed0e3a400f78c523c494317a93032f85951377b7ftargetblankd0e3a40a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/tree/d0e3a400f78c523c494317a93032f85951377b7f" target="_blank">d0e3a40</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomqpmnguyenmicrobesettraittreed0e3a400f78c523c494317a93032f85951377b7ftargetblankd0e3a40a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/qpmnguyen/microbe_set_trait/tree/d0e3a400f78c523c494317a93032f85951377b7f" target="_blank">d0e3a40</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Renviron
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    .ipynb_checkpoints/
+    Ignored:    .nextflow/
+    Ignored:    .snakemake/
+    Ignored:    .vscode/
+    Ignored:    config/.ipynb_checkpoints/
+    Ignored:    data/.ipynb_checkpoints/
+    Ignored:    gurobi.log
+    Ignored:    large_files/
+    Ignored:    logs/
+    Ignored:    metadata/.ipynb_checkpoints/
+    Ignored:    notebooks/.ipynb_checkpoints/
+    Ignored:    output/sequence_process_16s/crc_16s/exports/.ipynb_checkpoints/
+    Ignored:    output/sequence_process_16s/ibd_16s/exports/.ipynb_checkpoints/
+    Ignored:    output/sets/gurobi.log
+    Ignored:    python/.ipynb_checkpoints/
+    Ignored:    python/data/
+    Ignored:    renv/library/
+    Ignored:    renv/python/
+    Ignored:    renv/staging/
+    Ignored:    workflow/env/.ipynb_checkpoints/
+    Ignored:    workflow/rules/.ipynb_checkpoints/
+
+Untracked files:
+    Untracked:  output/figures/feat_importance_wgs.eps
+    Untracked:  output/figures/feat_importance_wgs.png
+
+Unstaged changes:
+    Modified:   DESCRIPTION
+    Modified:   notebooks/prediction.Rmd
+    Modified:   output/figures/pred_performance.eps
+    Modified:   output/figures/pred_performance.png
+    Modified:   renv.lock
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>notebooks/prediction.Rmd</code>) and HTML
+(<code>docs/prediction.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/blob/d0e3a400f78c523c494317a93032f85951377b7f/notebooks/prediction.Rmd" target="_blank">d0e3a40</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-05-06
+</td>
+<td>
+Finalizing coverage images and almost finishing feature importance
+images
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/qpmnguyen/microbe_set_trait/blob/e6297e0572ca1edbefff942054c3efcf4d1c690d/notebooks/prediction.Rmd" target="_blank">e6297e0</a>
+</td>
+<td>
+Quang Nguyen
+</td>
+<td>
+2022-05-04
+</td>
+<td>
+Some prediction values and re-generate feature_importance
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(here)</code></pre>
+<pre><code>here() starts at /Users/quangnguyen/research/microbe_set_trait</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+✓ tibble  3.1.6     ✓ dplyr   1.0.8
+✓ tidyr   1.2.0     ✓ stringr 1.4.0
+✓ readr   2.1.2     ✓ forcats 0.5.1</code></pre>
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+x dplyr::filter() masks stats::filter()
+x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(glue)
+library(ggsci)
+library(patchwork)
+source(here(&quot;R&quot;, &quot;plot_utils.R&quot;))
+library(gridExtra)</code></pre>
+<pre><code>
+Attaching package: &#39;gridExtra&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:dplyr&#39;:
+
+    combine</code></pre>
+<pre class="r"><code>library(ggpubr)
+
+theme_set(theme_nice())</code></pre>
+<div id="plotting-for-predictive-performance" class="section level2">
+<h2>Plotting for predictive performance</h2>
+<pre class="r"><code>condition &lt;- &quot;crc&quot;
+sequencing &lt;- &quot;16s&quot;
+
+files &lt;- list.files(here(&quot;output&quot;, &quot;pred&quot;), pattern = &quot;results&quot;, full.names = TRUE, 
+                    include.dirs = FALSE)
+
+df_list &lt;- map(files, ~read_csv(.x) %&gt;% dplyr::select(-1) %&gt;% 
+                   mutate(sequencing = as.character(sequencing)))</code></pre>
+<pre><code>New names:
+* `` -&gt; ...1</code></pre>
+<pre><code>Rows: 10 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (2): condition, input_type
+dbl (5): ...1, sequencing, fold, brier, roc_auc
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 10 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (2): condition, input_type
+dbl (5): ...1, sequencing, fold, brier, roc_auc
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 10 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (3): condition, sequencing, input_type
+dbl (4): ...1, fold, brier, roc_auc
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 10 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (3): condition, sequencing, input_type
+dbl (4): ...1, fold, brier, roc_auc
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 10 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (2): condition, input_type
+dbl (5): ...1, sequencing, fold, brier, roc_auc
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 10 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (2): condition, input_type
+dbl (5): ...1, sequencing, fold, brier, roc_auc
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 10 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (3): condition, sequencing, input_type
+dbl (4): ...1, fold, brier, roc_auc
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 10 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (3): condition, sequencing, input_type
+dbl (4): ...1, fold, brier, roc_auc
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>plot_df &lt;- do.call(bind_rows, df_list) %&gt;% 
+    mutate(sequencing = if_else(sequencing == &quot;16&quot;, &quot;16s&quot;, sequencing)) %&gt;% 
+    pivot_longer(c(brier, roc_auc), names_to = &quot;statistic&quot;, values_to = &quot;values&quot;) %&gt;% 
+    mutate(input_type = recode(input_type, &quot;picrust2&quot; = &quot;PICRUSt2&quot;, 
+                               &quot;trait&quot; = &quot;CBEA trait scores&quot;, 
+                               &quot;pathways&quot; = &quot;MetaCyc pathway abundance&quot;),
+           statistic = recode(statistic, &quot;brier&quot; = &quot;Brier Score&quot;, &quot;roc_auc&quot; = &quot;AUROC&quot;), 
+           condition = recode(condition, &quot;crc&quot; = &quot;Colorectal Cancer&quot;, &quot;ibd&quot; = &quot;Inflammatory Bowel Disease&quot;))
+
+
+(
+    metabar_plt &lt;- plot_df %&gt;% filter(sequencing == &quot;16s&quot;) %&gt;% 
+        ggplot(aes(x = input_type, y = values, col = input_type, fill = input_type)) + 
+        facet_grid(statistic~condition, scales = &quot;free&quot;) +
+        scale_fill_npg() +
+        geom_boxplot(alpha = 0.5) + geom_jitter() + 
+        labs(x = &quot;Input types&quot;, y = &quot;Performance&quot;, title = &quot;Metabarcoding data set&quot;) + 
+        theme(legend.position = &quot;None&quot;)
+)</code></pre>
+<p><img src="figure/prediction.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>(
+    wgs_plt &lt;- plot_df %&gt;% filter(sequencing == &quot;wgs&quot;) %&gt;% 
+        ggplot(aes(x = input_type, y = values, col = input_type, fill = input_type)) + 
+        facet_grid(statistic~condition, scales = &quot;free&quot;) +
+        scale_fill_npg() +
+        geom_boxplot(alpha = 0.5) + geom_jitter() + 
+        labs(x = &quot;Input types&quot;, y = &quot;Performance&quot;, title = &quot;Metagenomic data set&quot;) + 
+        theme(legend.position = &quot;None&quot;)
+)</code></pre>
+<p><img src="figure/prediction.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>combo_plot &lt;- metabar_plt / wgs_plt
+
+
+ggsave(combo_plot, filename = here(&quot;output&quot;, &quot;figures&quot;, &quot;pred_performance.png&quot;), dpi = 300, 
+       width = 8, height = 8)
+ggsave(combo_plot, filename = here(&quot;output&quot;, &quot;figures&quot;, &quot;pred_performance.eps&quot;), dpi = 300, 
+       width = 8, height = 8, device = cairo_ps)</code></pre>
+</div>
+<div id="plot-feature-importances" class="section level2">
+<h2>Plot feature importances</h2>
+<pre class="r"><code>annotation &lt;- read_delim(file = &quot;https://github.com/picrust/picrust2/raw/master/picrust2/default_files/description_mapfiles/metacyc_pathways_info.txt.gz&quot;, delim = &quot;\t&quot;, col_names = FALSE)</code></pre>
+<pre><code>Rows: 2714 Columns: 2
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;\t&quot;
+chr (2): X1, X2
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>colnames(annotation) &lt;- c(&quot;pathway&quot;, &quot;annotation&quot;)</code></pre>
+<div id="wgs-feature-importance" class="section level3">
+<h3>WGS feature importance</h3>
+<pre class="r"><code>imp_files &lt;- list.files(here(&quot;output&quot;, &quot;pred&quot;), pattern = &quot;fimportance&quot;, full.names = TRUE)
+
+imp_metadata &lt;- str_split(imp_files, &quot;\\/&quot;) %&gt;% 
+    map_dfr(~{
+        d_vec &lt;- .x[length(.x)] %&gt;% 
+            str_remove(&quot;fimportance_&quot;) %&gt;% 
+            str_remove(&quot;.csv&quot;) %&gt;% str_split(&quot;_&quot;) %&gt;% .[[1]] %&gt;% 
+            recode(
+                &quot;ibd&quot; = &quot;Inflammatory bowel disease&quot;, 
+                &quot;crc&quot; = &quot;Colorectal cancer&quot;, 
+                &quot;picrust2&quot; = &quot;PICRUSt2 predicted abundances&quot;,
+                &quot;16s&quot; = &quot;16s rRNA metabarcoding&quot;, 
+                &quot;wgs&quot; = &quot;Whole genome metagenomics&quot;, 
+                &quot;trait&quot; = &quot;CBEA trait scores&quot;, 
+                &quot;pathways&quot; = &quot;Pathway abundances&quot;
+            )
+        tibble(
+            condition = d_vec[1],
+            seq = d_vec[2],
+            input = d_vec[3]
+        )
+    })
+
+plot_imp_df &lt;- imp_metadata %&gt;% mutate(path = imp_files) %&gt;% 
+    mutate(data = map(path, ~{
+        imp_df &lt;- read_csv(.x)
+        imp_df &lt;- imp_df %&gt;% select(-1) %&gt;% 
+            select(-performance) %&gt;% 
+            pivot_longer(everything(), names_to = &quot;pathway&quot;) %&gt;%
+            left_join(annotation) %&gt;% 
+            mutate(full_name = paste(pathway, annotation, sep = &quot;-&quot;)) %&gt;% 
+            mutate(full_name = str_remove_all(full_name, &quot;-NA&quot;)) %&gt;%
+            group_by(full_name) %&gt;% 
+            summarise(m = mean(value), 
+                      se = sd(value)/sqrt(n())) %&gt;% 
+            arrange(m) %&gt;% slice(1:10) %&gt;% 
+            mutate(u = m + se, l = m - se)
+    })) %&gt;%
+    mutate(performance = map_chr(path, ~{
+        imp_df &lt;- read_csv(.x)
+        imp_df %&gt;% pull(performance) %&gt;% unique()
+    })) %&gt;% 
+    unnest(data) %&gt;% 
+    rename(&quot;features&quot; = &quot;full_name&quot;) %&gt;% 
+    mutate(features = str_replace(features, &quot;;&quot;, &quot;; &quot;) %&gt;% str_replace_all(&quot;_&quot;, &quot; &quot;))</code></pre>
+<pre><code>New names:
+* `` -&gt; ...1</code></pre>
+<pre><code>Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, PWY-5183, PWY-1501, PWY-6339, PWY-3801, PWY-7084, PWY-7295, ...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining, by = &quot;pathway&quot;
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, fucose;substrate, no;sporulation, alaninamide;substrate, obl...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining, by = &quot;pathway&quot;
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, ILEUSYN-PWY: L-isoleucine biosynthesis I (from threonine), V...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining, by = &quot;pathway&quot;
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, yes;sporulation, nitrate_reduction_to_ammonia;pathways, hydr...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining, by = &quot;pathway&quot;
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, UBISYN-PWY, PWY-5856, PWY-6708, PWY-6397, PWY-6338, PWY-5857...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining, by = &quot;pathway&quot;
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, alanine;substrate, fructose;substrate, pyruvic_acid_methyl_e...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining, by = &quot;pathway&quot;
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, PPGPPMET-PWY: ppGpp biosynthesis, P461-PWY: hexitol fermenta...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining, by = &quot;pathway&quot;
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, facultative_anaerobic;metabolism, coccus;cell_shape, acetoin...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Joining, by = &quot;pathway&quot;
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, PWY-5183, PWY-1501, PWY-6339, PWY-3801, PWY-7084, PWY-7295, ...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, fucose;substrate, no;sporulation, alaninamide;substrate, obl...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, ILEUSYN-PWY: L-isoleucine biosynthesis I (from threonine), V...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, yes;sporulation, nitrate_reduction_to_ammonia;pathways, hydr...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, UBISYN-PWY, PWY-5856, PWY-6708, PWY-6397, PWY-6338, PWY-5857...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, alanine;substrate, fructose;substrate, pyruvic_acid_methyl_e...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, PPGPPMET-PWY: ppGpp biosynthesis, P461-PWY: hexitol fermenta...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+New names:
+* `` -&gt; ...1
+
+Rows: 20 Columns: 13
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+dbl (13): ...1, facultative_anaerobic;metabolism, coccus;cell_shape, acetoin...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>wgs_imp &lt;- plot_imp_df %&gt;% filter(seq == &quot;Whole genome metagenomics&quot;)
+plot_grid &lt;- cross_df(list(
+    ipt = c(&quot;CBEA trait scores&quot;, &quot;Pathway abundances&quot;), 
+    cond = c(&quot;Inflammatory bowel disease&quot;, &quot;Colorectal cancer&quot;)
+))
+plots_list &lt;- pmap(plot_grid, function(ipt, cond, ...){
+        pltdf &lt;- wgs_imp %&gt;% filter(condition == {{ cond }}, 
+                           input == {{ ipt }})
+        perf &lt;- pltdf %&gt;% pull(performance) %&gt;% unique() %&gt;% as.numeric()
+        out &lt;- ggplot(pltdf, 
+                      aes(x = str_wrap(features, width = 30), y = m)) + 
+            geom_pointrange(aes(ymin = l, ymax = u)) +
+            coord_flip() +
+            labs(y = &quot;AUROC increase when feature is shuffled (20 iterations)&quot;, 
+                x = &quot;Features&quot;, 
+                title = glue(&quot;{cond}&quot;, cond = cond, ipt = ipt), 
+                caption = glue(&quot;Test set AUROC: {perf}&quot;, 
+                                perf = round(perf, digits = 2)), 
+                subtitle = glue(&quot;{ipt}&quot;, ipt = ipt)) + 
+            theme(legend.position = &quot;none&quot;, axis.title = element_blank()) + 
+            geom_hline(aes(yintercept = 0), col = &quot;red&quot;)
+        return(out)
+})
+
+gt &lt;- patchwork::patchworkGrob(Reduce(&quot;+&quot;, plots_list))
+
+x_axis &lt;- text_grob(&quot;Features&quot;, family = &quot;Source Sans Pro&quot;, face = &quot;bold&quot;,rot = 90)
+y_axis &lt;- text_grob(&quot;AUROC difference when feature is shuffled (20 iterations)&quot;,
+                    family = &quot;Source Sans Pro&quot;, face = &quot;bold&quot;) 
+
+feat_importance_wgs &lt;- gridExtra::grid.arrange(gt, left = x_axis, 
+                        bottom = y_axis)</code></pre>
+<p><img src="figure/prediction.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(feat_importance_wgs, 
+       filename = here(&quot;output&quot;, &quot;figures&quot;, &quot;feat_importance_wgs.png&quot;), 
+       width = 10, height = 11)  
+ggsave(feat_importance_wgs, 
+       filename = here(&quot;output&quot;, &quot;figures&quot;, &quot;feat_importance_wgs.eps&quot;), 
+       width = 10, height = 11, device = cairo_ps)</code></pre>
+</div>
+<div id="s-feature-importance" class="section level3">
+<h3>16S feature importance</h3>
+<pre class="r"><code>metabar_imp &lt;- plot_imp_df %&gt;% filter(seq == &quot;16s rRNA metabarcoding&quot;)
+plot_grid &lt;- cross_df(list(
+    ipt = c(&quot;CBEA trait scores&quot;, &quot;PICRUSt2 predicted abundances&quot;), 
+    cond = c(&quot;Inflammatory bowel disease&quot;, &quot;Colorectal cancer&quot;)
+))
+
+plots_list &lt;- pmap(plot_grid, function(ipt, cond, ...){
+        pltdf &lt;- metabar_imp %&gt;% filter(condition == {{ cond }}, 
+                           input == {{ ipt }})
+        print(head(pltdf))
+        perf &lt;- pltdf %&gt;% pull(performance) %&gt;% unique() %&gt;% as.numeric()
+        out &lt;- ggplot(pltdf, 
+                      aes(x = str_wrap(features, width = 30), y = m)) + 
+            geom_pointrange(aes(ymin = l, ymax = u)) +
+            coord_flip() +
+            labs(y = &quot;AUROC increase when feature is shuffled (20 iterations)&quot;, 
+                x = &quot;Features&quot;, 
+                title = glue(&quot;{cond}&quot;, cond = cond, ipt = ipt), 
+                caption = glue(&quot;Test set AUROC: {perf}&quot;, 
+                                perf = round(perf, digits = 2)), 
+                subtitle = glue(&quot;{ipt}&quot;, ipt = ipt)) + 
+            theme(legend.position = &quot;none&quot;, axis.title = element_blank()) + 
+            geom_hline(aes(yintercept = 0), col = &quot;red&quot;)
+        return(out)
+})</code></pre>
+<pre><code># A tibble: 6 × 10
+  condition        seq   input path  features        m      se        u        l
+  &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 Inflammatory bo… 16s … CBEA… /Use… alanine… -0.00312 4.57e-4 -2.66e-3 -0.00357
+2 Inflammatory bo… 16s … CBEA… /Use… fructos… -0.00300 4.24e-4 -2.58e-3 -0.00342
+3 Inflammatory bo… 16s … CBEA… /Use… pyruvic… -0.00193 9.29e-4 -9.97e-4 -0.00285
+4 Inflammatory bo… 16s … CBEA… /Use… aerobic… -0.00185 3.36e-4 -1.52e-3 -0.00219
+5 Inflammatory bo… 16s … CBEA… /Use… urocana… -0.00177 2.35e-4 -1.54e-3 -0.00201
+6 Inflammatory bo… 16s … CBEA… /Use… obligat… -0.00128 2.84e-4 -9.92e-4 -0.00156
+# … with 1 more variable: performance &lt;chr&gt;
+# A tibble: 6 × 10
+  condition        seq   input path  features        m      se        u        l
+  &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1 Inflammatory bo… 16s … PICR… /Use… UBISYN-… -0.00416 8.41e-4 -0.00332 -0.00500
+2 Inflammatory bo… 16s … PICR… /Use… PWY-585… -0.00346 7.88e-4 -0.00267 -0.00425
+3 Inflammatory bo… 16s … PICR… /Use… PWY-670… -0.00285 7.88e-4 -0.00206 -0.00363
+4 Inflammatory bo… 16s … PICR… /Use… PWY-639… -0.00281 2.59e-4 -0.00255 -0.00307
+5 Inflammatory bo… 16s … PICR… /Use… PWY-633… -0.00245 2.18e-4 -0.00223 -0.00266
+6 Inflammatory bo… 16s … PICR… /Use… PWY-585… -0.00236 7.48e-4 -0.00161 -0.00311
+# … with 1 more variable: performance &lt;chr&gt;
+# A tibble: 6 × 10
+  condition         seq     input path  features       m      se       u       l
+  &lt;chr&gt;             &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1 Colorectal cancer 16s rR… CBEA… /Use… fucose;… -0.0282 0.00212 -0.0261 -0.0303
+2 Colorectal cancer 16s rR… CBEA… /Use… no; spo… -0.0248 0.00263 -0.0222 -0.0275
+3 Colorectal cancer 16s rR… CBEA… /Use… alanina… -0.0197 0.00158 -0.0181 -0.0213
+4 Colorectal cancer 16s rR… CBEA… /Use… obligat… -0.0191 0.00299 -0.0161 -0.0221
+5 Colorectal cancer 16s rR… CBEA… /Use… maltose… -0.0191 0.00188 -0.0172 -0.0210
+6 Colorectal cancer 16s rR… CBEA… /Use… glycero… -0.0173 0.00183 -0.0154 -0.0191
+# … with 1 more variable: performance &lt;chr&gt;
+# A tibble: 6 × 10
+  condition       seq   input path  features     m    se     u     l performance
+  &lt;chr&gt;           &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;      
+1 Colorectal can… 16s … PICR… /Use… PWY-150…     0     0     0     0 0.751515   
+2 Colorectal can… 16s … PICR… /Use… PWY-380…     0     0     0     0 0.751515   
+3 Colorectal can… 16s … PICR… /Use… PWY-518…     0     0     0     0 0.751515   
+4 Colorectal can… 16s … PICR… /Use… PWY-633…     0     0     0     0 0.751515   
+5 Colorectal can… 16s … PICR… /Use… PWY-708…     0     0     0     0 0.751515   
+6 Colorectal can… 16s … PICR… /Use… PWY-729…     0     0     0     0 0.751515   </code></pre>
+<pre class="r"><code>gt &lt;- patchwork::patchworkGrob(Reduce(&quot;+&quot;, plots_list))
+
+x_axis &lt;- text_grob(&quot;Features&quot;, family = &quot;Source Sans Pro&quot;, face = &quot;bold&quot;,rot = 90)
+y_axis &lt;- text_grob(&quot;AUROC difference when feature is shuffled (20 iterations)&quot;,
+                    family = &quot;Source Sans Pro&quot;, face = &quot;bold&quot;) 
+
+feat_importance_16s &lt;- gridExtra::grid.arrange(gt, left = x_axis, 
+                        bottom = y_axis)</code></pre>
+<p><img src="figure/prediction.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggsave(feat_importance_16s, 
+       filename = here(&quot;output&quot;, &quot;figures&quot;, &quot;feat_importance_16s.png&quot;), 
+       width = 10, height = 11)  
+ggsave(feat_importance_16s, 
+       filename = here(&quot;output&quot;, &quot;figures&quot;, &quot;feat_importance_16s.eps&quot;), 
+       width = 10, height = 11, device = cairo_ps)</code></pre>
+</div>
+</div>
+<div id="copy-files" class="section level2">
+<h2>Copy files</h2>
+<pre class="r"><code>if (Sys.info()[&quot;sysname&quot;] == &quot;Darwin&quot;){
+    path_to &lt;- &quot;../../microbe_trait_manuscript/bmc_template/figures/&quot;
+}
+
+file.copy(Sys.glob(here(&quot;output&quot;, &quot;figures&quot;, &quot;*.eps&quot;)), 
+          to = path_to,
+          recursive = TRUE, overwrite = TRUE)</code></pre>
+<pre><code>[1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
+<pre class="r"><code>file.copy(Sys.glob(here(&quot;output&quot;, &quot;figures&quot;, &quot;*.png&quot;)), 
+          to = path_to,
+          recursive = TRUE, overwrite = TRUE)</code></pre>
+<pre><code>[1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.1.2 (2021-11-01)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Big Sur 10.16
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.1/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices datasets  utils     methods   base     
+
+other attached packages:
+ [1] ggpubr_0.4.0    gridExtra_2.3   patchwork_1.1.1 ggsci_2.9      
+ [5] glue_1.6.2      forcats_0.5.1   stringr_1.4.0   dplyr_1.0.8    
+ [9] purrr_0.3.4     readr_2.1.2     tidyr_1.2.0     tibble_3.1.6   
+[13] ggplot2_3.3.5   tidyverse_1.3.1 here_1.0.1     
+
+loaded via a namespace (and not attached):
+ [1] fs_1.5.2            lubridate_1.8.0     bit64_4.0.5        
+ [4] httr_1.4.2          rprojroot_2.0.2     tools_4.1.2        
+ [7] backports_1.4.1     bslib_0.3.1         utf8_1.2.2         
+[10] R6_2.5.1            DBI_1.1.2           colorspace_2.0-3   
+[13] withr_2.5.0         tidyselect_1.1.2    bit_4.0.4          
+[16] curl_4.3.2          compiler_4.1.2      git2r_0.30.1       
+[19] cli_3.2.0           rvest_1.0.2         xml2_1.3.3         
+[22] labeling_0.4.2      sass_0.4.0          scales_1.1.1       
+[25] digest_0.6.29       rmarkdown_2.14      pkgconfig_2.0.3    
+[28] htmltools_0.5.2     dbplyr_2.1.1        fastmap_1.1.0      
+[31] highr_0.9           rlang_1.0.2         readxl_1.3.1       
+[34] rstudioapi_0.13     jquerylib_0.1.4     generics_0.1.2     
+[37] farver_2.1.0        jsonlite_1.8.0      vroom_1.5.7        
+[40] car_3.0-13          magrittr_2.0.3      Rcpp_1.0.8         
+[43] munsell_0.5.0       fansi_1.0.2         abind_1.4-5        
+[46] lifecycle_1.0.1     stringi_1.7.6       whisker_0.4        
+[49] yaml_2.3.5          carData_3.0-5       grid_4.1.2         
+[52] parallel_4.1.2      promises_1.2.0.1    crayon_1.5.0       
+[55] haven_2.4.3         hms_1.1.1           knitr_1.37         
+[58] pillar_1.7.0        ggsignif_0.6.3      reprex_2.0.1       
+[61] evaluate_0.15       renv_0.15.4         BiocManager_1.30.16
+[64] modelr_0.1.8        vctrs_0.3.8         tzdb_0.2.0         
+[67] httpuv_1.6.5        cellranger_1.1.0    gtable_0.3.0       
+[70] assertthat_0.2.1    xfun_0.30           broom_0.7.12       
+[73] rstatix_0.7.0       later_1.3.0         workflowr_1.7.0    
+[76] ellipsis_0.3.2     </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

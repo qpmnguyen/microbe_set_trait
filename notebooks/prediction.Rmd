@@ -16,11 +16,15 @@ library(glue)
 library(ggsci)
 library(patchwork)
 source(here("R", "plot_utils.R"))
+library(gridExtra)
+library(ggpubr)
 
 theme_set(theme_nice())
 ```
 
 ## Plotting for predictive performance  
+
+Support link [here](https://github.com/thomasp85/patchwork/issues/150)    
 
 ```{r}
 condition <- "crc"
@@ -48,7 +52,7 @@ plot_df <- do.call(bind_rows, df_list) %>%
         facet_grid(statistic~condition, scales = "free") +
         scale_fill_npg() +
         geom_boxplot(alpha = 0.5) + geom_jitter() + 
-        labs(x = "Input types", y = "Performance", title = "Metabarcoding data set") + 
+        labs(x = "Input types", y = "Performance", title = "16S rRNA gene metabarcoding") + 
         theme(legend.position = "None")
 )
 
@@ -58,7 +62,7 @@ plot_df <- do.call(bind_rows, df_list) %>%
         facet_grid(statistic~condition, scales = "free") +
         scale_fill_npg() +
         geom_boxplot(alpha = 0.5) + geom_jitter() + 
-        labs(x = "Input types", y = "Performance", title = "Metagenomic data set") + 
+        labs(x = "Input types", y = "Performance", title = "Whole genome metagenomics") + 
         theme(legend.position = "None")
 )
 
@@ -72,66 +76,149 @@ ggsave(combo_plot, filename = here("output", "figures", "pred_performance.eps"),
 ```
 
 ## Plot feature importances  
+
 ```{r}
 annotation <- read_delim(file = "https://github.com/picrust/picrust2/raw/master/picrust2/default_files/description_mapfiles/metacyc_pathways_info.txt.gz", delim = "\t", col_names = FALSE)
 
 colnames(annotation) <- c("pathway", "annotation")
 ```
+### WGS feature importance
 
 ```{r}
 imp_files <- list.files(here("output", "pred"), pattern = "fimportance", full.names = TRUE)
 
-imp_plots <- vector(mode = "list", length = length(imp_files))
-
-for (i in seq_along(imp_files)){
-    df_identifier <- str_split(imp_files[i], "\\/")[[1]] %>% .[length(.)] %>% 
-        str_remove("fimportance_") %>% str_remove(".csv") %>% 
-        str_split("_") %>% .[[1]] %>% 
-        recode(
-            "ibd" = "Inflammatory Bowel Disease", 
-            "crc" = "Colorectal Cancer", 
-            "picrust2" = "PICRUSt2",
-            "16s" = "16s rRNA metabarcoding", 
-            "wgs" = "Whole genome Metagenomic", 
-            "trait" = "CBEA trait scores", 
-            "pathways" = "Pathway abundances"
+imp_metadata <- str_split(imp_files, "\\/") %>% 
+    map_dfr(~{
+        d_vec <- .x[length(.x)] %>% 
+            str_remove("fimportance_") %>% 
+            str_remove(".csv") %>% str_split("_") %>% .[[1]] %>% 
+            recode(
+                "ibd" = "Inflammatory bowel disease", 
+                "crc" = "Colorectal cancer", 
+                "picrust2" = "PICRUSt2 predicted abundances",
+                "16s" = "16s rRNA metabarcoding", 
+                "wgs" = "Whole genome metagenomics", 
+                "trait" = "CBEA trait scores", 
+                "pathways" = "Pathway abundances"
+            )
+        tibble(
+            condition = d_vec[1],
+            seq = d_vec[2],
+            input = d_vec[3]
         )
-    imp_df <- read_csv(imp_files[i]) 
-    plot_imp_df <- imp_df %>% select(-1) %>% 
-        select(-performance) %>% 
-        pivot_longer(everything(), names_to = "pathway") %>%
-        left_join(annotation) %>% 
-        mutate(full_name = paste(pathway, annotation, sep = "-")) %>% 
-        mutate(full_name = str_remove_all(full_name, "-NA")) %>%
-        group_by(full_name) %>% 
-        summarise(m = mean(value), sd = sd(value)) %>% 
-        arrange(m) %>% slice(1:10) %>% 
-        mutate(u = m + sd, l = m - sd)
-    
-    
-    perf <- imp_df$performance %>% unique()
-    
-    imp_plots[[i]] <- ggplot(plot_imp_df, aes(x = str_wrap(full_name, width = 30), 
-                            y = m, col = full_name)) + 
-        geom_pointrange(aes(ymin = l, ymax = u)) + 
-        coord_flip() + scale_x_discrete(expand = c(0.01,0.01)) + 
-        scale_color_npg() +
-        labs(y = "AUROC increase when feature is shuffled (20 iterations)", 
-             x = "Features", 
-             title = glue("{condition} - {sequencing}: {input}", 
-                          condition = df_identifier[1], 
-                          sequencing = df_identifier[2], 
-                          input = df_identifier[3]), 
-             subtitle = glue("Test set AUROC: {perf}", perf = round(perf,2))) + 
-        theme(legend.position = "none")
-    
-}
+    })
 
+plot_imp_df <- imp_metadata %>% mutate(path = imp_files) %>% 
+    mutate(data = map(path, ~{
+        imp_df <- read_csv(.x)
+        imp_df <- imp_df %>% select(-1) %>% 
+            select(-performance) %>% 
+            pivot_longer(everything(), names_to = "pathway") %>%
+            left_join(annotation) %>% 
+            mutate(full_name = paste(pathway, annotation, sep = "-")) %>% 
+            mutate(full_name = str_remove_all(full_name, "-NA")) %>%
+            group_by(full_name) %>% 
+            summarise(m = mean(value), 
+                      se = sd(value)/sqrt(n())) %>% 
+            arrange(m) %>% slice(1:10) %>% 
+            mutate(u = m + se, l = m - se)
+    })) %>%
+    mutate(performance = map_chr(path, ~{
+        imp_df <- read_csv(.x)
+        imp_df %>% pull(performance) %>% unique()
+    })) %>% 
+    unnest(data) %>% 
+    rename("features" = "full_name") %>% 
+    mutate(features = str_replace(features, ";", "; ") %>% str_replace_all("_", " "))
 
+wgs_imp <- plot_imp_df %>% filter(seq == "Whole genome metagenomics")
+plot_grid <- cross_df(list(
+    ipt = c("CBEA trait scores", "Pathway abundances"), 
+    cond = c("Inflammatory bowel disease", "Colorectal cancer")
+))
+plots_list <- pmap(plot_grid, function(ipt, cond, ...){
+        pltdf <- wgs_imp %>% filter(condition == {{ cond }}, 
+                           input == {{ ipt }})
+        perf <- pltdf %>% pull(performance) %>% unique() %>% as.numeric()
+        out <- ggplot(pltdf, 
+                      aes(x = str_wrap(features, width = 30), y = m)) + 
+            geom_pointrange(aes(ymin = l, ymax = u)) +
+            coord_flip() +
+            labs(y = "AUROC increase when feature is shuffled (20 iterations)", 
+                x = "Features", 
+                title = glue("{cond}", cond = cond, ipt = ipt), 
+                caption = glue("Test set AUROC: {perf}", 
+                                perf = round(perf, digits = 2)), 
+                subtitle = glue("{ipt}", ipt = ipt)) + 
+            theme(legend.position = "none", axis.title = element_blank()) + 
+            geom_hline(aes(yintercept = 0), col = "red")
+        return(out)
+})
 
+gt <- patchwork::patchworkGrob(Reduce("+", plots_list))
 
+x_axis <- text_grob("Features", family = "Source Sans Pro", face = "bold",rot = 90)
+y_axis <- text_grob("AUROC difference when feature is shuffled (20 iterations)",
+                    family = "Source Sans Pro", face = "bold") 
+
+feat_importance_wgs <- gridExtra::grid.arrange(gt, left = x_axis, 
+                        bottom = y_axis)
+
+ggsave(feat_importance_wgs, 
+       filename = here("output", "figures", "feat_importance_wgs.png"), 
+       width = 10, height = 11)  
+ggsave(feat_importance_wgs, 
+       filename = here("output", "figures", "feat_importance_wgs.eps"), 
+       width = 10, height = 11, device = cairo_ps)
 
 ```
+
+### 16S feature importance   
+
+```{r}
+metabar_imp <- plot_imp_df %>% filter(seq == "16s rRNA metabarcoding")
+plot_grid <- cross_df(list(
+    ipt = c("CBEA trait scores", "PICRUSt2 predicted abundances"), 
+    cond = c("Inflammatory bowel disease", "Colorectal cancer")
+))
+
+plots_list <- pmap(plot_grid, function(ipt, cond, ...){
+        pltdf <- metabar_imp %>% filter(condition == {{ cond }}, 
+                           input == {{ ipt }})
+        print(head(pltdf))
+        perf <- pltdf %>% pull(performance) %>% unique() %>% as.numeric()
+        out <- ggplot(pltdf, 
+                      aes(x = str_wrap(features, width = 30), y = m)) + 
+            geom_pointrange(aes(ymin = l, ymax = u)) +
+            coord_flip() +
+            labs(y = "AUROC increase when feature is shuffled (20 iterations)", 
+                x = "Features", 
+                title = glue("{cond}", cond = cond, ipt = ipt), 
+                caption = glue("Test set AUROC: {perf}", 
+                                perf = round(perf, digits = 2)), 
+                subtitle = glue("{ipt}", ipt = ipt)) + 
+            theme(legend.position = "none", axis.title = element_blank()) + 
+            geom_hline(aes(yintercept = 0), col = "red")
+        return(out)
+})
+
+gt <- patchwork::patchworkGrob(Reduce("+", plots_list))
+
+x_axis <- text_grob("Features", family = "Source Sans Pro", face = "bold",rot = 90)
+y_axis <- text_grob("AUROC difference when feature is shuffled (20 iterations)",
+                    family = "Source Sans Pro", face = "bold") 
+
+feat_importance_16s <- gridExtra::grid.arrange(gt, left = x_axis, 
+                        bottom = y_axis)
+
+ggsave(feat_importance_16s, 
+       filename = here("output", "figures", "feat_importance_16s.png"), 
+       width = 10, height = 11)  
+ggsave(feat_importance_16s, 
+       filename = here("output", "figures", "feat_importance_16s.eps"), 
+       width = 10, height = 11, device = cairo_ps)
+```
+
 
 
 ## Copy files  

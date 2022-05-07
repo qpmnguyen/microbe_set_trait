@@ -1,7 +1,6 @@
 library(phyloseq)
 library(tidyverse)
 library(glue)
-library(Maaslin2)
 
 t_test <- function(trait_data, met, outcome_var, pos_class, ret = "p.value", correction = "BH"){
     outcome <- met %>% pull(outcome_var)
@@ -66,9 +65,35 @@ assess_traits <- function(trait_data, path_data, met, ref_df, o_var, p_class, me
     return(results)
 }
 
-assess_correlation <- function(trait_data, path_data, met, ref_df, o_var, p_class, metadata, annotation){
-    ref_ids <- ref_df %>% pull(set)
-    trait_data <- trait_data %>% dplyr::select(which(colnames(trait_data) %in% ref_ids)) 
+assess_correlation <- function(trait_data, path_data, ref_df, metadata){
+    ref_ids <- ref_df %>% pull(set) %>% unique()
+    
+    common <- intersect(colnames(trait_data), ref_ids)
+
+    results <- imap(common, ~{
+        t_vec <- trait_data %>% pull(.x)
+        db_intersect <- ref_df %>% filter(set == .x) %>% pull(db)
+        db_intersect <- metadata[[db_intersect]]
+        p_df <- path_data %>% select(any_of(db_intersect))
+        if (ncol(p_df) == 0){
+            out <- tibble(trait = .x, corr = NA_real_, size = NA_real_, pathway = NA_character_)
+        } else {
+            corr <- vector(length = ncol(p_df))
+            pval <- vector(length = ncol(p_df))
+            for (i in seq_len(ncol(p_df))){
+                mod <- cor.test(x = t_vec, y = p_df[,i], method = "spearman")
+                corr[i] <- mod$estimate
+                pval[i] <- mod$p.value
+            }
+            pval <- p.adjust(pval, method = "BH")
+            out <- tibble(trait = .x, corr = corr, size = ncol(p_df), pathway = colnames(p_df), pval = pval)
+        }
+        return(out)
+    })
+    results <- do.call(bind_rows, results)
+    results <- results %>% left_join(annotation_df) %>% drop_na(corr)
+    results <- results %>% mutate(pnames = str_wrap(paste(pathway, annotation, sep = ": "), width = 20))
+    
     
     map(colnames(trait_data))
     sig_db <- ref_df %>% filter(set %in% sig_traits) %>% pull(db)
@@ -78,9 +103,21 @@ assess_correlation <- function(trait_data, path_data, met, ref_df, o_var, p_clas
     subset_metadata <- metadata[sig_db]
     retrieve_pathways <- map(subset_metadata, ~which(colnames(path_data) %in% .x))
     
+    imap(retrieve_pathways, ~{
+        if (length(.x) == 0){
+            out <- tibble(trait = .y, corr = NA_real_, size = NA_real_)
+        } else {
+            for (i in seq_along(.x)){
+                t_vec <- path_data[,.x[i]]
+                t_vec <- asin(sqrt(abs(t_vec/sum(t_vec))))
+                corr <- cor()
+            }
+        }
+    })
+    
     results <- imap(retrieve_pathways, ~{
         if (length(.x) == 0){
-            out <- tibble(trait = .y, prop = NA_real_, size = NA_real_)
+            out <- tibble(trait = .y, corr = NA_real_, size = NA_real_)
         } else {
             # per model 
             p_values <- vector(length = length(.x))

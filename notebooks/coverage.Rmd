@@ -211,13 +211,21 @@ t_coverage_plot <- ggplot(t_coverage,
                           aes(x = str_wrap(site, width = 15), y = m, fill = site)) + 
     geom_bar(stat = "identity") +
     facet_grid(seq ~ statistic, scales = "free") + 
-    labs(x = "Trait categories", y = "Mean values across sites") +
+    labs(x = "Body Site", y = "Mean values across sites") +
     scale_fill_npg() + 
-    theme(legend.position = "none", axis.title.x = element_blank(), 
-          axis.title.y = element_blank()) +
+    theme(legend.position = "none", axis.title.x = element_blank()) +
     coord_flip()
 
+combo_tc_cv <- t_coverage_plot/c_coverage_plot + plot_annotation(tag_levels = "A") &
+    theme(plot.tag = element_text(face = "bold"))
+```
 
+```{r}
+
+ggsave(combo_tc_cv, filename = here("output", "figures", "coverage_by_joint_agg.png"), 
+       width = 10, height = 9)
+ggsave(combo_tc_cv, filename = here("output", "figures", "coverage_by_joint_agg.eps"), 
+       width = 10, height = 9, device = cairo_ps)
 
 ggsave(t_coverage_plot, filename = here("output", "figures", "coverage_by_trait_agg.png"), 
        width = 10, height = 5)
@@ -228,9 +236,16 @@ ggsave(c_coverage_plot, filename = here("output", "figures", "coverage_by_categ_
        width = 10, height = 5)
 ggsave(c_coverage_plot, filename = here("output", "figures", "coverage_by_categ_agg.eps"), 
        width = 10, height = 5, device = cairo_ps)
+```
 
+
+Joining the two plots 
+
+```{r}
 
 ```
+
+
 
 
 
