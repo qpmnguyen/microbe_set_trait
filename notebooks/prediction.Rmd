@@ -18,6 +18,7 @@ library(patchwork)
 source(here("R", "plot_utils.R"))
 library(gridExtra)
 library(ggpubr)
+library(ggbeeswarm)
 
 theme_set(theme_nice())
 ```
@@ -117,11 +118,12 @@ plot_imp_df <- imp_metadata %>% mutate(path = imp_files) %>%
             left_join(annotation) %>% 
             mutate(full_name = paste(pathway, annotation, sep = "-")) %>% 
             mutate(full_name = str_remove_all(full_name, "-NA")) %>%
-            group_by(full_name) %>% 
-            summarise(m = mean(value), 
-                      se = sd(value)/sqrt(n())) %>% 
-            arrange(-m) %>% 
-            mutate(u = m + se, l = m - se)
+            group_by(full_name) #%>% 
+            #summarise(m = mean(value), 
+            #          se = sd(value)/sqrt(n())) %>% 
+            #arrange(-m) %>% 
+            #mutate(u = m + se, l = m - se)
+            #mutate(m = mean(value)) 
     })) %>%
     mutate(performance = map_chr(path, ~{
         imp_df <- read_csv(.x)
@@ -136,32 +138,34 @@ plot_grid <- cross_df(list(
     ipt = c("CBEA trait scores", "Pathway abundances"), 
     cond = c("Inflammatory bowel disease", "Colorectal cancer")
 ))
-plots_list <- pmap(plot_grid, function(ipt, cond, ...){
-        pltdf <- wgs_imp %>% filter(condition == {{ cond }}, 
-                           input == {{ ipt }}) %>% 
-            arrange(m) %>% dplyr::slice(1:10) %>% 
-            mutate(features = factor(str_wrap(features, width = 30), 
-                                     levels = str_wrap(features, width = 30)))
-        print(pltdf)
-        
-        perf <- pltdf %>% pull(performance) %>% unique() %>% as.numeric()
-        
-        out <- ggplot(pltdf, 
-                      aes(x = features, y = m)) + 
-            geom_pointrange(aes(ymin = l, ymax = u)) +
-            coord_flip() +
-            labs(y = "Feature Importance (10-fold cross validation)", 
-                x = "Features", 
-                title = glue("{cond}", cond = cond, ipt = ipt), 
-                caption = glue("Test set AUROC: {perf}", 
-                                perf = round(perf, digits = 2)), 
-                subtitle = glue("{ipt}", ipt = ipt)) + 
-            theme(legend.position = "none", axis.title = element_blank()) + 
-            geom_hline(aes(yintercept = 0), col = "red")
-        return(out)
+plot_list <- pmap(plot_grid, function(ipt, cond, ...){
+    pltdf <- wgs_imp %>% filter(condition == {{ cond }}, 
+                       input == {{ ipt }})
+    perf <- pltdf %>% pull(performance) %>% unique() %>% as.numeric()
+    feat_levels <- pltdf %>% group_by(features) %>% summarise(m = mean(value)) %>% 
+        arrange(m) %>% slice(1:10) %>% pull(features)
+    
+    pltdf <- pltdf %>% filter(features %in% feat_levels) %>%
+        group_by(features) %>% summarise(m = mean(value)) %>%
+        mutate(features = factor(str_wrap(features, width = 30), 
+                                 levels = str_wrap(feat_levels, width = 30)))
+    print(pltdf)
+    out <- ggplot(pltdf, 
+                  aes(x = features, y = m)) + 
+        #geom_pointrange(aes(ymin = l, ymax = u)) +
+        geom_bar(stat = "identity", fill = pal_npg()(1)) +
+        coord_flip() +
+        labs(y = "Feature Importance (10-fold cross validation)", 
+            x = "Features", 
+            title = glue("{cond}", cond = cond, ipt = ipt), 
+            caption = glue("Test set AUROC: {perf}", 
+                            perf = round(perf, digits = 2)), 
+            subtitle = glue("{ipt}", ipt = ipt)) + 
+        theme(legend.position = "none", axis.title = element_blank()) 
+    return(out)
 })
 
-gt <- patchwork::patchworkGrob(Reduce("+", plots_list))
+gt <- patchwork::patchworkGrob(Reduce("+", plot_list))
 
 x_axis <- text_grob("Features", family = "Source Sans Pro", face = "bold",rot = 90)
 y_axis <- text_grob("Feature importance (10-fold cross-validation)",
@@ -189,25 +193,30 @@ plot_grid <- cross_df(list(
 ))
 
 plots_list <- pmap(plot_grid, function(ipt, cond, ...){
-        pltdf <- metabar_imp %>% filter(condition == {{ cond }}, 
-                           input == {{ ipt }}) %>% 
-            arrange(m) %>% dplyr::slice(1:10) %>% 
-            mutate(features = factor(str_wrap(features, width = 30), 
-                                     levels = str_wrap(features, width = 30)))
-        perf <- pltdf %>% pull(performance) %>% unique() %>% as.numeric()
-        out <- ggplot(pltdf, 
-                      aes(x = features, y = m)) + 
-            geom_pointrange(aes(ymin = l, ymax = u)) +
-            coord_flip() +
-            labs(y = "Feature importance (10-fold cross-validation)", 
-                x = "Features", 
-                title = glue("{cond}", cond = cond, ipt = ipt), 
-                caption = glue("Test set AUROC: {perf}", 
-                                perf = round(perf, digits = 2)), 
-                subtitle = glue("{ipt}", ipt = ipt)) + 
-            theme(legend.position = "none", axis.title = element_blank()) + 
-            geom_hline(aes(yintercept = 0), col = "red")
-        return(out)
+    pltdf <- metabar_imp %>% filter(condition == {{ cond }}, 
+                       input == {{ ipt }})
+    perf <- pltdf %>% pull(performance) %>% unique() %>% as.numeric()
+    feat_levels <- pltdf %>% group_by(features) %>% summarise(m = mean(value)) %>% 
+        arrange(m) %>% slice(1:10) %>% pull(features)
+    
+    pltdf <- pltdf %>% filter(features %in% feat_levels) %>%
+        group_by(features) %>% summarise(m = mean(value)) %>%
+        mutate(features = factor(str_wrap(features, width = 30), 
+                                 levels = str_wrap(feat_levels, width = 30)))
+    
+    out <- ggplot(pltdf, 
+                  aes(x = features, y = m)) + 
+        #geom_pointrange(aes(ymin = l, ymax = u)) +
+        geom_bar(stat = "identity", fill = pal_npg()(1)) +
+        coord_flip() +
+        labs(y = "Feature importance (10-fold cross-validation)", 
+            x = "Features", 
+            title = glue("{cond}", cond = cond, ipt = ipt), 
+            caption = glue("Test set AUROC: {perf}", 
+                            perf = round(perf, digits = 2)), 
+            subtitle = glue("{ipt}", ipt = ipt)) + 
+        theme(legend.position = "none", axis.title = element_blank()) 
+    return(out)
 })
 
 gt <- patchwork::patchworkGrob(Reduce("+", plots_list))
@@ -233,7 +242,7 @@ ggsave(feat_importance_16s,
 
 ```{r}
 if (Sys.info()["sysname"] == "Darwin"){
-    path_to <- "../../microbe_trait_manuscript/bmc_template/figures/"
+    path_to <- "../../microbe_trait_manuscript/figures/"
 }
 
 file.copy(Sys.glob(here("output", "figures", "*.eps")), 
