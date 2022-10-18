@@ -1,0 +1,22 @@
+---
+title: "Database statistics"
+author: "Quang Nguyen"
+format: html
+editor: visual
+---
+
+# Database description
+
+## Loading libraries
+
+Loading requisite libraries
+
+```{r}
+library(here)
+library(flextable)
+library(tidyverse)
+```
+
+```{r}
+db <- readRDS(here("output/databases/db_merged.rds"))
+```
