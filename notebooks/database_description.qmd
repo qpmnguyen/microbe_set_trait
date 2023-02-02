@@ -1,7 +1,9 @@
 ---
 title: "Database statistics"
 author: "Quang Nguyen"
-format: html
+format: 
+    html:
+        toc: true
 editor: visual
 ---
 
@@ -12,11 +14,27 @@ editor: visual
 Loading requisite libraries
 
 ```{r}
+#| message: false
 library(here)
 library(flextable)
 library(tidyverse)
 ```
 
 ```{r}
-db <- readRDS(here("output/databases/db_merged.rds"))
+db <- readRDS(here("output", "databases", "db_merged.rds"))
+db_nested <- db %>% 
+    nest(taxonomic = c(species_tax_id, genus_tax_id)) %>% 
+    mutate(pathways = if_else(pathways == "NA", 
+                              NA_character_, pathways)) %>%
+    mutate(substrate = if_else(substrate == "NA", NA_character_, 
+                               substrate))
+test <- db_nested %>% select(metabolism, taxonomic) %>% drop_na() %>%
+    group_by(metabolism) %>% 
+    summarise(taxonomic = list(bind_rows(taxonomic))) %>% ungroup() %>% 
+    mutate(count_species = map_dbl(taxonomic, 
+                               ~ length(unique(na.omit(.x$species_tax_id))))) %>%
+    mutate(count_genus = map_dbl(taxonomic, 
+                                 ~ length(unique(na.omit(.x$genus_tax_id)))))
+
+
 ```
