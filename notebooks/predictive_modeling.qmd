@@ -1,0 +1,8 @@
+---
+title: "Predictive Modelling"
+format: html
+editor: visual
+date: last-updated
+---
+
+# Load packages 

@@ -31,3 +31,5 @@ _targets_r/
 hmp_metadata
 *.log
 sequence-*.qza
+
+/.quarto/
