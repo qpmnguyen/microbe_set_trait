@@ -2,7 +2,15 @@
 title: "Predictive Modelling"
 format: html
 editor: visual
-date: last-updated
+date: last-modified
 ---
 
-# Load packages 
+# Summary
+
+This notebook documents approaches to predicting outcomes using set-based trait features with publicly available microbiome data sets. We're not interested in surveying which method is the best, but rather to compare across different (but related) feature sets within a similar approach. As such, we did not tune the hyperparameters of the random forest but rather using standardized parameter setups.
+
+# Loading packages 
+
+```{r}
+
+```

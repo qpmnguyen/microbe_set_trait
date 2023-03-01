@@ -18,6 +18,8 @@ Loading requisite libraries
 library(here)
 library(flextable)
 library(tidyverse)
+library(here)
+library(xtable)
 ```
 
 ```{r}
@@ -37,4 +39,22 @@ test <- db_nested %>% select(metabolism, taxonomic) %>% drop_na() %>%
                                  ~ length(unique(na.omit(.x$genus_tax_id)))))
 
 
+db_nested |> slice(1:20) |>
+    pivot_longer(cols =  c(metabolism, gram_stain, pathways, substrate, sporulation, motility, cell_shape)) |> drop_na(value) |>
+    group_by(name) |>
+    summarise(total_traits = n_distinct(value),
+              taxonomic = list(taxonomic)) |>
+    mutate(n_species = map_dbl(taxonomic, ~{
+        bind_rows(.x) |> pull(species_tax_id) |> n_distinct()
+    })) |> 
+    mutate(n_genus = map_dbl(taxonomic, ~{
+        bind_rows(.x) |> pull(genus_tax_id) |> n_distinct()
+    })) |> 
+    select(-taxonomic) |>
+    xtable::xtable() |> print()
+
+
+
 ```
+
+\|

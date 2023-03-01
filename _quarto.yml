@@ -1,5 +1,6 @@
 project:
   title: "microbe_set_trait"
+  output-dir: "outputs"
 
 
 
