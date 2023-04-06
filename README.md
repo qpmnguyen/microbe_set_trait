@@ -1,6 +1,8 @@
 # Reproducible analyses for untitled manuscript on trait-based taxon sets.  
 # Quang Nguyen   
 
+[![DOI](https://zenodo.org/badge/404866966.svg)](https://zenodo.org/badge/latestdoi/404866966)  
+
 ## Dependency management 
 
 All R analyses were performed under R version 4.1.2 and the corresponding Bioconductor version 3.14. Specific package versions are managed via `renv` and details can be found in the corresponding `renv.lock` file.  
