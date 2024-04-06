@@ -30,16 +30,7 @@ db_nested <- db %>%
                               NA_character_, pathways)) %>%
     mutate(substrate = if_else(substrate == "NA", NA_character_, 
                                substrate))
-test <- db_nested %>% select(metabolism, taxonomic) %>% drop_na() %>%
-    group_by(metabolism) %>% 
-    summarise(taxonomic = list(bind_rows(taxonomic))) %>% ungroup() %>% 
-    mutate(count_species = map_dbl(taxonomic, 
-                               ~ length(unique(na.omit(.x$species_tax_id))))) %>%
-    mutate(count_genus = map_dbl(taxonomic, 
-                                 ~ length(unique(na.omit(.x$genus_tax_id)))))
-
-
-db_nested |> slice(1:20) |>
+db_table <- db_nested |>
     pivot_longer(cols =  c(metabolism, gram_stain, pathways, substrate, sporulation, motility, cell_shape)) |> drop_na(value) |>
     group_by(name) |>
     summarise(total_traits = n_distinct(value),
@@ -50,11 +41,13 @@ db_nested |> slice(1:20) |>
     mutate(n_genus = map_dbl(taxonomic, ~{
         bind_rows(.x) |> pull(genus_tax_id) |> n_distinct()
     })) |> 
-    select(-taxonomic) |>
-    xtable::xtable() |> print()
+    select(-taxonomic) |> 
+    arrange(total_traits, n_species, n_genus)
 
+flextable(db_table)
 
 
 ```
 
-\|
+A total of `r db_nested |> pull(taxonomic) |> bind_rows() |> pull(species_tax_id) |> n_distinct()` species and `r db_nested |> pull(taxonomic) |> bind_rows() |> pull(genus_tax_id) |> n_distinct()`
+was assigned.  
